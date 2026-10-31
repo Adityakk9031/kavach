@@ -8,15 +8,19 @@ from contextlib import asynccontextmanager
 from importlib.metadata import version
 from pathlib import Path
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import RedirectResponse
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi.responses import FileResponse, PlainTextResponse, RedirectResponse
+from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
 
 from app.call_room import ROLES, Peer, RoomRegistry
 from app.config import get_settings
 from app.detector import Detector
 from app.llm import LLM
+from app import report as report_mod
+from app.alerts import Alerter, CallAlerts
 from app.evidence import EvidenceCollector
+from app.finalize import make_finalize
 from app.persona import Persona
 from app.pipeline import CallPipeline
 from app.store import Store
@@ -25,6 +29,9 @@ from app.tts import TtsPool
 from app.warner import Warner
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+# httpx logs every request URL at INFO, and the Telegram bot token is part of its URL: keep those lines out of logs.
+for _noisy in ("httpx", "httpcore"):
+    logging.getLogger(_noisy).setLevel(logging.WARNING)
 
 settings = get_settings()
 store = Store(settings.db_path)
@@ -43,6 +50,7 @@ detector = Detector(settings, llm)
 tts_pool = TtsPool(settings)
 warner = Warner(settings, tts_pool)
 persona = Persona(settings, llm, tts_pool)
+alerter = Alerter(settings)
 
 
 def attach_pipeline(room) -> None:
@@ -52,6 +60,9 @@ def attach_pipeline(room) -> None:
             warner.attach(room, room.pipeline)
         persona.attach(room)
         room.evidence = EvidenceCollector(room, llm, settings.persona_model, room.pipeline)
+        room.alerts = CallAlerts(alerter, room, room.pipeline, room.persona, settings.max_alerts_per_call)
+
+        room.finalize_hooks.append(make_finalize(room, store, settings))
 
 
 rooms = RoomRegistry(stt_factory, store, settings.sample_rate, on_new_room=attach_pipeline)
@@ -84,6 +95,7 @@ async def lifespan(_app):
     yield
     task.cancel()
     await tts_pool.close()
+    await alerter.aclose()
     await llm.aclose()
 
 
@@ -143,6 +155,44 @@ def eval_script(script_id: str):
     return json.loads(path.read_text()) if path.exists() else {"error": "not found"}
 
 
+class ReportAnswers(BaseModel):
+    money_shared: bool | None = None
+    otp_shared: bool | None = None
+    notes: str = ""
+
+
+@app.post("/api/calls/{call_id}/report")
+def update_report(call_id: str, answers: ReportAnswers):
+    """The user answers the two questions only they can answer; the draft is rebuilt with their answers."""
+    if not store.query("SELECT 1 FROM calls WHERE id=?", (call_id,)):
+        raise HTTPException(404, "unknown call")
+    store.update_call(call_id, money_shared=None if answers.money_shared is None else int(answers.money_shared),
+                      otp_shared=None if answers.otp_shared is None else int(answers.otp_shared))
+    r, md, pdf = report_mod.generate(store, call_id, settings.reports_dir, notes=answers.notes[:1000])
+    return {"md": f"/api/calls/{call_id}/report.md", "pdf": f"/api/calls/{call_id}/report.pdf", "missing": r.missing}
+
+
+@app.get("/api/calls/{call_id}/report.md")
+def report_md(call_id: str):
+    row = store.query("SELECT report_md_path FROM calls WHERE id=?", (call_id,))
+    if not row or not row[0]["report_md_path"]:
+        raise HTTPException(404, "no report for this call")
+    return PlainTextResponse(Path(row[0]["report_md_path"]).read_text(), media_type="text/markdown; charset=utf-8")
+
+
+@app.get("/api/calls/{call_id}/report.pdf")
+def report_pdf(call_id: str):
+    row = store.query("SELECT report_pdf_path FROM calls WHERE id=?", (call_id,))
+    if not row or not row[0]["report_pdf_path"]:
+        raise HTTPException(404, "no report for this call")
+    return FileResponse(row[0]["report_pdf_path"], media_type="application/pdf", filename=f"kavach-complaint-{call_id}.pdf")
+
+
+@app.get("/api/calls/{call_id}/evidence")
+def call_evidence(call_id: str) -> list[dict]:
+    return store.query("SELECT type, value, normalized, quote, ts_ms FROM evidence WHERE call_id=? AND valid=1 ORDER BY id", (call_id,))
+
+
 @app.get("/api/calls/{call_id}/events")
 def call_events(call_id: str) -> list[dict]:
     return store.events(call_id)
@@ -154,14 +204,18 @@ def call_turns(call_id: str) -> list[dict]:
 
 
 @app.websocket("/ws/call/{call_id}/{role}")
-async def call_socket(ws: WebSocket, call_id: str, role: str, caller_number: str | None = None):
+async def call_socket(ws: WebSocket, call_id: str, role: str, caller_number: str | None = None, mode: str | None = None):
     """One tab of the call. Binary in = PCM from the mic; text in = JSON control messages."""
     if role not in ROLES:
         await ws.close(code=1008, reason="role must be caller or receiver")
         return
     await ws.accept()
+    done = store.query("SELECT 1 FROM calls WHERE id=? AND ended_at IS NOT NULL", (call_id,))
+    if done:  # reusing an id would mix two calls in one report
+        await ws.close(code=4409, reason="This call has ended. Use a new call id.")
+        return
     room = rooms.get(call_id)
-    await room.join(role, ws, caller_number=caller_number)
+    await room.join(role, ws, caller_number=caller_number, mode=mode)
     try:
         while True:
             msg = await ws.receive()
@@ -176,6 +230,10 @@ async def call_socket(ws: WebSocket, call_id: str, role: str, caller_number: str
     finally:
         if room.parties.get(role) and room.parties[role].ws is ws:
             await room.leave(role)
+            # A tab that closes or crashes without "Hang up" still ends the call: the report and the family's
+            # call-end message must not depend on the user pressing a button.
+            if role == "caller" or not room.parties:
+                asyncio.create_task(room.end())
 
 
 async def handle_control(room, role: str, msg: dict) -> None:
@@ -193,14 +251,19 @@ async def handle_control(room, role: str, msg: dict) -> None:
 async def events_socket(ws: WebSocket, call_id: str):
     """Read-only event stream for the dashboard."""
     await ws.accept()
-    room = rooms.get(call_id)
     peer = Peer(ws)
-    room.listeners.add(peer)
-    await peer.send_text(json.dumps({"type": "presence", "parties": sorted(room.parties), "call_id": call_id}))
+    room = rooms.rooms.get(call_id)  # a viewer never creates a call (no workers, no DB row)
+    if room is not None and not room.ended:
+        room.listeners.add(peer)
+        await peer.send_text(json.dumps({"type": "presence", "parties": sorted(room.parties), "call_id": call_id}))
+    else:
+        rooms.waiting.setdefault(call_id, set()).add(peer)  # attached when the call starts
     try:
         while True:
             await ws.receive_text()
     except WebSocketDisconnect:
         pass
     finally:
-        room.listeners.discard(peer)
+        if room is not None:
+            room.listeners.discard(peer)
+        rooms.waiting.get(call_id, set()).discard(peer)

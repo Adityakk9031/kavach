@@ -169,7 +169,14 @@ class EvidenceCollector:
                 self.room.log_event("evidence_llm_error", {"turn_idx": turn["idx"], "error": str(e)[:160]})
         new = []
         for it in found:
-            if it.key in self.items:
+            old = self.items.get(it.key)
+            if old is not None:
+                if it.valid and not old["valid"]:  # a hallucinated value later stated for real: keep the real one
+                    old.update(valid=True, quote=it.quote[:200], source=it.source, turn_idx=turn["idx"],
+                               ts_ms=turn.get("audio_end_ms"))
+                    self.room.store._exec("UPDATE evidence SET valid=1, quote=?, turn_id=?, ts_ms=? WHERE call_id=? AND type=? AND normalized=?",
+                                          (old["quote"], turn.get("turn_id"), old["ts_ms"], self.room.call_id, it.type, it.key[1]))
+                    new.append(old)
                 continue
             row = {"type": it.type, "value": it.value, "normalized": it.key[1], "quote": it.quote[:200],
                    "source": it.source, "valid": it.valid, "turn_idx": turn["idx"], "ts_ms": turn.get("audio_end_ms")}

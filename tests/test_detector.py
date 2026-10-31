@@ -186,3 +186,54 @@ async def test_chat_json_falls_back_after_primary_fails_twice(monkeypatch):
     out, _, model = await llm.chat_json(Out, [{"role": "user", "content": "x"}], model="primary", fallback_model="slow")
     await llm.aclose()
     assert out.ok == 2 and model == "slow" and calls == ["primary", "primary", "slow"]
+
+
+async def test_rate_limiter_fail_fast_for_call_path():
+    from app.llm import LLMError, RateLimiter
+
+    rl = RateLimiter(max_requests=1, max_tokens=1000, window=30)
+    await rl.acquire(10)
+    with pytest.raises(LLMError, match="local rate budget"):
+        await rl.acquire(10, max_wait=0.5)  # the detector never queues behind a full budget
+
+
+async def test_chat_json_total_deadline_covers_retries_and_fallback(monkeypatch):
+    import asyncio
+
+    from pydantic import BaseModel
+
+    from app.llm import LLMError
+
+    class Out(BaseModel):
+        ok: int
+
+    llm = LLM(get_settings())
+
+    async def slow(model, messages, **kw):
+        await asyncio.sleep(5)
+        return '{"ok": 1}', 1
+
+    monkeypatch.setattr(llm, "chat", slow)
+    t0 = asyncio.get_event_loop().time()
+    with pytest.raises(LLMError, match="total time limit"):
+        await llm.chat_json(Out, [{"role": "user", "content": "x"}], model="a", fallback_model="b", total_timeout=0.3)
+    assert asyncio.get_event_loop().time() - t0 < 1.0
+    await llm.aclose()
+
+
+async def test_malformed_provider_body_is_a_retryable_bad_reply_not_a_crash(monkeypatch):
+    from pydantic import BaseModel
+
+    class Out(BaseModel):
+        ok: int
+
+    llm = LLM(get_settings())
+    replies = iter(['{"ok": null}', '{"ok": 3}'])
+
+    async def fake_chat(model, messages, **kw):
+        return next(replies), 1
+
+    monkeypatch.setattr(llm, "chat", fake_chat)
+    out, _, _ = await llm.chat_json(Out, [{"role": "user", "content": "x"}], model="a")
+    assert out.ok == 3  # the null was treated as bad JSON and retried
+    await llm.aclose()

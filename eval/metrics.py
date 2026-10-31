@@ -16,12 +16,14 @@ def rate(num: int, den: int) -> float | None:
     return None if den == 0 else num / den
 
 
-def compute(results: list[dict]) -> dict:
+def compute(results: list[dict], expected: int | None = None) -> dict:
+    """Errored calls count against us: a scam that errored is a miss; an errored negative is excluded from the
+    false-alarm rates (we do not know what it would have done) and reported in n_errors."""
     scams = [r for r in results if r["label"] == "scam"]
-    legit = [r for r in results if r["category"] == "legit"]
-    hard = [r for r in results if r["category"] == "hard_negative"]
+    legit = [r for r in results if r["category"] == "legit" and not r.get("error")]
+    hard = [r for r in results if r["category"] == "hard_negative" and not r.get("error")]
     negatives = legit + hard
-    caught = [r for r in scams if r["triggered"]]
+    caught = [r for r in scams if r["triggered"] and not r.get("error")]
     with_warning = [r for r in caught if r.get("decisive_to_warning_s") is not None]
     d2w = [r["decisive_to_warning_s"] for r in with_warning]
     ttfa = [r["tts_ttfa_ms"] for r in caught if r.get("tts_ttfa_ms") is not None]
@@ -32,7 +34,8 @@ def compute(results: list[dict]) -> dict:
     fp = sum(r["triggered"] for r in negatives)
     tn = len(negatives) - fp
     return {
-        "n_calls": len(results), "n_scam": len(scams), "n_legit": len(legit), "n_hard_negative": len(hard),
+        "n_calls": len(results), "n_expected": expected if expected is not None else len(results),
+        "n_errors": sum(1 for r in results if r.get("error")), "n_scam": len(scams), "n_legit": len(legit), "n_hard_negative": len(hard),
         "recall": rate(tp, len(scams)),
         "fpr_legit": rate(sum(r["triggered"] for r in legit), len(legit)),
         "fpr_hard_negative": rate(sum(r["triggered"] for r in hard), len(hard)),

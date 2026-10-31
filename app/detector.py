@@ -101,7 +101,7 @@ class Decision:
 class RiskTracker:
     """Cumulative risk: rises fast toward a higher LLM score, decays slowly when the LLM score is lower."""
 
-    def __init__(self, threshold: int = 70, rise: float = 0.7, decay: float = 4.0):
+    def __init__(self, threshold: int = 60, rise: float = 0.7, decay: float = 4.0):
         self.threshold, self.rise, self.decay = threshold, rise, decay
         self.risk = 0.0
         self.stages: set[str] = set()
@@ -145,7 +145,8 @@ class Detector:
         return await self.llm.chat_json(
             Detection, messages, model=self.settings.detector_model,
             fallback_model=self.settings.detector_fallback_model, max_tokens=200,
-            timeout=self.settings.detector_timeout_s,
+            timeout=self.settings.detector_timeout_s, lane="detector", max_wait=1.0,
+            total_timeout=self.settings.detector_total_s,
         )
 
     async def process(self, tracker: RiskTracker, window: list[dict]) -> tuple[Decision | None, dict]:

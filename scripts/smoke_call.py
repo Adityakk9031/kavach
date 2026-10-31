@@ -115,7 +115,7 @@ async def main(base: str, call_id: str) -> int:
     ws_base = base.replace("http", "ws", 1)
     finals: list = []
     status: dict = {}
-    async with websockets.connect(f"{ws_base}/ws/call/{call_id}/caller?caller_number=%2B919876543210") as caller, \
+    async with websockets.connect(f"{ws_base}/ws/call/{call_id}/caller?mode=eval&caller_number=%2B919876543210") as caller, \
                websockets.connect(f"{ws_base}/ws/call/{call_id}/receiver") as receiver:
         counts: dict = {}
         reader = asyncio.create_task(collect(receiver, finals, status, counts))

@@ -29,6 +29,21 @@
       <strong id="warnTitle"></strong>
       <p id="warnText" class="muted"></p>
     </section>
+    <section class="panel" id="reportBox" hidden>
+      <strong>Complaint draft ready</strong>
+      <p class="muted">This is a draft for you to review. Kavach never submits anything: file it yourself at cybercrime.gov.in or call 1930.</p>
+      <div class="row">
+        <label>Did you send any money? <select id="moneyShared"><option value="">Not answered yet</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>Did you share an OTP, PIN or card details? <select id="otpShared"><option value="">Not answered yet</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+      </div>
+      <p><label>Anything to add (optional)<br><input type="text" id="reportNotes" style="width:100%" maxlength="500"></label></p>
+      <div class="row">
+        <button class="primary" id="saveReport">Save answers and update draft</button>
+        <a id="reportPdf" target="_blank">Open PDF</a>
+        <a id="reportMd" target="_blank">Open Markdown</a>
+      </div>
+      <p class="muted" id="reportMissing"></p>
+    </section>
     <section class="panel" id="personaBox" hidden>
       <strong id="personaTitle">Kavach is on the call</strong>
       <p id="personaText" class="muted"></p>
@@ -55,6 +70,21 @@
     const $ = (id) => document.getElementById(id);
     let call, player, mic;
     const seenEvidence = new Set();
+
+    function showReport(report) {
+      $('reportBox').hidden = false;
+      $('reportPdf').href = report.pdf;
+      $('reportMd').href = report.md;
+      $('saveReport').onclick = async () => {
+        const yn = (id) => ({ yes: true, no: false }[$(id).value] ?? null);
+        const r = await fetch(report.md.replace('/report.md', '/report'), {
+          method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ money_shared: yn('moneyShared'), otp_shared: yn('otpShared'), notes: $('reportNotes').value }),
+        });
+        const d = await r.json();
+        $('reportMissing').textContent = r.ok ? 'Draft updated. ' + (d.missing || []).join(' ') : 'Could not update the draft.';
+      };
+    }
 
     function addEvidence(items) {
       $('evidenceBox').hidden = false;
@@ -113,12 +143,13 @@
         onEvent(ev) {
           if (sv.handle(ev) || dv.handle(ev)) return;
           if (ev.type === 'transcript') tv.show(ev);
+          else if (ev.type === 'call_rejected') $('status').textContent = ev.reason + ' Open a new call from the start page.';
           else if (ev.type === 'flush_playback') player.flush(ev.source);
           else if (ev.type === 'warning') showWarning(ev);
           else if (ev.type === 'takeover') showTakeover(ev.state === 'on');
           else if (ev.type === 'persona' && ev.text) { $('personaBox').hidden = false; $('personaText').textContent = 'Kavach says: ' + ev.text; }
           else if (ev.type === 'evidence') addEvidence(ev.items);
-          else if (ev.type === 'call_ended') $('status').textContent = 'Call ended.';
+          else if (ev.type === 'call_ended') { $('status').textContent = 'Call ended.'; if (ev.report) showReport(ev.report); }
         },
         onAudio(source, pcm) { player.play(source, pcm); },
       });

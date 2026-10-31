@@ -55,6 +55,7 @@
         onEvent(ev) {
           if (sv.handle(ev)) return;
           if (ev.type === 'transcript') tv.show(ev);
+          else if (ev.type === 'call_rejected') $('status').textContent = ev.reason + ' Open a new call from the start page.';
           else if (ev.type === 'flush_playback') player.flush(ev.source);
           else if (ev.type === 'call_ended') $('status').textContent = 'Call ended.';
         },

@@ -76,7 +76,7 @@ async def run_call(base: str, call_id: str, script: dict, rate: int) -> dict:
             elif ev["type"] == "call_ended":
                 return
 
-    async with websockets.connect(f"{ws_base}/ws/call/{call_id}/caller?caller_number=" + script["caller_number"].replace("+", "%2B").replace(" ", "")) as caller, \
+    async with websockets.connect(f"{ws_base}/ws/call/{call_id}/caller?mode=eval&caller_number=" + script["caller_number"].replace("+", "%2B").replace(" ", "")) as caller, \
                websockets.connect(f"{ws_base}/ws/call/{call_id}/receiver") as receiver:
         reader = asyncio.create_task(receiver_reader(receiver))
         cdrain = asyncio.create_task(drain(caller))
@@ -106,6 +106,14 @@ async def run_call(base: str, call_id: str, script: dict, rate: int) -> dict:
     return score(script, timing, marks, events, turns, warning_states)
 
 
+def map_to_script_turn(caller_turns: list[dict], audio_end_ms: float) -> int:
+    """The script turn the STT final belongs to. STT can split or merge turns, so match by the interval the final's
+    end falls in (small tolerance for STT timing), not by the nearest turn end, which could credit an earlier turn."""
+    inside = [t for t in caller_turns if t["start_ms"] - 400 <= audio_end_ms <= t["end_ms"] + 700]
+    pool = inside or caller_turns
+    return min(pool, key=lambda t: abs(t["end_ms"] - audio_end_ms))["i"]
+
+
 def score(script: dict, timing: dict, marks: dict, events: list[dict], turns: list[dict], warning_states: list[str]) -> dict:
     by: dict[str, list[dict]] = {}
     for e in events:
@@ -116,7 +124,7 @@ def score(script: dict, timing: dict, marks: dict, events: list[dict], turns: li
     if trigger:
         row = next((t for t in turns if t["channel"] == "caller" and t["idx"] == trigger["turn_idx"]), None)
         if row and row["audio_end_ms"] is not None:  # caller-channel clock == script timeline (both start at t0)
-            trigger_script_turn = min(caller_turns, key=lambda t: abs(t["end_ms"] - row["audio_end_ms"]))["i"]
+            trigger_script_turn = map_to_script_turn(caller_turns, row["audio_end_ms"])
     warn_s = (marks["first_warning"] - marks["t0"]) if "first_warning" in marks else None
     dec = script["decisive_turn_index"]
     dec_end_s = timing["turns"][dec]["end_ms"] / 1000 if dec is not None else None
@@ -148,20 +156,65 @@ def score(script: dict, timing: dict, marks: dict, events: list[dict], turns: li
     }
 
 
+def error_row(script: dict, why: str) -> dict:
+    """A call that crashed or had no audio still counts: as a miss if it was a scam, and it blocks 'finished'."""
+    return {"id": script["id"], "label": script["label"], "category": script["category"], "scam_type": script["scam_type"],
+            "subtype": script["subtype"], "split": script["split"], "decisive_turn_index": script["decisive_turn_index"],
+            "first_s5_s6_turn_index": script["first_s5_s6_turn_index"], "triggered": False, "error": why,
+            "decisive_to_warning_s": None, "caught_before_s5s6": None, "max_risk": 0, "detections": [],
+            "stt_finals": [], "stt_incidents": 0, "detect_errors": 0}
+
+
+def rescore(run_file: Path) -> None:
+    """Recompute each call's trigger->script-turn mapping from the stored events (no server, no API) and fix the
+    metrics. Used to hold an already-finished run to the current mapping rule."""
+    from app.store import Store
+    S = get_settings()
+    st = Store(S.db_path)
+    data = json.loads(run_file.read_text())
+    changed = []
+    for r in data["results"]:
+        if r.get("error") or not r["triggered"]:
+            continue
+        cid = f"{data['run_id']}-{r['id']}"
+        timing = json.loads((AUDIO / f"{r['id']}.timing.json").read_text())
+        trig = [e for e in st.events(cid) if e["type"] == "trigger"]
+        turns = st.turns(cid)
+        if not trig:
+            continue
+        row = next((t for t in turns if t["channel"] == "caller" and t["idx"] == trig[0]["payload"]["turn_idx"]), None)
+        if not row or row["audio_end_ms"] is None:
+            continue
+        new = map_to_script_turn([t for t in timing["turns"] if t["speaker"] == "caller"], row["audio_end_ms"])
+        if new != r["trigger_script_turn"]:
+            changed.append((r["id"], r["trigger_script_turn"], new))
+            r["trigger_script_turn"] = new
+            s56 = r["first_s5_s6_turn_index"]
+            r["caught_before_s5s6"] = (new < s56) if s56 is not None else None
+    data["metrics"] = compute(data["results"])
+    data["rescored"] = True
+    run_file.write_text(json.dumps(data, indent=1))
+    print(f"rescored {run_file.name}: {len(changed)} trigger mapping(s) changed {changed}")
+
+
 async def main(a) -> int:
+    if a.rescore:
+        rescore(RESULTS / a.rescore)
+        return 0
     S = get_settings()
     RESULTS.mkdir(exist_ok=True)
     run_id = a.run_id or time.strftime("%Y%m%d-%H%M%S")
     path = RESULTS / f"{a.split}-{run_id}.json"
     scripts = [json.loads(p.read_text()) for p in sorted(SCRIPTS.glob("*.json"))]
-    scripts = [s for s in scripts if s["split"] == a.split and (AUDIO / f"{s['id']}.timing.json").exists()]
+    scripts = [s for s in scripts if s["split"] == a.split]  # EVERY script of the split is expected
     if a.ids:
         scripts = [s for s in scripts if s["id"] in a.ids]
     if a.limit:
         scripts = scripts[:a.limit]
+    expected = len(scripts)
     results = []
     if path.exists():
-        results = json.loads(path.read_text())["results"]
+        results = [r for r in json.loads(path.read_text())["results"] if not r.get("error")]  # failed ones are retried
     done = {r["id"] for r in results}
     async with httpx.AsyncClient(timeout=10) as c:
         cfg = (await c.get(f"{a.base}/api/config")).json()
@@ -174,23 +227,36 @@ async def main(a) -> int:
         if wait > 0:
             await asyncio.sleep(wait)
         last_start = time.monotonic()
-        try:
-            r = await run_call(a.base, f"{run_id}-{script['id']}", script, S.sample_rate)
-        except Exception as e:
-            print(f"  [{n}/{len(scripts)}] {script['id']}: ERROR {type(e).__name__}: {e}")
-            continue
+        if not (AUDIO / f"{script['id']}.timing.json").exists():
+            r = error_row(script, "no rendered audio")
+        else:
+            try:
+                r = await run_call(a.base, f"{run_id}-{script['id']}", script, S.sample_rate)
+            except Exception as e:
+                r = error_row(script, f"{type(e).__name__}: {e}")
+        if r.get("error"):
+            print(f"  [{n}/{len(scripts)}] {script['id']}: ERROR {r['error']}  (counted: a missed scam / excluded negative)")
         results.append(r)
+        if r.get("error"):
+            path.write_text(json.dumps({"run_id": run_id, "split": a.split, "config": cfg, "metrics": compute(results, expected),
+                                        "finished": False, "results": results}, indent=1))
+            continue
         flag = "TRIGGER" if r["triggered"] else "quiet  "
         print(f"  [{n}/{len(scripts)}] {r['id']:<40} {r['label']:5} {flag} risk {r['max_risk']:>5} "
               f"d2w={r['decisive_to_warning_s']} before_s5s6={r['caught_before_s5s6']}")
-        path.write_text(json.dumps({"run_id": run_id, "split": a.split, "config": cfg, "metrics": compute(results),
-                                    "finished": False, "results": results}, indent=1))
-    out = {"run_id": run_id, "split": a.split, "config": cfg, "metrics": compute(results), "finished": True,
+        path.write_text(json.dumps({"run_id": run_id, "split": a.split, "config": cfg,
+                                    "metrics": compute(results, expected), "finished": False, "results": results}, indent=1))
+    complete = len(results) == expected and not any(r.get("error") for r in results)
+    out = {"run_id": run_id, "split": a.split, "config": cfg, "metrics": compute(results, expected), "finished": complete,
            "results": results}
     path.write_text(json.dumps(out, indent=1))
-    (RESULTS / f"latest-{a.split}.json").write_text(json.dumps(out, indent=1))
+    if complete:  # only a complete run becomes the one the scoreboard shows
+        (RESULTS / f"latest-{a.split}.json").write_text(json.dumps(out, indent=1))
+    else:
+        print(f"INCOMPLETE: {len(results)} of {expected} calls, "
+              f"{sum(1 for r in results if r.get('error'))} errored. Not published; re-run with --run-id {run_id}.")
     print(json.dumps(out["metrics"], indent=1))
-    return 0
+    return 0 if complete else 1
 
 
 if __name__ == "__main__":
@@ -201,4 +267,5 @@ if __name__ == "__main__":
     ap.add_argument("--limit", type=int)
     ap.add_argument("--ids", nargs="*")
     ap.add_argument("--min-gap", type=float, default=25.0)
+    ap.add_argument("--rescore", help="re-score a results file in eval/results/ from the stored events (no API calls)")
     sys.exit(asyncio.run(main(ap.parse_args())))

@@ -72,30 +72,42 @@ class RateLimiter:
         self.events: deque[tuple[float, int]] = deque()
         self.lock = asyncio.Lock()
 
-    async def acquire(self, tokens: int) -> float:
-        """Wait until a request of `tokens` fits. Returns seconds waited."""
+    def _prune(self, now: float) -> None:
+        while self.events and now - self.events[0][0] >= self.window:
+            self.events.popleft()
+
+    def _fits(self, tokens: int) -> bool:
+        return len(self.events) < self.max_requests and sum(t for _, t in self.events) + tokens <= self.max_tokens
+
+    async def acquire(self, tokens: int, max_wait: float | None = None) -> float:
+        """Wait until a request of `tokens` fits. Returns seconds waited. With `max_wait`, fail fast instead of
+        queueing: a call-path request (the detector) must never sit behind a full budget."""
         waited = 0.0
         async with self.lock:
             while True:
                 now = time.monotonic()
-                while self.events and now - self.events[0][0] >= self.window:
-                    self.events.popleft()
-                used = sum(t for _, t in self.events)
-                if len(self.events) < self.max_requests and used + tokens <= self.max_tokens:
+                self._prune(now)
+                if self._fits(tokens):
                     self.events.append((now, tokens))
                     return waited
                 wait = self.window - (now - self.events[0][0]) + 0.05 if self.events else 0.5
+                if max_wait is not None and waited + wait > max_wait:
+                    raise LLMError(f"local rate budget exhausted (would wait {wait:.1f}s)")
                 waited += wait
                 await asyncio.sleep(wait)
 
 
-# (requests per window, reserved tokens per window), kept under this account's observed limits.
-MODEL_LIMITS = {"qwen3.5-4b-32k-fast": (26, 16000), "gemma-4-31b": (26, 150000)}
+# (requests per window, reserved tokens per window), kept under this account's observed limits (30 req/min and
+# 20k tokens/min on qwen, 30 req/min and 200k tokens/min on gemma). Each model's budget is split into lanes so the
+# detector (the call path) cannot be starved by persona/evidence calls during a takeover.
+MODEL_LIMITS = {"qwen3.5-4b-32k-fast": {"detector": (14, 8000), "other": (11, 6500)},
+                "gemma-4-31b": {"detector": (12, 60000), "other": (12, 80000)}}
+DEFAULT_LIMITS = {"detector": (12, 6000), "other": (12, 6000)}
 
 
 class LLM:
     def __init__(self, settings: Settings):
-        self.limiters: dict[str, RateLimiter] = {}
+        self.limiters: dict[tuple[str, str], RateLimiter] = {}
         self.settings = settings
         self._client = httpx.AsyncClient(
             base_url=settings.llm_gateway_url,
@@ -108,14 +120,15 @@ class LLM:
         await self._client.aclose()
 
     async def chat(self, model: str, messages: list[dict], max_tokens: int = 400, temperature: float = 0.2,
-                   timeout: float | None = None) -> tuple[str, int]:
-        """Returns (reply text, latency ms)."""
+                   timeout: float | None = None, lane: str = "other", max_wait: float | None = None) -> tuple[str, int]:
+        """Returns (reply text, latency ms). `lane` picks the rate budget; `max_wait` makes it fail fast."""
         body = {"model": model, "messages": messages, "max_tokens": max_tokens, "temperature": temperature}
         est_prompt = sum(len(m["content"]) for m in messages) // 3 + 50
-        limiter = self.limiters.setdefault(model, RateLimiter(*MODEL_LIMITS.get(model, (26, 16000))))
+        limits = MODEL_LIMITS.get(model, DEFAULT_LIMITS)[lane]
+        limiter = self.limiters.setdefault((model, lane), RateLimiter(*limits))
         t0 = time.perf_counter()
         for attempt in range(2):
-            await limiter.acquire(est_prompt + max_tokens)
+            await limiter.acquire(est_prompt + max_tokens, max_wait)
             t0 = time.perf_counter()  # latency excludes our own pacing wait
             try:
                 r = await self._client.post("/chat/completions", json=body, timeout=timeout)
@@ -123,7 +136,7 @@ class LLM:
                 raise LLMError(f"{model}: {type(e).__name__}: {e}") from e
             if r.status_code == 429 and attempt == 0:
                 retry_after = float(r.headers.get("retry-after", "5") or 5)
-                if retry_after > 10:
+                if retry_after > (max_wait if max_wait is not None else 10):
                     break
                 log.warning("429 from %s, retrying in %.1fs", model, retry_after)
                 await asyncio.sleep(retry_after + 0.2)
@@ -132,11 +145,26 @@ class LLM:
         ms = round((time.perf_counter() - t0) * 1000)
         if r.status_code != 200:
             raise LLMError(f"{model}: HTTP {r.status_code}: {r.text[:200]}")
-        return r.json()["choices"][0]["message"]["content"] or "", ms
+        try:
+            return r.json()["choices"][0]["message"]["content"] or "", ms
+        except (KeyError, IndexError, TypeError, ValueError) as e:
+            raise ValueError(f"unexpected response body from {model}: {str(r.text)[:120]}") from e
 
     async def chat_json(self, schema: type[T], messages: list[dict], model: str | None = None,
                         fallback_model: str | None = None, max_tokens: int = 500, timeout: float | None = None,
-                        retries: int = 1, temperature: float = 0.2) -> tuple[T, int, str]:
+                        retries: int = 1, temperature: float = 0.2, lane: str = "other",
+                        max_wait: float | None = None, total_timeout: float | None = None) -> tuple[T, int, str]:
+        """Call, extract JSON, validate; see `_chat_json`. `total_timeout` bounds the WHOLE thing (retries and
+        fallback included): the detector uses it so one slow attempt cannot push the warning past its budget."""
+        try:
+            return await asyncio.wait_for(
+                self._chat_json(schema, messages, model, fallback_model, max_tokens, timeout, retries, temperature,
+                                lane, max_wait), total_timeout)
+        except asyncio.TimeoutError as e:
+            raise LLMError(f"total time limit {total_timeout}s exceeded") from e
+
+    async def _chat_json(self, schema, messages, model, fallback_model, max_tokens, timeout, retries, temperature,
+                         lane, max_wait):
         """Call, extract JSON, validate. One retry on bad JSON (with the error fed back), then the fallback model.
         Returns (validated object, total latency ms, model that answered)."""
         models = [model or self.settings.detector_model]
@@ -147,10 +175,11 @@ class LLM:
             msgs = list(messages)
             for attempt in range(retries + 1):
                 try:
-                    text, ms = await self.chat(m, msgs, max_tokens=max_tokens, temperature=temperature, timeout=timeout)
+                    text, ms = await self.chat(m, msgs, max_tokens=max_tokens, temperature=temperature, timeout=timeout,
+                                               lane=lane, max_wait=max_wait)
                     total += ms
                     return schema.model_validate(extract_json(text)), total, m
-                except (ValueError, ValidationError) as e:
+                except (ValueError, ValidationError, TypeError, KeyError, IndexError) as e:
                     last_err = e
                     log.warning("bad JSON from %s (attempt %d): %s", m, attempt + 1, str(e)[:120])
                     msgs = messages + [{"role": "user", "content":

@@ -69,7 +69,7 @@ async def run(base: str, call_id: str, barge: str) -> dict:
         marks["barge_sent"] = time.monotonic()
         await ws.send(json.dumps({"type": "barge_in"}))
 
-    async with websockets.connect(f"{ws_base}/ws/call/{call_id}/caller?caller_number=%2B919876543210") as caller, \
+    async with websockets.connect(f"{ws_base}/ws/call/{call_id}/caller?mode=eval&caller_number=%2B919876543210") as caller, \
                websockets.connect(f"{ws_base}/ws/call/{call_id}/receiver") as receiver:
         readers = [asyncio.create_task(receiver_reader(receiver)), asyncio.create_task(sc.collect(caller, [], {}))]
         if barge == "browser":

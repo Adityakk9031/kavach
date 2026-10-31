@@ -120,3 +120,30 @@ def test_generated_scripts_are_valid_and_consistent():
         else:
             assert s["decisive_turn_index"] is None and s["first_s5_s6_turn_index"] is None, p.name
         assert s["split"] in ("train", "test")
+
+
+def test_errored_calls_are_counted_not_dropped():
+    from eval.run_eval import error_row
+
+    script = {"id": "s1", "label": "scam", "category": "scam", "scam_type": "digital_arrest", "subtype": "digital_arrest",
+              "split": "test", "decisive_turn_index": 4, "first_s5_s6_turn_index": 8}
+    neg = {**script, "id": "n1", "label": "legit", "category": "legit", "scam_type": None, "decisive_turn_index": None,
+           "first_s5_s6_turn_index": None}
+    results = [r(id="a"), error_row(script, "boom"), r(id="l", label="legit", category="legit", scam_type=None, triggered=False,
+                                                          decisive_to_warning_s=None), error_row(neg, "boom")]
+    m = compute(results, expected=5)
+    assert m["n_errors"] == 2 and m["n_expected"] == 5 and m["n_calls"] == 4
+    assert m["recall"] == 0.5  # the errored scam is a miss, not silently removed
+    assert m["n_legit"] == 1 and m["fpr_legit"] == 0.0  # the errored negative is excluded, and visible in n_errors
+
+
+def test_trigger_maps_to_the_interval_not_the_nearest_end():
+    from eval.run_eval import map_to_script_turn
+
+    caller = [{"i": 0, "start_ms": 0, "end_ms": 5000}, {"i": 2, "start_ms": 9000, "end_ms": 20000},
+              {"i": 4, "start_ms": 24000, "end_ms": 30000}]
+    # STT split the long turn 2 and reported the first part ending at 12 s: nearest end would say turn 0 (5 s)
+    # or turn 4; the interval says turn 2.
+    assert map_to_script_turn(caller, 12000) == 2
+    assert map_to_script_turn(caller, 20200) == 2 and map_to_script_turn(caller, 30400) == 4
+    assert map_to_script_turn(caller, 22000) in (2, 4)  # between turns: falls back to the nearest end

@@ -153,13 +153,16 @@ def test_stt_url_and_message_normalization():
 
 
 def test_websocket_endpoints_relay_between_two_tabs(monkeypatch):
+    import uuid
+
     import app.main as main
 
+    call_id = f"wsrelay-{uuid.uuid4().hex[:8]}"  # a used call id is refused, and the DB persists across runs
     monkeypatch.setattr(main.rooms, "stt_factory", FakeStt)
     # Entering the client shares one event loop between both sockets, as uvicorn does.
     with TestClient(main.app) as client, \
-         client.websocket_connect("/ws/call/wsrelay/caller?caller_number=%2B911234") as caller, \
-         client.websocket_connect("/ws/call/wsrelay/receiver") as receiver:
+         client.websocket_connect(f"/ws/call/{call_id}/caller?caller_number=%2B911234") as caller, \
+         client.websocket_connect(f"/ws/call/{call_id}/receiver") as receiver:
         caller.send_bytes(chunk(value=3))
         while True:  # skip JSON status events until the audio frame arrives
             msg = receiver.receive()
@@ -174,7 +177,7 @@ def test_websocket_endpoints_relay_between_two_tabs(monkeypatch):
                 break
         else:
             pytest.fail("no call_ended event")
-    row = main.store.query("SELECT caller_number FROM calls WHERE id='wsrelay'")[0]
+    row = main.store.query("SELECT caller_number FROM calls WHERE id=?", (call_id,))[0]
     assert row["caller_number"] == "+911234"
 
 
@@ -203,3 +206,26 @@ async def test_restart_limit(room):
         await FakeStt.instances["caller"].on_event({"type": "closed", "code": 1006, "reason": "", "clean": False})
     restarted = [e for e in room.store.events("t1") if e["type"] == "stt_restarted"]
     assert len(restarted) == CallRoom.MAX_STT_RESTARTS
+
+
+def test_ended_call_id_cannot_be_reused_and_a_viewer_does_not_create_a_call(monkeypatch):
+    import uuid
+
+    import app.main as main
+
+    cid = f"reuse-{uuid.uuid4().hex[:8]}"
+    monkeypatch.setattr(main.rooms, "stt_factory", FakeStt)
+    with TestClient(main.app) as client:
+        with client.websocket_connect(f"/ws/call/{cid}/caller") as caller:
+            caller.send_text(json.dumps({"type": "end_call"}))
+            while True:  # wait until the server has finished ending the call
+                msg = caller.receive()
+                if msg.get("text") and json.loads(msg["text"])["type"] == "call_ended":
+                    break
+        assert main.store.query("SELECT 1 FROM calls WHERE id=? AND ended_at IS NOT NULL", (cid,))
+        with client.websocket_connect(f"/ws/call/{cid}/receiver") as again:
+            msg = again.receive()
+            assert msg["type"] == "websocket.close" and msg["code"] == 4409  # refused: the call already ended
+        with client.websocket_connect(f"/ws/events/never-started-{cid}") as viewer:
+            pass
+        assert not main.store.query("SELECT 1 FROM calls WHERE id=?", (f"never-started-{cid}",))

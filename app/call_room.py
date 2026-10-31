@@ -96,11 +96,14 @@ class CallRoom:
         self.takeover = False
         self.turn_idx = 0
         self.stt_restarts: dict[str, int] = {}
+        self.stt_offset_ms: dict[str, float] = {}  # audio already sent before the current STT session started
         self.ended = False
         # Hooks later milestones attach to (detector, warner, persona). Each is an async callable.
         self.on_final_hooks: list[Callable] = []
         self.on_speech_started_hooks: list[Callable] = []
-        self.on_end_hooks: list[Callable] = []
+        self.on_end_hooks: list[Callable] = []  # stop workers (run last)
+        self.finalize_hooks: list[Callable] = []  # build report / send alerts; may return a dict for the UI (run first)
+        self.mode = "live"
         self.control_handlers: dict[str, Callable] = {}  # JSON control message type -> async (room, role, msg)
         self.pipeline = None
         self.warning = None
@@ -110,9 +113,12 @@ class CallRoom:
 
     # ---- lifecycle -------------------------------------------------------------------------------
 
-    async def join(self, role: str, ws: Sendable, caller_number: str | None = None) -> None:
+    async def join(self, role: str, ws: Sendable, caller_number: str | None = None, mode: str | None = None) -> None:
         if role not in ROLES:
             raise ValueError(f"unknown role {role}")
+        if mode in ("live", "eval"):
+            self.mode = mode
+            self.store.update_call(self.call_id, mode=mode)
         if role in self.parties:
             await self.leave(role)
         self.parties[role] = Peer(ws)
@@ -141,14 +147,20 @@ class CallRoom:
         if self.ended:
             return
         self.ended = True
-        for hook in self.on_end_hooks:
-            await hook()
-        for role in list(self.stt):
+        for role in list(self.stt):  # close STT first so the last finals still reach the workers below
             stt = self.stt.pop(role)
             await stt.close()
+        extra: dict = {}
+        for hook in self.finalize_hooks:
+            try:
+                extra.update(await hook() or {})
+            except Exception:
+                log.exception("finalize hook failed")
+        for hook in self.on_end_hooks:
+            await hook()
         self.store.update_call(self.call_id, ended_at=time.time())
         self.log_event("call_end", {})
-        await self.broadcast({"type": "call_ended"})
+        await self.broadcast({"type": "call_ended", **extra})
 
     # ---- audio -----------------------------------------------------------------------------------
 
@@ -195,6 +207,12 @@ class CallRoom:
     async def _on_stt_event(self, channel: str, ev: dict) -> None:
         now = time.monotonic()
         kind = ev["type"]
+        off = self.stt_offset_ms.get(channel, 0.0)
+        if off:  # a restarted STT session counts its audio from 0; put it back on the channel's own clock
+            ev = dict(ev)
+            for k in ("audio_ms", "audio_start_ms", "audio_end_ms"):
+                if ev.get(k) is not None:
+                    ev[k] = ev[k] + off
         if kind == "begin":
             self.log_event("stt_begin", {"channel": channel, "model": ev["model"], "session": ev["session_id"]}, now)
             await self.broadcast({"type": "stt_status", "channel": channel, "ok": True, "model": ev["model"]})
@@ -250,7 +268,10 @@ class CallRoom:
         self.stt[channel] = stt
         try:
             await stt.start()
-            self.log_event("stt_restarted", {"channel": channel, "attempt": restarts + 1})
+            # Audio sent while the new session was connecting was dropped; its timeline starts from here.
+            self.stt_offset_ms[channel] = self.clocks[channel].audio_ms if channel in self.clocks else 0.0
+            self.log_event("stt_restarted", {"channel": channel, "attempt": restarts + 1,
+                                             "offset_ms": round(self.stt_offset_ms[channel])})
         except Exception as e:
             self.log_event("stt_error", {"channel": channel, "error": f"restart failed: {e}"})
             await self.broadcast({"type": "stt_status", "channel": channel, "ok": False, "error": str(e)})
@@ -260,6 +281,7 @@ class RoomRegistry:
     def __init__(self, stt_factory: SttFactory, store: Store, sample_rate: int,
                  on_new_room: Callable[[CallRoom], None] | None = None):
         self.on_new_room = on_new_room
+        self.waiting: dict[str, set] = {}  # dashboard viewers that connected before their call started
         self.rooms: dict[str, CallRoom] = {}
         self.stt_factory = stt_factory
         self.store = store
@@ -270,6 +292,7 @@ class RoomRegistry:
         if room is None or room.ended:
             room = CallRoom(call_id, self.stt_factory, self.store, self.sample_rate)
             self.rooms[call_id] = room
+            room.listeners |= self.waiting.pop(call_id, set())
             if self.on_new_room:
                 self.on_new_room(room)
         return room

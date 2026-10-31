@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kavach · Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header><h1>Kavach dashboard</h1><span class="muted">watch a call live without joining it</span></header>
+  <main>
+    <section class="panel">
+      <div class="row">
+        <label>Call ID <input type="text" id="call" placeholder="the id both tabs use"></label>
+        <button class="primary" id="go">Watch</button>
+        <a href="scoreboard.html">Scoreboard</a>
+      </div>
+      <p class="muted">Shows the live transcript, scam stages, risk meter, warning, takeover and evidence for that call, read-only.</p>
+    </section>
+  </main>
+  <script>
+    const id = new URLSearchParams(location.search).get('call');
+    if (id) location.replace('receiver.html?call=' + encodeURIComponent(id) + '&watch=1');
+    document.getElementById('go').onclick = () => {
+      const v = document.getElementById('call').value.trim();
+      if (v) location.href = 'dashboard.html?call=' + encodeURIComponent(v);
+    };
+  </script>
+</body>
+</html>

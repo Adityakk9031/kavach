@@ -38,7 +38,7 @@ def test_guard_allows_the_decoy_phone_but_not_other_number_runs():
     ok = f"Sure, my number is {DECOY}, did you get it?"
     assert guard(ok, DECOY) == (ok, None)
     out, why = guard("My number is five five five one two three four, ok?", DECOY)
-    assert why == "number-run-not-decoy" and out in STALLS
+    assert why == "number-run" and out in STALLS
     assert guard("Oh, one moment, I have two sons and three grandchildren.", DECOY)[1] is None
 
 
@@ -264,3 +264,32 @@ async def test_takeback_unmutes_cancels_and_flushes_both_tabs(server):
     await asyncio.sleep(0.1)
     assert llm.calls == []
     await s.close()
+
+
+@pytest.mark.parametrize("text", [
+    "My pin is one two three, ok?", "It is one two three four.", "You can write to me, Ramesh at the rate okaxis.",
+    "Send it to ramesh dot com please", "My UPI is ramesh at gmail", "Is it zero zero zero? I will check.",
+])
+def test_guard_blocks_invented_pins_and_spoken_addresses(text):
+    out, why = guard(text, DECOY)
+    assert why is not None and out in STALLS
+
+
+def test_guard_blocks_extra_digits_next_to_the_decoy_phone():
+    out, why = guard(f"My number is {DECOY} and my pin is one two three four.", DECOY)
+    assert why == "number-run"  # the decoy phone no longer excuses other number runs in the same reply
+    assert guard(f"Ah, my number is {DECOY}.", DECOY)[1] is None
+
+
+async def test_invalid_evidence_is_upgraded_when_the_caller_really_says_it():
+    room = CallRoom("e3", NoStt, Store(":memory:"))
+    llm = FakeLLM(json.dumps({"entities": [{"type": "officer_id", "value": "BX 4471", "quote": "x"}]}))
+    room.takeover = True
+    ev = EvidenceCollector(room, llm, "m")
+    await ev.process(turn("I am an officer", idx=0))  # hallucinated: not in the text
+    assert not ev.valid_items()
+    llm.reply = json.dumps({"entities": [{"type": "officer_id", "value": "BX 4471", "quote": "my badge is BX 4471"}]})
+    await ev.process(turn("my badge is BX 4471", idx=1))  # now genuinely said
+    assert [v["value"] for v in ev.valid_items()] == ["BX 4471"]
+    assert room.store.query("SELECT valid FROM evidence WHERE call_id='e3' AND type='officer_id'")[0]["valid"] == 1
+    await ev.close()

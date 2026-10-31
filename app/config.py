@@ -57,7 +57,8 @@ class Settings(BaseSettings):
     risk_rise: float = 0.7
     risk_decay_per_turn: float = 4.0
     detector_window_turns: int = 6
-    detector_timeout_s: float = 2.5
+    detector_timeout_s: float = 1.8   # per LLM attempt
+    detector_total_s: float = 3.0     # whole detection incl. retry and fallback
 
     # --- warning text ---
     parent_address: str = "Papa"

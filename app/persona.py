@@ -49,25 +49,37 @@ Hard rules:
 Output only what you say aloud."""
 
 
+ADDRESS_WORDS = re.compile(r"\b(at the rate|at sign|dot\s*(com|in|org|net|co|app)|upi|gmail|yahoo|ifsc|www)\b", re.I)
+
+
+def number_runs(text: str) -> int:
+    """Length of the longest run of spoken digits ("one two three")."""
+    run = best = 0
+    for w in re.findall(r"[a-z]+", text.lower()):
+        run = run + 1 if w in NUMBER_WORDS else 0
+        best = max(best, run)
+    return best
+
+
 def guard(text: str, decoy_phone: str) -> tuple[str, str | None]:
-    """Return (safe text, reason it was replaced or None). Blocks anything that could be a real identifier."""
+    """Return (safe text, reason it was replaced or None). Only the configured decoy details may be spoken: anything
+    that could be a real identifier (digits, a PIN-like run of number words, an address) is replaced by a stall."""
     t = text.strip().strip('"').strip()
     if not t:
         return STALLS[0], "empty"
     if re.search(r"\d", t):
         return STALLS[1], "digits"
-    if re.search(r"@|https?://|www\.|\.com\b|\.in\b", t, re.I):
+    if re.search(r"@|https?://|www\.|\.com\b|\.in\b", t, re.I) or ADDRESS_WORDS.search(t):
         return STALLS[1], "address-like"
-    words = re.findall(r"[a-z]+", t.lower())
-    run = best = 0
-    for w in words:
-        run = run + 1 if w in NUMBER_WORDS else 0
-        best = max(best, run)
-    decoy_run = sum(1 for w in re.findall(r"[a-z]+", decoy_phone.lower()) if w in NUMBER_WORDS)
-    if best > 4 and decoy_run < 6:
+    # Remove the decoy phone (exact phrase) first; any other run of 3+ spoken digits is an invented number/PIN/OTP.
+    squash = lambda x: re.sub(r"[^a-z ]", "", x.lower()).split()  # noqa: E731
+    words, decoy = squash(t), squash(decoy_phone)
+    for i in range(len(words) - len(decoy) + 1):
+        if decoy and words[i:i + len(decoy)] == decoy:
+            words[i:i + len(decoy)] = ["_"]
+            break
+    if number_runs(" ".join(words)) >= 3:
         return STALLS[1], "number-run"
-    if best > 4 and decoy_phone.lower().replace(",", "") not in t.lower().replace(",", ""):
-        return STALLS[1], "number-run-not-decoy"
     if len(t) > 400:
         return STALLS[2], "too-long"
     return t, None
@@ -83,6 +95,7 @@ class Persona:
         room.on_speech_started_hooks.append(p.on_speech_started)
         room.control_handlers["takeover"] = p.on_takeover
         room.control_handlers["takeback"] = p.on_takeback
+        room.on_end_hooks.append(p.close)
         room.persona = p
         return p
 
@@ -103,6 +116,13 @@ class CallPersona:
     @property
     def speaking(self) -> bool:
         return (self.request is not None and not self.request.done.is_set()) or time.monotonic() < self.play_until
+
+    async def close(self) -> None:
+        self.active = False
+        if self.pending and not self.pending.done():
+            self.pending.cancel()
+        if self.session is not None and self.request is not None and not self.request.done.is_set():
+            await self.session.cancel()
 
     # ---- control ---------------------------------------------------------------------------------
 
@@ -187,7 +207,8 @@ class CallPersona:
             self.replies += 1
             idx = room.turn_idx
             room.turn_idx += 1
-            room.store.add_turn(room.call_id, "persona", idx, text, None, None, time.monotonic(), None, is_decoy=True)
+            tid = room.store.add_turn(room.call_id, "persona", idx, text, None, None, time.monotonic(), None, is_decoy=True)
+            room.log_event("turn_final", {"channel": "persona", "idx": idx, "turn_id": tid})
             turn_end_at = None
             if turn and turn.get("audio_end_ms") is not None and "caller" in room.clocks:
                 turn_end_at = room.clocks["caller"].time_at(turn["audio_end_ms"])

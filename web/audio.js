@@ -148,6 +148,9 @@ export function connectCall(callId, role, handlers, params = {}) {
   const qs = new URLSearchParams(params).toString();
   const ws = new WebSocket(`${proto}://${location.host}/ws/call/${encodeURIComponent(callId)}/${role}${qs ? '?' + qs : ''}`);
   ws.binaryType = 'arraybuffer';
+  ws.addEventListener('close', (e) => {
+    if (e.code === 4409) handlers.onEvent({ type: 'call_rejected', reason: e.reason || 'This call has ended. Use a new call id.' });
+  });
   ws.onmessage = (e) => {
     if (typeof e.data === 'string') handlers.onEvent(JSON.parse(e.data));
     else {

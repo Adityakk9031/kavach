@@ -28,6 +28,7 @@ class CallPipeline:
         self.on_trigger: list[TriggerHook] = []
         self.on_new_stage: list[TriggerHook] = []
         self.triggered = False
+        self.hook_tasks: set[asyncio.Task] = set()
         self.max_risk = 0.0
         self._worker = asyncio.create_task(self._run(), name=f"pipeline-{room.call_id}")
         room.on_final_hooks.append(self.on_final)
@@ -79,17 +80,34 @@ class CallPipeline:
         room.store.update_call(room.call_id, max_risk=self.max_risk)
         await room.broadcast({"type": "detection", **payload, "quotes": info["evidence_quotes"],
                               "rationale": info["rationale"]})
-        if decision.new_stages:
-            for hook in self.on_new_stage:
-                await hook(self, decision, {**payload, "turn": turn, "turn_end_at": turn_end_at})
         if decision.trigger and not self.triggered:
             self.triggered = True
             trig = {**payload, "turn_end_at": turn_end_at}
             room.log_event("trigger", {k: v for k, v in trig.items() if k != "turn_end_at"}, now)
             room.store.update_call(room.call_id, warned_at=time.time())
             for hook in self.on_trigger:
-                await hook(self, decision, {**trig, "turn": turn})
+                self._spawn(hook, decision, {**trig, "turn": turn})
+        if decision.new_stages:
+            for hook in self.on_new_stage:
+                self._spawn(hook, decision, {**payload, "turn": turn, "turn_end_at": turn_end_at})
+
+    def _spawn(self, hook: TriggerHook, decision: Decision, info: dict) -> None:
+        """Run a trigger hook on its own task. The warning (several seconds of audio) and the family alert must not
+        wait for each other, a hook that raises must not stop the others, and later turns must keep being analysed."""
+        async def run():
+            try:
+                await hook(self, decision, info)
+            except asyncio.CancelledError:
+                raise
+            except Exception:
+                log.exception("trigger hook %s failed", getattr(hook, "__qualname__", hook))
+                self.room.log_event("hook_error", {"hook": getattr(hook, "__qualname__", str(hook))})
+        task = asyncio.create_task(run())
+        self.hook_tasks.add(task)
+        task.add_done_callback(self.hook_tasks.discard)
 
     async def close(self) -> None:
         self._worker.cancel()
-        await asyncio.gather(self._worker, return_exceptions=True)
+        for t in list(self.hook_tasks):
+            t.cancel()
+        await asyncio.gather(self._worker, *self.hook_tasks, return_exceptions=True)

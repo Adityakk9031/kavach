@@ -180,11 +180,19 @@ class TtsSession:
         self._cancels_outstanding += 1
         at = time.monotonic()
         await self._send({"type": "Cancel"})
+        # Safety net: the server answers every Cancel with Cancelled, but if one ever goes missing, audio must not
+        # stay muted for the rest of the session.
+        asyncio.get_running_loop().call_later(3.0, self._expire_cancel)
         for req in list(self._pending):
             req.done_at = at
             req.done.set()
         self._pending.clear()  # cancelled requests get no FlushDone
         return at
+
+    def _expire_cancel(self) -> None:
+        if self._cancels_outstanding > 0:
+            log.warning("%s: no Cancelled received within 3 s; resuming audio", self.label)
+            self._cancels_outstanding = 0
 
     async def close(self) -> None:
         for task in (self._keepalive, self._reader):
