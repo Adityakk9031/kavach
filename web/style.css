@@ -1,0 +1,34 @@
+:root {
+  --bg: #f6f5f1; --panel: #ffffff; --ink: #1d1f23; --muted: #6b6f76; --line: #e3e1da;
+  --accent: #1f6f5c; --danger: #b3261e; --warn: #b26a00; --caller: #7a3e9d; --receiver: #1f5f9e;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #15171a; --panel: #1e2125; --ink: #e8e6e1; --muted: #9a9ea6; --line: #2e3238;
+          --accent: #4fb39a; --danger: #ef6b62; --warn: #e3a23b; --caller: #c08ae0; --receiver: #74a9e3; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); }
+header { padding: 14px 20px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+header h1 { margin: 0; font-size: 18px; }
+header .role { font-weight: 600; }
+main { padding: 16px 20px; display: grid; gap: 16px; max-width: 980px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+button { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+button.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+button:disabled { opacity: .5; cursor: default; }
+input[type=text] { font: inherit; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); }
+.muted { color: var(--muted); font-size: 13px; }
+.status { font-size: 13px; color: var(--muted); }
+.status .ok { color: var(--accent); } .status .bad { color: var(--danger); }
+#transcript { display: grid; gap: 8px; max-height: 55vh; overflow-y: auto; }
+.turn { padding: 8px 10px; border-radius: 8px; border-left: 4px solid var(--line); background: var(--bg); }
+.turn.caller { border-left-color: var(--caller); }
+.turn.receiver { border-left-color: var(--receiver); }
+.turn.partial { opacity: .6; font-style: italic; }
+.turn .who { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.turn .lat { float: right; font-size: 12px; color: var(--muted); }
+.meter { height: 8px; width: 160px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.meter > div { height: 100%; width: 0; background: var(--accent); transition: width 60ms linear; }
+a { color: var(--accent); }

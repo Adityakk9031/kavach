@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kavach · Receiver</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Kavach call simulator</h1>
+    <span class="role" style="color: var(--receiver)">Receiver tab (the person we protect)</span>
+    <span class="muted" id="callLabel"></span>
+  </header>
+  <main>
+    <section class="panel">
+      <div class="row">
+        <button class="primary" id="answer">Answer call</button>
+        <button class="danger" id="end" disabled>Hang up</button>
+        <div class="meter"><div id="level"></div></div>
+      </div>
+      <p class="status" id="status">Not connected.</p>
+      <p class="status bad" id="micError" style="color: var(--danger)"></p>
+      <p class="muted">Use headphones: the warning plays here, and speakers can leak it back into your mic.</p>
+    </section>
+    <section class="panel">
+      <div id="transcript"></div>
+    </section>
+  </main>
+  <script type="module">
+    import { connectCall, startMic, Player, callIdFromUrl } from './audio.js';
+    import { transcriptView, statusView, levelMeter } from './ui.js';
+
+    const callId = callIdFromUrl();
+    document.getElementById('callLabel').textContent = `call: ${callId}`;
+    const tv = transcriptView(document.getElementById('transcript'));
+    const sv = statusView(document.getElementById('status'));
+    const meter = levelMeter(document.getElementById('level'));
+    const $ = (id) => document.getElementById(id);
+    let call, player, mic;
+
+    $('answer').onclick = async () => {
+      player = new Player((source, leadMs) => call.clientEvent('playback_started', { source, lead_ms: leadMs }));
+      await player.resume();
+      call = connectCall(callId, 'receiver', {
+        onEvent(ev) {
+          if (sv.handle(ev)) return;
+          if (ev.type === 'transcript') tv.show(ev);
+          else if (ev.type === 'flush_playback') player.flush(ev.source);
+          else if (ev.type === 'call_ended') $('status').textContent = 'Call ended.';
+        },
+        onAudio(source, pcm) { player.play(source, pcm); },
+      });
+      call.ws.onopen = async () => {
+        $('answer').disabled = true;
+        $('end').disabled = false;
+        try {
+          mic = await startMic((buf) => { meter(new Int16Array(buf)); call.sendAudio(buf); });
+        } catch (e) {
+          $('micError').textContent = `Microphone unavailable (${e.name}). You can still hear the caller.`;
+        }
+      };
+    };
+    $('end').onclick = () => { call.send({ type: 'end_call' }); mic && mic.stop(); };
+  </script>
+</body>
+</html>

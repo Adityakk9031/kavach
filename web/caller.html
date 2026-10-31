@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kavach · Caller</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Kavach call simulator</h1>
+    <span class="role" style="color: var(--caller)">Caller tab (the scammer)</span>
+    <span class="muted" id="callLabel"></span>
+  </header>
+  <main>
+    <section class="panel">
+      <div class="row">
+        <label>Caller number <input type="text" id="number" value="+91 98765 43210"></label>
+        <button class="primary" id="connect">Connect to call</button>
+        <button class="danger" id="end" disabled>End call</button>
+      </div>
+      <p class="status" id="status">Not connected.</p>
+    </section>
+    <section class="panel">
+      <div class="row">
+        <button id="mic" disabled>Use microphone</button>
+        <span class="muted">or</span>
+        <input type="file" id="file" accept="audio/*" disabled>
+        <button id="play" disabled>Play scripted audio</button>
+        <div class="meter"><div id="level"></div></div>
+      </div>
+      <p class="status" id="micError" style="color: var(--danger)"></p>
+      <p class="muted">Scripted audio streams a recording as the caller, in real time. Use it when both tabs share one laptop, so two mics don't pick each other up.</p>
+    </section>
+    <section class="panel">
+      <div id="transcript"></div>
+    </section>
+  </main>
+  <script type="module">
+    import { connectCall, startMic, fileToPcm16, streamPcm, Player, callIdFromUrl } from './audio.js';
+    import { transcriptView, statusView, levelMeter } from './ui.js';
+
+    const callId = callIdFromUrl();
+    document.getElementById('callLabel').textContent = `call: ${callId}`;
+    const tv = transcriptView(document.getElementById('transcript'));
+    const sv = statusView(document.getElementById('status'));
+    const meter = levelMeter(document.getElementById('level'));
+    let call, player, mic, stream;
+
+    const $ = (id) => document.getElementById(id);
+    $('connect').onclick = async () => {
+      player = new Player();
+      await player.resume();
+      call = connectCall(callId, 'caller', {
+        onEvent(ev) {
+          if (sv.handle(ev)) return;
+          if (ev.type === 'transcript') tv.show(ev);
+          else if (ev.type === 'flush_playback') player.flush(ev.source);
+          else if (ev.type === 'call_ended') $('status').textContent = 'Call ended.';
+        },
+        onAudio(source, pcm) { player.play(source, pcm); },
+      }, { caller_number: $('number').value });
+      call.ws.onopen = () => {
+        ['mic', 'file', 'end'].forEach((id) => ($(id).disabled = false));
+        $('connect').disabled = true;
+      };
+    };
+    $('file').onchange = () => ($('play').disabled = !$('file').files.length);
+    $('mic').onclick = async () => {
+      try {
+        mic = await startMic((buf) => { meter(new Int16Array(buf)); call.sendAudio(buf); });
+        $('mic').disabled = true;
+        $('micError').textContent = '';
+      } catch (e) {
+        $('micError').textContent = `Microphone unavailable (${e.name}). Use scripted audio instead.`;
+      }
+    };
+    $('play').onclick = async () => {
+      const pcm = await fileToPcm16($('file').files[0]);
+      $('play').disabled = true;
+      stream = streamPcm(pcm, (buf) => { meter(new Int16Array(buf)); call.sendAudio(buf); },
+                         () => ($('play').disabled = false));
+    };
+    $('end').onclick = () => { call.send({ type: 'end_call' }); mic && mic.stop(); stream && stream.stop(); };
+  </script>
+</body>
+</html>

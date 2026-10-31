@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kavach</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header><h1>Kavach</h1><span class="muted">real-time scam-call protector · call simulator</span></header>
+  <main>
+    <section class="panel">
+      <div class="row">
+        <label>Call ID <input type="text" id="call"></label>
+      </div>
+      <p>Open both tabs with the same call ID:</p>
+      <ul>
+        <li><a id="caller" target="_blank">Caller tab</a> (the scammer)</li>
+        <li><a id="receiver" target="_blank">Receiver tab</a> (the person being protected)</li>
+      </ul>
+    </section>
+  </main>
+  <script>
+    const input = document.getElementById('call');
+    input.value = 'call-' + Math.random().toString(36).slice(2, 7);
+    const sync = () => {
+      for (const role of ['caller', 'receiver'])
+        document.getElementById(role).href = `${role}.html?call=${encodeURIComponent(input.value)}`;
+    };
+    input.oninput = sync;
+    sync();
+  </script>
+</body>
+</html>
