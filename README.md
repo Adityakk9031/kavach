@@ -117,4 +117,65 @@ demo, step by step, is in [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md). To replay 
 - **Free-tier limits** shaped the design: the LLM account allows 30 requests per minute, and 5 new streaming sessions
   per minute.
 
-RESULTS_PLACEHOLDER
+## Results
+
+### Held-out test split: 36 calls the system was never tuned on
+
+How it was built: 90 call scripts written by `gemma-4-31b` (a different model family from the detector, which is
+`qwen3.5-4b-32k-fast`): 45 scam in six types, 30 legitimate, 15 "hard negatives" (genuine calls that mention OTPs or
+police safely). Split 54 train / 36 test, stratified by type. Every turn is rendered with TTS-1 in different voices and
+accents and streamed in real time through the live backend as two separate microphones: real streaming
+speech-to-text, the real detector, the real warning in the cloned voice. **The prompt and threshold (60) were tuned
+on the 54 train calls only and frozen before the test split was ever run.**
+
+| Test split (36 calls) | Run 1 | Run 2 (final code) |
+|---|---|---|
+| Scam recall | **18/18** | **18/18** |
+| False alarms on normal calls | 0/12 | **1/12** |
+| False alarms on hard negatives | 0/6 | 0/6 |
+| Caller's last word → warning audio, median / p90 | 1529 / 1668 ms | 1552 / 1625 ms |
+| Warning voice, time to first audio (median) | 401 ms | 398 ms |
+| Caught before the OTP/money request | 15/18 (83%) | 12/18 (67%) |
+| Decisive turn → warning, median / p90 | -11.9 s / +2.1 s | -11.5 s / +14.9 s |
+
+Run 1 was on the code before an independent review; run 2 is the same frozen prompt and threshold on the final
+code. After run 2 one robustness setting changed (the detector's total time limit for one turn, 3.0 s to 4.5 s, because
+a slow LLM answer made it skip a turn); the full test split was not re-run for that.
+
+**How to read these numbers honestly**
+
+- **It is a small test.** 18 scams and 18 non-scams. Zero misses is consistent with a true recall anywhere from about
+  82% to 100%; one false alarm in 18 is consistent with a true false-alarm rate from about 0.1% to 27%. One call moves a
+  rate by about 3 to 6 points.
+- **A small language model is not deterministic at the margin.** The same frozen system on the same audio gave 0/12 then
+  1/12 false alarms and 15/18 then 12/18 "caught before the ask". The false alarm in run 2 is a **genuine** bank
+  fraud-team call that says "I am blocking your debit card immediately" after a large flagged transaction; it peaked at
+  a risk score of 54.6 in run 1 (threshold 60) and 78.2 in run 2. It is the clearest weakness: a real bank call that
+  sounds firm. Two scams also only just crossed the threshold (60.5, 61.6).
+- **"Decisive turn" is an LLM-written label**, usually later than the point where a careful person would first worry,
+  so the median is negative (the system warned before the label). The number that matters for a protected person is
+  the **1.5 s** from the caller's last word to the warning audio.
+- **The OTP/money ask is often the same turn as the decisive turn** (22 of 45 scripts), so "caught before the ask"
+  means flagging earlier than the dataset itself says is certain.
+- **Synthetic audio is cleaner than a real phone line.** Real-world numbers may be lower.
+- A scam whose warning the person talks over is repeated when they stop speaking (up to three times). In run 1 one
+  warning was cancelled by the person's reply before it was heard and never replayed; that was fixed.
+
+### Other measured behaviour (loopback, TTS-rendered audio)
+
+| Check | Result |
+|---|---|
+| Family-voice warning after the caller's last word | 1.4 to 1.9 s over 8 live runs (target 3 s); it starts 0.4 s after the trigger |
+| Barge-in: person speaks, playback stops | stop command reaches the receiver in about 1 ms, including audio already delivered |
+| Takeover: details captured from a scripted scammer in 2.5 minutes | 6 of 6 planted details (UPI ID, account, IFSC, callback number, name, link) |
+| Persona reply after the scammer stops | about 2.2 to 3.2 s (includes a 0.7 s wait to let the caller finish) |
+| Take back while the persona is mid-sentence | cancelled in 0 ms, zero stray frames, caller hears the user again |
+| Family alerts | 3 real Telegram messages (warning, takeover, call end with the PDF) in one call |
+
+What these do **not** show: the persona coaxing details out of a *reluctant* scammer (in the scripted gate the scammer
+reveals them; an adaptive LLM scammer got 1 to 3 of 6 depending on the run), and real microphone capture, which needs a
+real browser and headphones.
+
+Everything is reproducible: `docs/evidence/` holds the raw eval results for both runs, the train-split sweeps, and the
+takeover and regression runs; `PROGRESS.md` is the full log, including the failed attempts.
+

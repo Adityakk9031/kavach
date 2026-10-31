@@ -1,0 +1,7 @@
+[OK  ] AssemblyAI streaming STT: Begin in 1602 ms, model=universal-3-6-pro, session=b028b826-8803-4594-acd7-6bf02729bddf
+[OK  ] AssemblyAI TTS (library voice): listed 1 voices, first=kavach-warning-voice-id-46ade8; synthesized with voice_id=aai-gunnar model=assemblyai-tts-1 24000 Hz, 1760 ms audio in 1332 ms -> data/check/tts_library_voice.wav
+[OK  ] AssemblyAI LLM Gateway: model=qwen3.5-4b-32k-fast replied 'kavach ok' in 1149 ms
+[OK  ] AssemblyAI TTS (cloned voice): resolved=01a19208-766c-7003-97c5-4f0cf646ade8 lang=english model=assemblyai-tts-1 expires=2026-12-30, first audio 431 ms after Generate (34 frames)
+[OK  ] Telegram bot: bot @naughtkavcha_bot ok; chat id set
+
+5/5 checks passed

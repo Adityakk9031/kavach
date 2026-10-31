@@ -1,0 +1,40 @@
+.......F..                                                               [100%]
+=================================== FAILURES ===================================
+__________ test_legit_transcripts_do_not_trigger[doctor_appointment] ___________
+
+name = 'doctor_appointment'
+
+    @live
+    @pytest.mark.parametrize("name", list(LEGIT))
+    async def test_legit_transcripts_do_not_trigger(name):
+        llm = LLM(get_settings())
+        try:
+>           log = await run_call(Detector(get_settings(), llm), LEGIT[name])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_detector.py:115: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+detector = <app.detector.Detector object at 0x10322ef00>
+turns = [('caller', "Hello, this is Dr. Mehta's clinic. I am calling to confirm your appointment tomorrow at ten thirty."), ('... reports. The consultation fee is five hundred rupees, you can pay at the counter.'), ('receiver', 'Okay, thank you.')]
+
+    async def run_call(detector: Detector, turns):
+        tracker = detector.new_tracker()
+        seen, log = [], []
+        for speaker, text in turns:
+            seen.append({"channel": speaker, "text": text})
+            if speaker != "caller":
+                continue
+            decision, info = await detector.process(tracker, seen)
+>           assert decision is not None, info
+E           AssertionError: {'error': 'total time limit 3.0s exceeded'}
+E           assert None is not None
+
+tests/test_detector.py:90: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  kavach.llm:llm.py:190 LLM call failed (attempt 1 on qwen3.5-4b-32k-fast): qwen3.5-4b-32k-fast: HTTP 429: {"request_id":"e3791612-9d85-416a-ab05-792616bc6723","message":"too many tokens per minute for this account - max_tokens is reserved against this limit for the duration of the request, whether or not 
+WARNING  kavach.llm:llm.py:190 LLM call failed (attempt 2 on qwen3.5-4b-32k-fast): qwen3.5-4b-32k-fast: HTTP 429: {"request_id":"8c84de1f-7640-4c38-a655-072589976da6","message":"too many tokens per minute for this account - max_tokens is reserved against this limit for the duration of the request, whether or not 
+ERROR    kavach.detector:detector.py:157 detector failed: total time limit 3.0s exceeded
+=========================== short test summary info ============================
+FAILED tests/test_detector.py::test_legit_transcripts_do_not_trigger[doctor_appointment]
+1 failed, 9 passed, 15 deselected in 35.28s
