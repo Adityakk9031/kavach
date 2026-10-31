@@ -38,11 +38,11 @@ class Settings(BaseSettings):
     # --- models ---
     stt_model: str = "universal-3-6-pro"
     stt_mode: str = "balanced"
-    detector_model: str = "gpt-6-luna"
-    detector_reasoning_effort: str = "none"
-    detector_fallback_model: str = "mercury-3"
-    persona_model: str = "gpt-6-luna"
-    script_gen_model: str = "claude-sonnet-5-5"
+    detector_model: str = "qwen3.5-4b-32k-fast"
+    detector_reasoning_effort: str = ""  # only sent when set and supported
+    detector_fallback_model: str = "gemma-4-31b"
+    persona_model: str = "qwen3.5-4b-32k-fast"
+    script_gen_model: str = "gemma-4-31b"
 
     # --- voices ---
     kavach_warning_voice_id: str = ""  # cloned family voice (US data zone)

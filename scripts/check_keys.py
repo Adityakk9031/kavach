@@ -111,7 +111,7 @@ async def check_llm() -> str:
         r = await client.post(
             f"{S.llm_gateway_url}/chat/completions",
             headers={"authorization": S.assemblyai_api_key},
-            json={"model": S.detector_model, "reasoning_effort": S.detector_reasoning_effort, "max_tokens": 20,
+            json={"model": S.detector_model, "max_tokens": 20,
                   "messages": [{"role": "user", "content": "Reply with exactly: kavach ok"}]},
         )
     ms = (time.perf_counter() - t0) * 1000

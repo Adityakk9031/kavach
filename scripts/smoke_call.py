@@ -75,17 +75,22 @@ async def stream(ws, pcm: bytearray, t0: float) -> None:
         await ws.send(bytes(pcm[i:i + CHUNK_BYTES]))
 
 
-async def collect(ws, finals: list, status: dict) -> None:
+async def collect(ws, finals: list, status: dict, counts: dict | None = None) -> None:
     async for raw in ws:
         if isinstance(raw, bytes):
             continue
         ev = json.loads(raw)
+        if counts is not None:
+            key = f"{ev['type']}:{ev.get('channel')}:{'final' if ev.get('final') else 'partial'}"
+            counts[key] = counts.get(key, 0) + 1
         if ev["type"] == "transcript" and ev["final"]:
             finals.append(ev)
-            print(f"  [{ev['channel']:8}] STT {ev['stt_latency_ms']!s:>5} ms | {ev['text']}")
+            if counts is not None:
+                print(f"  [{ev['channel']:8}] STT {ev['stt_latency_ms']!s:>5} ms | {ev['text']}")
         elif ev["type"] == "stt_status":
             status[ev["channel"]] = ev
-            print(f"  [{ev['channel']:8}] STT session: {ev.get('model') or ev.get('error')}")
+            if counts is not None:
+                print(f"  [{ev['channel']:8}] STT session: {ev.get('model') or ev.get('error')}")
         elif ev["type"] == "call_ended":
             return
 
@@ -112,7 +117,8 @@ async def main(base: str, call_id: str) -> int:
     status: dict = {}
     async with websockets.connect(f"{ws_base}/ws/call/{call_id}/caller?caller_number=%2B919876543210") as caller, \
                websockets.connect(f"{ws_base}/ws/call/{call_id}/receiver") as receiver:
-        reader = asyncio.create_task(collect(receiver, finals, status))
+        counts: dict = {}
+        reader = asyncio.create_task(collect(receiver, finals, status, counts))
         drain = asyncio.create_task(collect(caller, [], {}))  # keep the caller socket read
         await asyncio.sleep(1.5)  # let both STT sessions reach Begin
         t0 = time.monotonic()
@@ -120,6 +126,7 @@ async def main(base: str, call_id: str) -> int:
         await caller.send(json.dumps({"type": "end_call"}))
         await asyncio.wait_for(asyncio.gather(reader, drain), 15)
 
+    print("event counts seen by receiver socket:", json.dumps(counts))
     # Match finals to script turns by best word overlap within the same channel.
     rows = []
     for i, (role, text) in enumerate(SCRIPT):
