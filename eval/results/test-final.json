@@ -1,0 +1,355 @@
+{
+ "run_id": "final",
+ "split": "test",
+ "config": {
+  "risk_threshold": 60,
+  "risk_rise": 0.7,
+  "risk_decay_per_turn": 4.0,
+  "detector_model": "qwen3.5-4b-32k-fast",
+  "stt_model": "universal-3-6-pro",
+  "stt_mode": "balanced",
+  "language": "english",
+  "warning_voice_cloned": true
+ },
+ "metrics": {
+  "n_calls": 2,
+  "n_scam": 0,
+  "n_legit": 0,
+  "n_hard_negative": 2,
+  "recall": null,
+  "fpr_legit": null,
+  "fpr_hard_negative": 0.0,
+  "fpr_all_negatives": 0.0,
+  "precision": null,
+  "decisive_to_warning_s": {
+   "n": 0,
+   "median": null,
+   "p90": null,
+   "pct_warned_before_decisive_turn_ended": null
+  },
+  "turn_end_to_warning_audio_ms": {
+   "n": 0,
+   "median": null,
+   "p90": null
+  },
+  "warning_tts_first_audio_ms_median": null,
+  "pct_caught_before_s5_s6": null,
+  "n_scams_with_s5_s6": 0,
+  "confusion": {
+   "tp": 0,
+   "fn": 0,
+   "fp": 0,
+   "tn": 2
+  },
+  "by_scam_type": {},
+  "warned_without_audio": 0
+ },
+ "finished": false,
+ "results": [
+  {
+   "id": "hard_negative_safe_mention_02",
+   "label": "legit",
+   "category": "hard_negative",
+   "scam_type": null,
+   "subtype": "safe_mention",
+   "split": "test",
+   "decisive_turn_index": null,
+   "first_s5_s6_turn_index": null,
+   "triggered": false,
+   "trigger_reason": null,
+   "trigger_script_turn": null,
+   "caught_before_s5s6": null,
+   "warning_first_audio_s": null,
+   "decisive_end_s": null,
+   "decisive_to_warning_s": null,
+   "tts_ttfa_ms": null,
+   "turn_end_to_audio_ms": null,
+   "warning_voice_cloned": null,
+   "warning_states": [],
+   "max_risk": 5.0,
+   "detections": [
+    {
+     "turn_idx": 0,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 535,
+     "trigger": false
+    },
+    {
+     "turn_idx": 2,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 3.5,
+     "llm_ms": 600,
+     "trigger": false
+    },
+    {
+     "turn_idx": 4,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 4.5,
+     "llm_ms": 565,
+     "trigger": false
+    },
+    {
+     "turn_idx": 6,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 4.9,
+     "llm_ms": 638,
+     "trigger": false
+    },
+    {
+     "turn_idx": 8,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 5.0,
+     "llm_ms": 539,
+     "trigger": false
+    },
+    {
+     "turn_idx": 9,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 5.0,
+     "llm_ms": 555,
+     "trigger": false
+    },
+    {
+     "turn_idx": 11,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 1.0,
+     "llm_ms": 571,
+     "trigger": false
+    }
+   ],
+   "detect_errors": 0,
+   "stt_incidents": 0,
+   "stt_finals": [
+    {
+     "channel": "caller",
+     "text": "Hello, am I speaking with Mr. Patel from the T. Nagar area in Chennai?",
+     "latency_ms": 377.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Yes, this is Patil. Who is calling, please?",
+     "latency_ms": 361.0
+    },
+    {
+     "channel": "caller",
+     "text": "Namaste, sir. I am Anirudh from the Community Policing Wing. I am calling to inform you about a recent spike in fraudulent calls targeting senior citizens in your neighborhood.",
+     "latency_ms": 484.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Oh, I have been getting many strange calls lately. Is there something I should worry about?",
+     "latency_ms": 362.0
+    },
+    {
+     "channel": "caller",
+     "text": "Please do not worry, sir, but be cautious. We noticed some suspicious activity involving transfers of \u20b980,000 from several accounts in your locality.",
+     "latency_ms": 506.0
+    },
+    {
+     "channel": "receiver",
+     "text": "80,000? That is a lot of money. How do they take it?",
+     "latency_ms": 348.0
+    },
+    {
+     "channel": "caller",
+     "text": "They usually trick people into sharing a one-time password or a PIN. I want to warn you that the police or any bank official will never ask you for these details over the phone.",
+     "latency_ms": 562.0
+    },
+    {
+     "channel": "receiver",
+     "text": "I see, but what if they say it is for a government verification?",
+     "latency_ms": 331.0
+    },
+    {
+     "channel": "caller",
+     "text": "Even then, please do not share your Aadhaar number or bank passwords.",
+     "latency_ms": 375.0
+    },
+    {
+     "channel": "caller",
+     "text": "If anyone asks for such things, just hang up immediately.",
+     "latency_ms": 376.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Thank you for telling me, Anirudh. I was getting very confused about these calls.",
+     "latency_ms": 370.0
+    },
+    {
+     "channel": "caller",
+     "text": "You are welcome, Mr. Patil. Just remember that we will never ask for money or codes over a call.",
+     "latency_ms": 453.0
+    },
+    {
+     "channel": "receiver",
+     "text": "I will keep that in mind.",
+     "latency_ms": 362.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Thank you for the warning.",
+     "latency_ms": 348.0
+    }
+   ],
+   "duration_streamed_s": 93.7
+  },
+  {
+   "id": "hard_negative_safe_mention_04",
+   "label": "legit",
+   "category": "hard_negative",
+   "scam_type": null,
+   "subtype": "safe_mention",
+   "split": "test",
+   "decisive_turn_index": null,
+   "first_s5_s6_turn_index": null,
+   "triggered": false,
+   "trigger_reason": null,
+   "trigger_script_turn": null,
+   "caught_before_s5s6": null,
+   "warning_first_audio_s": null,
+   "decisive_end_s": null,
+   "decisive_to_warning_s": null,
+   "tts_ttfa_ms": null,
+   "turn_end_to_audio_ms": null,
+   "warning_voice_cloned": null,
+   "warning_states": [],
+   "max_risk": 5.0,
+   "detections": [
+    {
+     "turn_idx": 0,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 534,
+     "trigger": false
+    },
+    {
+     "turn_idx": 2,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 545,
+     "trigger": false
+    },
+    {
+     "turn_idx": 3,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 3.5,
+     "llm_ms": 554,
+     "trigger": false
+    },
+    {
+     "turn_idx": 5,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 4.5,
+     "llm_ms": 588,
+     "trigger": false
+    },
+    {
+     "turn_idx": 7,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 4.9,
+     "llm_ms": 607,
+     "trigger": false
+    },
+    {
+     "turn_idx": 9,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 5.0,
+     "llm_ms": 611,
+     "trigger": false
+    },
+    {
+     "turn_idx": 11,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 5.0,
+     "llm_ms": 541,
+     "trigger": false
+    }
+   ],
+   "detect_errors": 0,
+   "stt_incidents": 0,
+   "stt_finals": [
+    {
+     "channel": "caller",
+     "text": "Hello, am I speaking with Mrs. Iyer from Lucknow?",
+     "latency_ms": 330.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Yes, this is she. Who is calling, please?",
+     "latency_ms": 406.0
+    },
+    {
+     "channel": "caller",
+     "text": "Namaste, I am Anjali from the State Bank security team.",
+     "latency_ms": 359.0
+    },
+    {
+     "channel": "caller",
+     "text": "I am calling to confirm if you just made a payment of \u20b99,500.",
+     "latency_ms": 351.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Oh my goodness, yes I did. Is there some problem with the transaction?",
+     "latency_ms": 419.0
+    },
+    {
+     "channel": "caller",
+     "text": "No, no, everything is perfect. We just noticed a large amount and wanted to ensure it was actually you.",
+     "latency_ms": 444.0
+    },
+    {
+     "channel": "receiver",
+     "text": "I was a bit worried. Do I need to do anything to verify it?",
+     "latency_ms": 461.0
+    },
+    {
+     "channel": "caller",
+     "text": "Nothing at all, Mrs. Iyer. This is just a courtesy confirmation call for your safety.",
+     "latency_ms": 415.0
+    },
+    {
+     "channel": "receiver",
+     "text": "I see. Some people told me that banks call to steal money these days.",
+     "latency_ms": 466.0
+    },
+    {
+     "channel": "caller",
+     "text": "They are right to be careful. Please remember that the bank will never ask you for your OTP, PIN, or password over the phone.",
+     "latency_ms": 441.0
+    },
+    {
+     "channel": "receiver",
+     "text": "That is a relief. I almost asked if I should tell you my details for the record.",
+     "latency_ms": 414.0
+    },
+    {
+     "channel": "caller",
+     "text": "Please never share those details with anyone, even if they claim to be from the bank. We already have your records here.",
+     "latency_ms": 421.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Thank you, Beta. I will keep that in mind.",
+     "latency_ms": 408.0
+    }
+   ],
+   "duration_streamed_s": 76.7
+  }
+ ]
+}

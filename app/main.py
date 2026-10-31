@@ -16,6 +16,8 @@ from app.call_room import ROLES, Peer, RoomRegistry
 from app.config import get_settings
 from app.detector import Detector
 from app.llm import LLM
+from app.evidence import EvidenceCollector
+from app.persona import Persona
 from app.pipeline import CallPipeline
 from app.store import Store
 from app.stt import NullStt, SttSession
@@ -40,6 +42,7 @@ detector = Detector(settings, llm)
 
 tts_pool = TtsPool(settings)
 warner = Warner(settings, tts_pool)
+persona = Persona(settings, llm, tts_pool)
 
 
 def attach_pipeline(room) -> None:
@@ -47,6 +50,8 @@ def attach_pipeline(room) -> None:
         room.pipeline = CallPipeline(room, detector)
         if settings.kavach_warning_voice_id:
             warner.attach(room, room.pipeline)
+        persona.attach(room)
+        room.evidence = EvidenceCollector(room, llm, settings.persona_model, room.pipeline)
 
 
 rooms = RoomRegistry(stt_factory, store, settings.sample_rate, on_new_room=attach_pipeline)

@@ -104,6 +104,8 @@ class CallRoom:
         self.control_handlers: dict[str, Callable] = {}  # JSON control message type -> async (room, role, msg)
         self.pipeline = None
         self.warning = None
+        self.persona = None
+        self.evidence = None
         self.store.start_call(call_id)
 
     # ---- lifecycle -------------------------------------------------------------------------------

@@ -17,6 +17,8 @@
       <div class="row">
         <button class="primary" id="answer">Answer call</button>
         <button class="danger" id="end" disabled>Hang up</button>
+        <button id="handover" disabled title="Kavach talks to the caller for you; the caller cannot hear you">Hand over to Kavach</button>
+        <button id="takeback" disabled hidden>Take back</button>
         <div class="meter"><div id="level"></div></div>
       </div>
       <p class="status" id="status">Not connected.</p>
@@ -27,7 +29,15 @@
       <strong id="warnTitle"></strong>
       <p id="warnText" class="muted"></p>
     </section>
+    <section class="panel" id="personaBox" hidden>
+      <strong id="personaTitle">Kavach is on the call</strong>
+      <p id="personaText" class="muted"></p>
+    </section>
     <section class="panel" id="detection"></section>
+    <section class="panel" id="evidenceBox" hidden>
+      <strong>Evidence collected</strong>
+      <table id="evidence" style="width:100%; font-size:14px; border-collapse:collapse"></table>
+    </section>
     <section class="panel">
       <div id="transcript"></div>
     </section>
@@ -44,6 +54,31 @@
     const dv = detectionView(document.getElementById('detection'));
     const $ = (id) => document.getElementById(id);
     let call, player, mic;
+    const seenEvidence = new Set();
+
+    function addEvidence(items) {
+      $('evidenceBox').hidden = false;
+      for (const it of items) {
+        const key = it.type + '|' + it.normalized;
+        if (seenEvidence.has(key)) continue;
+        seenEvidence.add(key);
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td style="padding:4px 8px; color:var(--muted)"></td><td style="padding:4px 8px"><b></b></td><td style="padding:4px 8px; color:var(--muted)"></td>';
+        const [a, b, c] = tr.children;
+        a.textContent = it.type.replaceAll('_', ' ');
+        b.firstChild.textContent = it.value;
+        c.textContent = '"' + it.quote + '"';
+        $('evidence').appendChild(tr);
+      }
+    }
+
+    function showTakeover(on) {
+      $('handover').hidden = on;
+      $('takeback').hidden = !on;
+      $('takeback').disabled = !on;
+      $('personaBox').hidden = !on && $('personaText').textContent === '';
+      $('personaTitle').textContent = on ? 'Kavach is on the call (the caller cannot hear you)' : 'You are back on the call';
+    }
 
     function showWarning(ev) {
       const box = $('warningBox');
@@ -80,6 +115,9 @@
           if (ev.type === 'transcript') tv.show(ev);
           else if (ev.type === 'flush_playback') player.flush(ev.source);
           else if (ev.type === 'warning') showWarning(ev);
+          else if (ev.type === 'takeover') showTakeover(ev.state === 'on');
+          else if (ev.type === 'persona' && ev.text) { $('personaBox').hidden = false; $('personaText').textContent = 'Kavach says: ' + ev.text; }
+          else if (ev.type === 'evidence') addEvidence(ev.items);
           else if (ev.type === 'call_ended') $('status').textContent = 'Call ended.';
         },
         onAudio(source, pcm) { player.play(source, pcm); },
@@ -87,6 +125,7 @@
       call.ws.onopen = async () => {
         $('answer').disabled = true;
         $('end').disabled = false;
+        $('handover').disabled = false;
         try {
           mic = await startMic((buf) => { const pcm = new Int16Array(buf); meter(pcm); vad(pcm); call.sendAudio(buf); });
         } catch (e) {
@@ -95,6 +134,8 @@
       };
     };
     $('end').onclick = () => { call.send({ type: 'end_call' }); mic && mic.stop(); };
+    $('handover').onclick = () => call.send({ type: 'takeover' });
+    $('takeback').onclick = () => { player.flush(SOURCE.PERSONA); call.send({ type: 'takeback' }); };
 
     // ?watch=1: read-only view of a call that other clients (or the eval runner) are driving.
     if (new URLSearchParams(location.search).get('watch')) {
@@ -106,6 +147,9 @@
         if (sv.handle(ev) || dv.handle(ev)) return;
         if (ev.type === 'transcript') tv.show(ev);
         else if (ev.type === 'warning') showWarning(ev);
+        else if (ev.type === 'takeover') showTakeover(ev.state === 'on');
+        else if (ev.type === 'persona' && ev.text) { $('personaBox').hidden = false; $('personaText').textContent = 'Kavach says: ' + ev.text; }
+        else if (ev.type === 'evidence') addEvidence(ev.items);
       };
     }
   </script>
