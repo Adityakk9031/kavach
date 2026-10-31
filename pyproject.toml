@@ -1,0 +1,36 @@
+[project]
+name = "kavach"
+version = "0.1.0"
+description = "Real-time scam-call protector: live detection, family-voice warning, takeover persona, alerts, 1930 complaint draft."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "assemblyai>=1.8.2",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "websockets>=14",
+    "httpx>=0.27",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "reportlab>=4.2",
+    "numpy>=2.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+filterwarnings = ["ignore::DeprecationWarning:fastapi.testclient", "ignore:Using `httpx` with `starlette.testclient`"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "live: calls real external APIs (needs keys in .env); skipped unless KAVACH_LIVE_TESTS=1",
+]

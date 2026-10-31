@@ -1,0 +1,10 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+data/
+eval/audio/
+*.wav
+*.pcm
+.DS_Store
