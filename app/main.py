@@ -1,7 +1,10 @@
 """FastAPI entry point. Run with: uv run uvicorn app.main:app --reload"""
 
+import asyncio
 import json
 import logging
+import time
+from contextlib import asynccontextmanager
 from importlib.metadata import version
 from pathlib import Path
 
@@ -11,6 +14,9 @@ from fastapi.staticfiles import StaticFiles
 
 from app.call_room import ROLES, Peer, RoomRegistry
 from app.config import get_settings
+from app.detector import Detector
+from app.llm import LLM
+from app.pipeline import CallPipeline
 from app.store import Store
 from app.stt import NullStt, SttSession
 
@@ -26,9 +32,40 @@ def stt_factory(channel: str, on_event):
     return SttSession(channel, settings, on_event)
 
 
-rooms = RoomRegistry(stt_factory, store, settings.sample_rate)
+llm = LLM(settings)
+detector = Detector(settings, llm)
 
-app = FastAPI(title="Kavach", version="0.1.0")
+
+def attach_pipeline(room) -> None:
+    if settings.assemblyai_api_key:
+        room.pipeline = CallPipeline(room, detector)
+
+
+rooms = RoomRegistry(stt_factory, store, settings.sample_rate, on_new_room=attach_pipeline)
+
+async def loop_lag_monitor(threshold_ms: int = 300) -> None:
+    """Log any time the event loop is blocked longer than the threshold (a stalled loop drops STT sockets)."""
+    log = logging.getLogger("kavach.lag")
+    while True:
+        t0 = time.monotonic()
+        await asyncio.sleep(0.1)
+        lag = (time.monotonic() - t0 - 0.1) * 1000
+        if lag > threshold_ms:
+            log.warning("event loop blocked for %.0f ms", lag)
+            for room in list(rooms.rooms.values()):
+                if not room.ended:
+                    room.log_event("loop_lag", {"ms": round(lag)})
+
+
+@asynccontextmanager
+async def lifespan(_app):
+    task = asyncio.create_task(loop_lag_monitor())
+    yield
+    task.cancel()
+    await llm.aclose()
+
+
+app = FastAPI(title="Kavach", version="0.1.0", lifespan=lifespan)
 WEB = Path(__file__).resolve().parent.parent / "web"
 app.mount("/web", StaticFiles(directory=WEB, html=True), name="web")
 

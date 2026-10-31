@@ -176,3 +176,30 @@ def test_websocket_endpoints_relay_between_two_tabs(monkeypatch):
             pytest.fail("no call_ended event")
     row = main.store.query("SELECT caller_number FROM calls WHERE id='wsrelay'")[0]
     assert row["caller_number"] == "+911234"
+
+
+async def test_unexpected_stt_close_is_logged_and_restarted(room):
+    await room.join("caller", FakeWs())
+    first = FakeStt.instances["caller"]
+    await first.on_event({"type": "closed", "code": 1008, "reason": "limit", "clean": False})
+    assert FakeStt.instances["caller"] is not first  # a fresh session replaced it
+    types = [e["type"] for e in room.store.events("t1")]
+    assert "stt_closed" in types and "stt_restarted" in types
+
+
+async def test_clean_close_and_leave_do_not_restart(room):
+    await room.join("caller", FakeWs())
+    first = FakeStt.instances["caller"]
+    await first.on_event({"type": "closed", "code": 1000, "reason": "", "clean": True})
+    assert FakeStt.instances["caller"] is first
+    await room.leave("caller")
+    await first.on_event({"type": "closed", "code": 1006, "reason": "", "clean": False})
+    assert "caller" not in room.stt
+
+
+async def test_restart_limit(room):
+    await room.join("caller", FakeWs())
+    for _ in range(5):
+        await FakeStt.instances["caller"].on_event({"type": "closed", "code": 1006, "reason": "", "clean": False})
+    restarted = [e for e in room.store.events("t1") if e["type"] == "stt_restarted"]
+    assert len(restarted) == CallRoom.MAX_STT_RESTARTS

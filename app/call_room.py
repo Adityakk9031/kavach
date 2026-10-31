@@ -95,10 +95,13 @@ class CallRoom:
         self.listeners: set[Peer] = set()
         self.takeover = False
         self.turn_idx = 0
+        self.stt_restarts: dict[str, int] = {}
         self.ended = False
         # Hooks later milestones attach to (detector, warner, persona). Each is an async callable.
         self.on_final_hooks: list[Callable] = []
         self.on_speech_started_hooks: list[Callable] = []
+        self.on_end_hooks: list[Callable] = []
+        self.pipeline = None
         self.store.start_call(call_id)
 
     # ---- lifecycle -------------------------------------------------------------------------------
@@ -134,6 +137,8 @@ class CallRoom:
         if self.ended:
             return
         self.ended = True
+        for hook in self.on_end_hooks:
+            await hook()
         for role in list(self.stt):
             stt = self.stt.pop(role)
             await stt.close()
@@ -217,13 +222,40 @@ class CallRoom:
             await self.broadcast({k: v for k, v in turn.items() if k != "final_at"})
             for hook in self.on_final_hooks:
                 await hook(self, turn)
+        elif kind == "closed":
+            await self._on_stt_closed(channel, ev)
         elif kind == "error":
             self.log_event("stt_error", {"channel": channel, "error": ev["error"]}, now)
             await self.broadcast({"type": "stt_status", "channel": channel, "ok": False, "error": ev["error"]})
 
 
+    MAX_STT_RESTARTS = 2
+
+    async def _on_stt_closed(self, channel: str, ev: dict) -> None:
+        """An STT session ended. If the call is still live and nobody asked for it, say so and restart it."""
+        if self.ended or channel not in self.stt or ev.get("clean", True):
+            return
+        self.log_event("stt_closed", {"channel": channel, "code": ev.get("code"), "reason": ev.get("reason")})
+        restarts = self.stt_restarts.get(channel, 0)
+        if restarts >= self.MAX_STT_RESTARTS:
+            await self.broadcast({"type": "stt_status", "channel": channel, "ok": False,
+                                  "error": f"STT closed ({ev.get('code')}) and restart limit reached"})
+            return
+        self.stt_restarts[channel] = restarts + 1
+        stt = self.stt_factory(channel, lambda e, r=channel: self._on_stt_event(r, e))
+        self.stt[channel] = stt
+        try:
+            await stt.start()
+            self.log_event("stt_restarted", {"channel": channel, "attempt": restarts + 1})
+        except Exception as e:
+            self.log_event("stt_error", {"channel": channel, "error": f"restart failed: {e}"})
+            await self.broadcast({"type": "stt_status", "channel": channel, "ok": False, "error": str(e)})
+
+
 class RoomRegistry:
-    def __init__(self, stt_factory: SttFactory, store: Store, sample_rate: int):
+    def __init__(self, stt_factory: SttFactory, store: Store, sample_rate: int,
+                 on_new_room: Callable[[CallRoom], None] | None = None):
+        self.on_new_room = on_new_room
         self.rooms: dict[str, CallRoom] = {}
         self.stt_factory = stt_factory
         self.store = store
@@ -234,4 +266,6 @@ class RoomRegistry:
         if room is None or room.ended:
             room = CallRoom(call_id, self.stt_factory, self.store, self.sample_rate)
             self.rooms[call_id] = room
+            if self.on_new_room:
+                self.on_new_room(room)
         return room

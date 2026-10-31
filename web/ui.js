@@ -50,3 +50,41 @@ export function levelMeter(el) {
     el.style.width = `${Math.min(100, (peak / 0x7fff) * 140)}%`;
   };
 }
+
+const STAGE_LABELS = {
+  S1: 'Authority', S2: 'Threat', S3: 'Secrecy', S4: 'Urgency', S5: 'Credentials', S6: 'Payment', S7: 'Remote access',
+};
+
+// Stage chips + cumulative risk meter + latest rationale. Call handle(ev) with each server event.
+export function detectionView(el) {
+  el.innerHTML = `
+    <div class="row" style="justify-content:space-between">
+      <strong>Scam risk <span id="riskNum">0</span></strong>
+      <span id="riskState" class="muted">listening</span>
+    </div>
+    <div class="riskbar"><div id="riskFill"></div></div>
+    <div class="chips" id="chips"></div>
+    <p class="muted" id="rationale"></p>`;
+  const chips = el.querySelector('#chips');
+  chips.innerHTML = Object.entries(STAGE_LABELS)
+    .map(([k, v]) => `<span class="chip" data-s="${k}" title="${k}">${v}</span>`).join('');
+  const q = (id) => el.querySelector(id);
+  return {
+    handle(ev) {
+      if (ev.type !== 'detection') return false;
+      if (ev.error) { q('#riskState').textContent = 'detector unavailable'; return true; }
+      q('#riskNum').textContent = Math.round(ev.risk_cum);
+      const fill = q('#riskFill');
+      fill.style.width = `${ev.risk_cum}%`;
+      fill.className = ev.risk_cum >= 70 ? 'high' : ev.risk_cum >= 40 ? 'mid' : '';
+      q('#riskState').textContent = ev.trigger ? `WARNING (${ev.reason}) · ${ev.llm_ms} ms` : `${ev.llm_ms} ms`;
+      q('#riskState').style.color = ev.trigger ? 'var(--danger)' : '';
+      for (const c of chips.children) {
+        c.classList.toggle('on', ev.stages_all.includes(c.dataset.s));
+        c.classList.toggle('now', ev.stages_now.includes(c.dataset.s));
+      }
+      q('#rationale').textContent = ev.rationale || '';
+      return true;
+    },
+  };
+}

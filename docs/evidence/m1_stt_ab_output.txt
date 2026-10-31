@@ -1,0 +1,36 @@
+event counts seen by receiver socket: {"stt_status:receiver:partial": 1, "presence:None:partial": 2, "stt_status:caller:partial": 1, "speech_started:caller:partial": 3, "transcript:caller:partial": 22, "transcript:caller:final": 3, "speech_started:receiver:partial": 3, "transcript:receiver:partial": 9, "transcript:receiver:final": 3, "call_ended:None:partial": 1}
+  "finals": 6,
+      "median": 484,
+      "median": 462,
+  "mean_word_match": 0.976
+PASS
+event counts seen by receiver socket: {"stt_status:receiver:partial": 1, "stt_status:caller:partial": 1, "presence:None:partial": 2, "speech_started:caller:partial": 3, "transcript:caller:partial": 25, "transcript:caller:final": 3, "speech_started:receiver:partial": 3, "transcript:receiver:partial": 9, "transcript:receiver:final": 3, "call_ended:None:partial": 1}
+  "finals": 6,
+      "median": 438,
+      "median": 437,
+  "mean_word_match": 0.976
+PASS
+server ok, stt_model=universal-streaming-english
+  [caller  ] STT session: universal-streaming-english
+  [receiver] STT session: universal-streaming-english
+event counts seen by receiver socket: {"stt_status:caller:partial": 1, "stt_status:receiver:partial": 1, "presence:None:partial": 2, "transcript:caller:partial": 79, "transcript:caller:final": 3, "transcript:receiver:partial": 34, "transcript:receiver:final": 3, "call_ended:None:partial": 1}
+  "stt_model": {
+    "caller": "universal-streaming-english",
+    "receiver": "universal-streaming-english"
+  "finals": 6,
+      "median": 743,
+      "median": 900,
+  "mean_word_match": 0.96
+PASS
+server ok, stt_model=universal-streaming-english
+  [caller  ] STT session: universal-streaming-english
+  [receiver] STT session: universal-streaming-english
+event counts seen by receiver socket: {"stt_status:caller:partial": 1, "presence:None:partial": 2, "stt_status:receiver:partial": 1, "transcript:caller:partial": 44, "transcript:caller:final": 1, "transcript:receiver:partial": 12, "transcript:receiver:final": 1, "call_ended:None:partial": 1}
+  "stt_model": {
+    "caller": "universal-streaming-english",
+    "receiver": "universal-streaming-english"
+  "finals": 2,
+      "median": 571,
+      "median": 918,
+  "mean_word_match": 0.315
+FAIL

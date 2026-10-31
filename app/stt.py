@@ -69,6 +69,7 @@ class SttSession:
         self._ws = None
         self._reader: asyncio.Task | None = None
         self._terminated = asyncio.Event()
+        self._close_info: dict = {"code": None, "reason": "", "clean": True}
         self.model: str | None = None
 
     async def start(self) -> None:
@@ -99,14 +100,18 @@ class SttSession:
                 if event:
                     await self.on_event(event)
         except websockets.ConnectionClosed as e:
-            if not self._terminated.is_set() and e.rcvd and e.rcvd.code != 1000:
-                await self.on_event({"type": "error", "error": f"closed {e.rcvd.code} {e.rcvd.reason}"})
+            code = e.rcvd.code if e.rcvd else None
+            self._close_info = {"code": code, "reason": e.rcvd.reason if e.rcvd else "",
+                                "clean": self._terminated.is_set() or code == 1000}
+            if not self._close_info["clean"]:
+                log.warning("STT %s closed unexpectedly: %s", self.channel, self._close_info)
         except Exception as e:  # never let a reader crash silently
             log.exception("STT %s reader failed", self.channel)
             await self.on_event({"type": "error", "error": f"{type(e).__name__}: {e}"})
         finally:
+            clean = self._terminated.is_set() and self._close_info["clean"]
             self._terminated.set()
-            await self.on_event({"type": "closed"})
+            await self.on_event({"type": "closed", **self._close_info, "clean": clean})
 
     async def send_audio(self, pcm: bytes) -> None:
         if self._ws is None or self._terminated.is_set():

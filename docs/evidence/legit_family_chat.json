@@ -1,0 +1,22 @@
+[
+ {
+  "turn": 1,
+  "stages": [],
+  "risk_llm": 0,
+  "risk_cum": 0.0,
+  "trigger": false,
+  "reason": null,
+  "llm_ms": 1150,
+  "model": "qwen3.5-4b-32k-fast"
+ },
+ {
+  "turn": 3,
+  "stages": [],
+  "risk_llm": 0,
+  "risk_cum": 0.0,
+  "trigger": false,
+  "reason": null,
+  "llm_ms": 561,
+  "model": "qwen3.5-4b-32k-fast"
+ }
+]

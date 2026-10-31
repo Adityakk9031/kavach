@@ -1,0 +1,57 @@
+[
+ {
+  "turn": 1,
+  "stages": [
+   "S1"
+  ],
+  "risk_llm": 60,
+  "risk_cum": 42.0,
+  "trigger": false,
+  "reason": null,
+  "llm_ms": 1285,
+  "model": "qwen3.5-4b-32k-fast"
+ },
+ {
+  "turn": 3,
+  "stages": [
+   "S1",
+   "S2"
+  ],
+  "risk_llm": 85,
+  "risk_cum": 72.1,
+  "trigger": true,
+  "reason": "threshold",
+  "llm_ms": 675,
+  "model": "qwen3.5-4b-32k-fast"
+ },
+ {
+  "turn": 5,
+  "stages": [
+   "S1",
+   "S2",
+   "S3"
+  ],
+  "risk_llm": 95,
+  "risk_cum": 88.1,
+  "trigger": true,
+  "reason": "threshold",
+  "llm_ms": 715,
+  "model": "qwen3.5-4b-32k-fast"
+ },
+ {
+  "turn": 7,
+  "stages": [
+   "S1",
+   "S2",
+   "S3",
+   "S4",
+   "S6"
+  ],
+  "risk_llm": 95,
+  "risk_cum": 92.9,
+  "trigger": true,
+  "reason": "threshold",
+  "llm_ms": 782,
+  "model": "qwen3.5-4b-32k-fast"
+ }
+]

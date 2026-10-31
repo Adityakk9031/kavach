@@ -32,3 +32,10 @@ input[type=text] { font: inherit; padding: 7px 10px; border: 1px solid var(--lin
 .meter { height: 8px; width: 160px; background: var(--line); border-radius: 4px; overflow: hidden; }
 .meter > div { height: 100%; width: 0; background: var(--accent); transition: width 60ms linear; }
 a { color: var(--accent); }
+.riskbar { height: 12px; background: var(--line); border-radius: 6px; overflow: hidden; margin: 8px 0; }
+.riskbar > div { height: 100%; width: 0; background: var(--accent); transition: width .25s ease, background .25s; }
+.riskbar > div.mid { background: var(--warn); } .riskbar > div.high { background: var(--danger); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+.chip.on { background: var(--warn); border-color: var(--warn); color: #fff; }
+.chip.now { outline: 2px solid var(--danger); outline-offset: 1px; }

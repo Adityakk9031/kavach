@@ -23,19 +23,21 @@
       <p class="status bad" id="micError" style="color: var(--danger)"></p>
       <p class="muted">Use headphones: the warning plays here, and speakers can leak it back into your mic.</p>
     </section>
+    <section class="panel" id="detection"></section>
     <section class="panel">
       <div id="transcript"></div>
     </section>
   </main>
   <script type="module">
     import { connectCall, startMic, Player, callIdFromUrl } from './audio.js';
-    import { transcriptView, statusView, levelMeter } from './ui.js';
+    import { transcriptView, statusView, levelMeter, detectionView } from './ui.js';
 
     const callId = callIdFromUrl();
     document.getElementById('callLabel').textContent = `call: ${callId}`;
     const tv = transcriptView(document.getElementById('transcript'));
     const sv = statusView(document.getElementById('status'));
     const meter = levelMeter(document.getElementById('level'));
+    const dv = detectionView(document.getElementById('detection'));
     const $ = (id) => document.getElementById(id);
     let call, player, mic;
 
@@ -44,7 +46,7 @@
       await player.resume();
       call = connectCall(callId, 'receiver', {
         onEvent(ev) {
-          if (sv.handle(ev)) return;
+          if (sv.handle(ev) || dv.handle(ev)) return;
           if (ev.type === 'transcript') tv.show(ev);
           else if (ev.type === 'flush_playback') player.flush(ev.source);
           else if (ev.type === 'call_ended') $('status').textContent = 'Call ended.';
@@ -62,6 +64,18 @@
       };
     };
     $('end').onclick = () => { call.send({ type: 'end_call' }); mic && mic.stop(); };
+
+    // ?watch=1: read-only view of a call that other clients (or the eval runner) are driving.
+    if (new URLSearchParams(location.search).get('watch')) {
+      $('answer').disabled = true;
+      const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+      const ws = new WebSocket(`${proto}://${location.host}/ws/events/${encodeURIComponent(callId)}`);
+      ws.onmessage = (e) => {
+        const ev = JSON.parse(e.data);
+        if (sv.handle(ev) || dv.handle(ev)) return;
+        if (ev.type === 'transcript') tv.show(ev);
+      };
+    }
   </script>
 </body>
 </html>
