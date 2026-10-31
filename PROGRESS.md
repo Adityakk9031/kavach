@@ -123,7 +123,7 @@ Built: `app/alerts.py` (max 3 per call, slots for takeover and call-end are neve
 |---|---|---|
 | Every field filled from a call; PDF opens | ✅ offline | `tests/test_report_alerts.py`: seeded call fills all 11 evidence fields, quotes verified against the caller's actual words, PDF text read back with `pypdf` (banner on every page, number, UPI, IFSC, steps) |
 | Alert content, rate limit, mock Telegram API | ✅ offline | 12 tests |
-| **A real Telegram message arrives** | ✅ API accepted 4 messages | chat id found after you messaged the bot (`1524903598`); test message id 3; then a live scripted scam call (`e2e-scam-1`, mode live) sent warning, takeover and call-end alerts: ids 4, 5, 6, the last with the PDF attached. Telegram's API says delivered; I cannot see your screen |
+| **A real Telegram message arrives** | ✅ API accepted 4 messages | chat id found after you messaged the bot (`1524903598`); test message id 3; then a live scripted scam call (`e2e-scam-1`, mode live) sent warning, takeover and call-end alerts: ids 4, 5, 6, the last with the PDF attached. Telegram's API accepted them, and the user confirmed on 2026-11-01 that they arrived on their phone |
 | Report from a live call | ✅ | `docs/evidence/m6_sample_complaint_draft.pdf/.md`: 3 pages, 8 captured details, banner on every page |
 
 ## Independent review (separate subagent, spec + repo only, no network)
