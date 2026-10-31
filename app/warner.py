@@ -99,6 +99,9 @@ class CallWarning:
 
     async def speak(self, text: str, stage: str, trigger_at: float, turn_end_at: float | None) -> None:
         room = self.room
+        if room.takeover:  # the person already handed the call to Kavach: a warning would talk over the persona
+            room.log_event("warn_skipped", {"reason": "takeover in progress"})
+            return
         if "receiver" not in room.parties:
             room.log_event("warn_skipped", {"reason": "receiver not connected"})
             return
@@ -117,6 +120,7 @@ class CallWarning:
             if first:
                 first = False
                 self.first_audio_at = now
+                room.store.update_call(room.call_id, warned_at=time.time())  # only when audio really started
                 room.log_event("warn_first_audio", {
                     "ttfa_ms": round(self.request.ttfa_ms) if self.request else None,
                     "trigger_to_audio_ms": round((now - trigger_at) * 1000),

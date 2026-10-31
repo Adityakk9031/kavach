@@ -209,13 +209,13 @@ async def main(a) -> int:
     llm = LLM(S)
     t_start = time.monotonic()
     # --demo is a real call (mode=live, family alerts go out) and a human is the receiver; otherwise it is a test.
-    mode = "live" if a.demo else "eval"
+    mode = "live" if (a.demo or a.live_alerts) else "eval"
     async with contextlib.AsyncExitStack() as stack:
         client = await stack.enter_async_context(httpx.AsyncClient(timeout=60))
         caller = await stack.enter_async_context(
             websockets.connect(f"{ws_base}/ws/call/{a.call_id}/caller?mode={mode}&caller_number=%2B919820133456"))
         receiver = None if a.demo else await stack.enter_async_context(
-            websockets.connect(f"{ws_base}/ws/call/{a.call_id}/receiver?mode=eval"))
+            websockets.connect(f"{ws_base}/ws/call/{a.call_id}/receiver?mode={mode}"))
         tasks = [asyncio.create_task(caller_reader(caller, st))] + ([asyncio.create_task(drain(receiver))] if receiver else [])
         await asyncio.sleep(2.5)
         turns = await scammer_loop(a, caller, receiver, client, llm, st)
@@ -300,6 +300,8 @@ if __name__ == "__main__":
     ap.add_argument("--base", default="http://localhost:8000")
     ap.add_argument("--call-id", default=f"takeover-{int(time.time())}")
     ap.add_argument("--seconds", type=int, default=120)
+    ap.add_argument("--live-alerts", action="store_true",
+                    help="scripted run as a REAL call: the family gets the Telegram alerts and the call-end PDF")
     ap.add_argument("--adaptive", action="store_true",
                     help="LLM-driven scammer instead of the fixed script (variable; informational, not the gate)")
     ap.add_argument("--demo", action="store_true",

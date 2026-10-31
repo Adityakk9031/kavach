@@ -99,6 +99,8 @@ def build(store, call_id: str, notes: str = "") -> Report:
             seen.add(key)
             quotes.append({"time": _clock(wall.get(src["id"], started)), "quote": q.strip(),
                            "stages": json.loads(d["stages"] or "[]")})
+    quotes = [q for q in quotes if not any(o is not q and o["time"] == q["time"] and squash(q["quote"]) in squash(o["quote"])
+                                           and len(o["quote"]) > len(q["quote"]) for o in quotes)]
     transcript = []
     for t in turns:
         who = {"caller": "Caller", "receiver": "You", "persona": "Kavach decoy persona (fake details)"}.get(t["channel"], t["channel"])

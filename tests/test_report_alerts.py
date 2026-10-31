@@ -212,3 +212,11 @@ def test_report_drops_detector_quotes_the_caller_never_said():
     assert "Send me your OTP right now" not in quotes  # paraphrase the model invented
     assert "What is this about?" not in quotes  # a listener line, not the caller's
     assert any(q.startswith("Pay fifty thousand rupees") for q in quotes)
+
+
+def test_report_drops_quotes_nested_inside_a_longer_quote_from_the_same_turn():
+    st = seeded_store()
+    st._exec("INSERT INTO detections(call_id, turn_id, stages, evidence_quotes, risk_llm, risk_cum, rationale, triggered, llm_ms, model) "
+             "VALUES ('r1', 3, '[\"S6\"]', '[\"Pay fifty thousand rupees to pay.now@okbank\", \"Pay fifty thousand rupees\"]', 90, 90, '', 1, 700, 'q')")
+    quotes = [q["quote"] for q in report.build(st, "r1").key_quotes]
+    assert "Pay fifty thousand rupees" not in quotes and "Pay fifty thousand rupees to pay.now@okbank" in quotes

@@ -1,5 +1,5 @@
 {
- "run_id": "final",
+ "run_id": "final2",
  "split": "test",
  "config": {
   "risk_threshold": 60,
@@ -19,29 +19,29 @@
   "n_legit": 12,
   "n_hard_negative": 6,
   "recall": 1.0,
-  "fpr_legit": 0.0,
+  "fpr_legit": 0.08333333333333333,
   "fpr_hard_negative": 0.0,
-  "fpr_all_negatives": 0.0,
-  "precision": 1.0,
+  "fpr_all_negatives": 0.05555555555555555,
+  "precision": 0.9473684210526315,
   "decisive_to_warning_s": {
-   "n": 17,
-   "median": -11.92,
-   "p90": 2.0740000000000003,
-   "pct_warned_before_decisive_turn_ended": 0.6470588235294118
+   "n": 18,
+   "median": -11.515,
+   "p90": 14.895000000000001,
+   "pct_warned_before_decisive_turn_ended": 0.5555555555555556
   },
   "turn_end_to_warning_audio_ms": {
-   "n": 17,
-   "median": 1529,
-   "p90": 1668.2
+   "n": 18,
+   "median": 1551.5,
+   "p90": 1625.0
   },
-  "warning_tts_first_audio_ms_median": 401,
-  "pct_caught_before_s5_s6": 0.8333333333333334,
+  "warning_tts_first_audio_ms_median": 398.5,
+  "pct_caught_before_s5_s6": 0.6666666666666666,
   "n_scams_with_s5_s6": 18,
   "confusion": {
    "tp": 18,
    "fn": 0,
-   "fp": 0,
-   "tn": 18
+   "fp": 1,
+   "tn": 17
   },
   "by_scam_type": {
    "bank_kyc": {
@@ -69,7 +69,7 @@
     "caught": 2
    }
   },
-  "warned_without_audio": 1
+  "warned_without_audio": 0
  },
  "finished": true,
  "results": [
@@ -93,14 +93,14 @@
    "turn_end_to_audio_ms": null,
    "warning_voice_cloned": null,
    "warning_states": [],
-   "max_risk": 5.0,
+   "max_risk": 8.5,
    "detections": [
     {
      "turn_idx": 0,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 535,
+     "llm_ms": 1262,
      "trigger": false
     },
     {
@@ -108,31 +108,31 @@
      "stages": [],
      "risk_llm": 5,
      "risk_cum": 3.5,
-     "llm_ms": 600,
+     "llm_ms": 598,
      "trigger": false
     },
     {
      "turn_idx": 4,
      "stages": [],
-     "risk_llm": 5,
-     "risk_cum": 4.5,
-     "llm_ms": 565,
+     "risk_llm": 10,
+     "risk_cum": 8.1,
+     "llm_ms": 568,
      "trigger": false
     },
     {
      "turn_idx": 6,
      "stages": [],
      "risk_llm": 5,
-     "risk_cum": 4.9,
-     "llm_ms": 638,
+     "risk_cum": 5.0,
+     "llm_ms": 544,
      "trigger": false
     },
     {
      "turn_idx": 8,
      "stages": [],
-     "risk_llm": 5,
-     "risk_cum": 5.0,
-     "llm_ms": 539,
+     "risk_llm": 10,
+     "risk_cum": 8.5,
+     "llm_ms": 544,
      "trigger": false
     },
     {
@@ -140,15 +140,15 @@
      "stages": [],
      "risk_llm": 5,
      "risk_cum": 5.0,
-     "llm_ms": 555,
+     "llm_ms": 557,
      "trigger": false
     },
     {
      "turn_idx": 11,
      "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 1.0,
-     "llm_ms": 571,
+     "risk_llm": 5,
+     "risk_cum": 5.0,
+     "llm_ms": 521,
      "trigger": false
     }
    ],
@@ -158,72 +158,72 @@
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mr. Patel from the T. Nagar area in Chennai?",
-     "latency_ms": 377.0
+     "latency_ms": 368.0
     },
     {
      "channel": "receiver",
      "text": "Yes, this is Patil. Who is calling, please?",
-     "latency_ms": 361.0
+     "latency_ms": 367.0
     },
     {
      "channel": "caller",
      "text": "Namaste, sir. I am Anirudh from the Community Policing Wing. I am calling to inform you about a recent spike in fraudulent calls targeting senior citizens in your neighborhood.",
-     "latency_ms": 484.0
+     "latency_ms": 471.0
     },
     {
      "channel": "receiver",
      "text": "Oh, I have been getting many strange calls lately. Is there something I should worry about?",
-     "latency_ms": 362.0
+     "latency_ms": 365.0
     },
     {
      "channel": "caller",
      "text": "Please do not worry, sir, but be cautious. We noticed some suspicious activity involving transfers of \u20b980,000 from several accounts in your locality.",
-     "latency_ms": 506.0
+     "latency_ms": 413.0
     },
     {
      "channel": "receiver",
      "text": "80,000? That is a lot of money. How do they take it?",
-     "latency_ms": 348.0
+     "latency_ms": 422.0
     },
     {
      "channel": "caller",
      "text": "They usually trick people into sharing a one-time password or a PIN. I want to warn you that the police or any bank official will never ask you for these details over the phone.",
-     "latency_ms": 562.0
+     "latency_ms": 554.0
     },
     {
      "channel": "receiver",
      "text": "I see, but what if they say it is for a government verification?",
-     "latency_ms": 331.0
+     "latency_ms": 397.0
     },
     {
      "channel": "caller",
      "text": "Even then, please do not share your Aadhaar number or bank passwords.",
-     "latency_ms": 375.0
+     "latency_ms": 358.0
     },
     {
      "channel": "caller",
      "text": "If anyone asks for such things, just hang up immediately.",
-     "latency_ms": 376.0
+     "latency_ms": 364.0
     },
     {
      "channel": "receiver",
      "text": "Thank you for telling me, Anirudh. I was getting very confused about these calls.",
-     "latency_ms": 370.0
+     "latency_ms": 359.0
     },
     {
      "channel": "caller",
      "text": "You are welcome, Mr. Patil. Just remember that we will never ask for money or codes over a call.",
-     "latency_ms": 453.0
+     "latency_ms": 441.0
     },
     {
      "channel": "receiver",
      "text": "I will keep that in mind.",
-     "latency_ms": 362.0
+     "latency_ms": 358.0
     },
     {
      "channel": "receiver",
      "text": "Thank you for the warning.",
-     "latency_ms": 348.0
+     "latency_ms": 339.0
     }
    ],
    "duration_streamed_s": 93.7
@@ -255,7 +255,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 534,
+     "llm_ms": 498,
      "trigger": false
     },
     {
@@ -263,47 +263,39 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 545,
-     "trigger": false
-    },
-    {
-     "turn_idx": 3,
-     "stages": [],
-     "risk_llm": 5,
-     "risk_cum": 3.5,
-     "llm_ms": 554,
-     "trigger": false
-    },
-    {
-     "turn_idx": 5,
-     "stages": [],
-     "risk_llm": 5,
-     "risk_cum": 4.5,
      "llm_ms": 588,
      "trigger": false
     },
     {
-     "turn_idx": 7,
+     "turn_idx": 4,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 3.5,
+     "llm_ms": 546,
+     "trigger": false
+    },
+    {
+     "turn_idx": 6,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 4.5,
+     "llm_ms": 562,
+     "trigger": false
+    },
+    {
+     "turn_idx": 8,
      "stages": [],
      "risk_llm": 5,
      "risk_cum": 4.9,
-     "llm_ms": 607,
+     "llm_ms": 612,
      "trigger": false
     },
     {
-     "turn_idx": 9,
+     "turn_idx": 10,
      "stages": [],
      "risk_llm": 5,
      "risk_cum": 5.0,
-     "llm_ms": 611,
-     "trigger": false
-    },
-    {
-     "turn_idx": 11,
-     "stages": [],
-     "risk_llm": 5,
-     "risk_cum": 5.0,
-     "llm_ms": 541,
+     "llm_ms": 538,
      "trigger": false
     }
    ],
@@ -313,394 +305,68 @@
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mrs. Iyer from Lucknow?",
-     "latency_ms": 330.0
+     "latency_ms": 334.0
     },
     {
      "channel": "receiver",
      "text": "Yes, this is she. Who is calling, please?",
-     "latency_ms": 406.0
+     "latency_ms": 411.0
     },
     {
      "channel": "caller",
-     "text": "Namaste, I am Anjali from the State Bank security team.",
-     "latency_ms": 359.0
-    },
-    {
-     "channel": "caller",
-     "text": "I am calling to confirm if you just made a payment of \u20b99,500.",
-     "latency_ms": 351.0
+     "text": "Namaste, I am Anjali from the State Bank security team. I am calling to confirm if you just made a payment of \u20b99,500.",
+     "latency_ms": 467.0
     },
     {
      "channel": "receiver",
      "text": "Oh my goodness, yes I did. Is there some problem with the transaction?",
-     "latency_ms": 419.0
+     "latency_ms": 420.0
     },
     {
      "channel": "caller",
      "text": "No, no, everything is perfect. We just noticed a large amount and wanted to ensure it was actually you.",
-     "latency_ms": 444.0
+     "latency_ms": 446.0
     },
     {
      "channel": "receiver",
      "text": "I was a bit worried. Do I need to do anything to verify it?",
-     "latency_ms": 461.0
+     "latency_ms": 486.0
     },
     {
      "channel": "caller",
      "text": "Nothing at all, Mrs. Iyer. This is just a courtesy confirmation call for your safety.",
-     "latency_ms": 415.0
+     "latency_ms": 419.0
     },
     {
      "channel": "receiver",
      "text": "I see. Some people told me that banks call to steal money these days.",
-     "latency_ms": 466.0
+     "latency_ms": 390.0
     },
     {
      "channel": "caller",
      "text": "They are right to be careful. Please remember that the bank will never ask you for your OTP, PIN, or password over the phone.",
-     "latency_ms": 441.0
+     "latency_ms": 448.0
     },
     {
      "channel": "receiver",
      "text": "That is a relief. I almost asked if I should tell you my details for the record.",
-     "latency_ms": 414.0
+     "latency_ms": 423.0
     },
     {
      "channel": "caller",
      "text": "Please never share those details with anyone, even if they claim to be from the bank. We already have your records here.",
-     "latency_ms": 421.0
+     "latency_ms": 432.0
     },
     {
      "channel": "receiver",
      "text": "Thank you, Beta. I will keep that in mind.",
-     "latency_ms": 408.0
+     "latency_ms": 415.0
     }
    ],
    "duration_streamed_s": 76.7
   },
   {
    "id": "hard_negative_safe_mention_07",
-   "label": "legit",
-   "category": "hard_negative",
-   "scam_type": null,
-   "subtype": "safe_mention",
-   "split": "test",
-   "decisive_turn_index": null,
-   "first_s5_s6_turn_index": null,
-   "triggered": false,
-   "trigger_reason": null,
-   "trigger_script_turn": null,
-   "caught_before_s5s6": null,
-   "warning_first_audio_s": null,
-   "decisive_end_s": null,
-   "decisive_to_warning_s": null,
-   "tts_ttfa_ms": null,
-   "turn_end_to_audio_ms": null,
-   "warning_voice_cloned": null,
-   "warning_states": [],
-   "max_risk": 22.8,
-   "detections": [
-    {
-     "turn_idx": 0,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 498,
-     "trigger": false
-    },
-    {
-     "turn_idx": 2,
-     "stages": [
-      "S1"
-     ],
-     "risk_llm": 25,
-     "risk_cum": 17.5,
-     "llm_ms": 596,
-     "trigger": false
-    },
-    {
-     "turn_idx": 3,
-     "stages": [
-      "S1"
-     ],
-     "risk_llm": 25,
-     "risk_cum": 22.8,
-     "llm_ms": 562,
-     "trigger": false
-    },
-    {
-     "turn_idx": 5,
-     "stages": [
-      "S1"
-     ],
-     "risk_llm": 5,
-     "risk_cum": 18.8,
-     "llm_ms": 565,
-     "trigger": false
-    },
-    {
-     "turn_idx": 7,
-     "stages": [
-      "S1"
-     ],
-     "risk_llm": 5,
-     "risk_cum": 14.8,
-     "llm_ms": 581,
-     "trigger": false
-    },
-    {
-     "turn_idx": 9,
-     "stages": [
-      "S1"
-     ],
-     "risk_llm": 5,
-     "risk_cum": 10.8,
-     "llm_ms": 551,
-     "trigger": false
-    },
-    {
-     "turn_idx": 11,
-     "stages": [
-      "S1"
-     ],
-     "risk_llm": 0,
-     "risk_cum": 6.8,
-     "llm_ms": 508,
-     "trigger": false
-    }
-   ],
-   "detect_errors": 0,
-   "stt_incidents": 0,
-   "stt_finals": [
-    {
-     "channel": "caller",
-     "text": "Hello, am I speaking with Mr. Patil from Delhi?",
-     "latency_ms": 384.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Yes, speaking. Who is this, please?",
-     "latency_ms": 463.0
-    },
-    {
-     "channel": "caller",
-     "text": "I am Anjali from the City Police Community Outreach Cell, sir.",
-     "latency_ms": 373.0
-    },
-    {
-     "channel": "caller",
-     "text": "I am calling to let you know that we are seeing a lot of fraud cases in your area lately.",
-     "latency_ms": 480.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Oh dear, is that so? I have been getting many strange calls since morning.",
-     "latency_ms": 421.0
-    },
-    {
-     "channel": "caller",
-     "text": "Exactly why I am calling. We want to warn you that the police or any bank officer will never ask you for an OTP or your PIN over the phone.",
-     "latency_ms": 482.0
-    },
-    {
-     "channel": "receiver",
-     "text": "But what if they say it is for a refund or some government scheme?",
-     "latency_ms": 402.0
-    },
-    {
-     "channel": "caller",
-     "text": "That is the trick, sir. Even if they mention a specific amount like \u20b912,000 or more, just hang up immediately.",
-     "latency_ms": 381.0
-    },
-    {
-     "channel": "receiver",
-     "text": "I see. I was actually worried about a message I got about a payment today.",
-     "latency_ms": 461.0
-    },
-    {
-     "channel": "caller",
-     "text": "Please ignore those messages and do not click any links. Just remember that your Aadhaar and bank details should never be shared with anyone calling you.",
-     "latency_ms": 483.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Thank you for the warning, Beta. You are very kind to call and tell me this.",
-     "latency_ms": 407.0
-    },
-    {
-     "channel": "caller",
-     "text": "It is my duty, Mr. Patil. Stay safe, and please tell your neighbors as well.",
-     "latency_ms": 385.0
-    },
-    {
-     "channel": "receiver",
-     "text": "I will definitely do that. Have a good day.",
-     "latency_ms": 407.0
-    }
-   ],
-   "duration_streamed_s": 85.3
-  },
-  {
-   "id": "hard_negative_safe_mention_09",
-   "label": "legit",
-   "category": "hard_negative",
-   "scam_type": null,
-   "subtype": "safe_mention",
-   "split": "test",
-   "decisive_turn_index": null,
-   "first_s5_s6_turn_index": null,
-   "triggered": false,
-   "trigger_reason": null,
-   "trigger_script_turn": null,
-   "caught_before_s5s6": null,
-   "warning_first_audio_s": null,
-   "decisive_end_s": null,
-   "decisive_to_warning_s": null,
-   "tts_ttfa_ms": null,
-   "turn_end_to_audio_ms": null,
-   "warning_voice_cloned": null,
-   "warning_states": [],
-   "max_risk": 52.5,
-   "detections": [
-    {
-     "turn_idx": 0,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 503,
-     "trigger": false
-    },
-    {
-     "turn_idx": 2,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 575,
-     "trigger": false
-    },
-    {
-     "turn_idx": 4,
-     "stages": [
-      "S1",
-      "S2"
-     ],
-     "risk_llm": 75,
-     "risk_cum": 52.5,
-     "llm_ms": 1502,
-     "trigger": false
-    },
-    {
-     "turn_idx": 6,
-     "stages": [
-      "S1",
-      "S2"
-     ],
-     "risk_llm": 5,
-     "risk_cum": 48.5,
-     "llm_ms": 647,
-     "trigger": false
-    },
-    {
-     "turn_idx": 8,
-     "stages": [
-      "S1",
-      "S2"
-     ],
-     "risk_llm": 5,
-     "risk_cum": 44.5,
-     "llm_ms": 597,
-     "trigger": false
-    },
-    {
-     "turn_idx": 11,
-     "stages": [
-      "S1",
-      "S2"
-     ],
-     "risk_llm": 5,
-     "risk_cum": 40.5,
-     "llm_ms": 577,
-     "trigger": false
-    }
-   ],
-   "detect_errors": 0,
-   "stt_incidents": 0,
-   "stt_finals": [
-    {
-     "channel": "caller",
-     "text": "Hello, am I speaking with Mr. Gupta from Hyderabad?",
-     "latency_ms": 347.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Yes, this is Gupta speaking. Who is calling, please?",
-     "latency_ms": 470.0
-    },
-    {
-     "channel": "caller",
-     "text": "I am Ananya from the State Bank Fraud Prevention Cell calling to confirm a transaction of \u20b950,000 made this morning.",
-     "latency_ms": 518.0
-    },
-    {
-     "channel": "receiver",
-     "text": "$50,000? I did not make any such payment today.",
-     "latency_ms": 412.0
-    },
-    {
-     "channel": "caller",
-     "text": "That is exactly why I am calling. We noticed a suspicious attempt and have temporarily blocked the transfer for your safety.",
-     "latency_ms": 465.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Oh my goodness, thank you! What do I need to do now to fix this?",
-     "latency_ms": 450.0
-    },
-    {
-     "channel": "caller",
-     "text": "You do not need to do anything on this call. Please just visit your home branch in person tomorrow with your ID to resolve it.",
-     "latency_ms": 618.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Can you not just take my details over the phone to verify it now?",
-     "latency_ms": 370.0
-    },
-    {
-     "channel": "caller",
-     "text": "No, Mr. Gupta, we will never ask for your OTP, PIN, or account details over the phone.",
-     "latency_ms": 360.0
-    },
-    {
-     "channel": "receiver",
-     "text": "I see.",
-     "latency_ms": 371.0
-    },
-    {
-     "channel": "receiver",
-     "text": "I was worried someone would ask me for a code or something.",
-     "latency_ms": 411.0
-    },
-    {
-     "channel": "caller",
-     "text": "Exactly. Please remember that bank officials never ask for such private information. Just go to the branch and they will help you.",
-     "latency_ms": 557.0
-    },
-    {
-     "channel": "receiver",
-     "text": "All right, I will go there tomorrow morning.",
-     "latency_ms": 371.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Thank you for the warning.",
-     "latency_ms": 371.0
-    }
-   ],
-   "duration_streamed_s": 81.2
-  },
-  {
-   "id": "hard_negative_safe_mention_12",
    "label": "legit",
    "category": "hard_negative",
    "scam_type": null,
@@ -726,7 +392,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 512,
+     "llm_ms": 513,
      "trigger": false
     },
     {
@@ -736,17 +402,17 @@
      ],
      "risk_llm": 25,
      "risk_cum": 17.5,
-     "llm_ms": 662,
+     "llm_ms": 635,
      "trigger": false
     },
     {
-     "turn_idx": 3,
+     "turn_idx": 4,
      "stages": [
       "S1"
      ],
      "risk_llm": 5,
      "risk_cum": 13.5,
-     "llm_ms": 577,
+     "llm_ms": 575,
      "trigger": false
     },
     {
@@ -754,39 +420,322 @@
      "stages": [
       "S1"
      ],
-     "risk_llm": 5,
+     "risk_llm": 0,
      "risk_cum": 9.5,
-     "llm_ms": 550,
+     "llm_ms": 563,
      "trigger": false
     },
     {
-     "turn_idx": 9,
+     "turn_idx": 8,
      "stages": [
       "S1"
      ],
      "risk_llm": 5,
      "risk_cum": 5.5,
-     "llm_ms": 603,
+     "llm_ms": 506,
      "trigger": false
     },
     {
-     "turn_idx": 12,
+     "turn_idx": 10,
      "stages": [
       "S1"
      ],
-     "risk_llm": 0,
-     "risk_cum": 1.5,
-     "llm_ms": 647,
+     "risk_llm": 5,
+     "risk_cum": 5.0,
+     "llm_ms": 546,
      "trigger": false
+    }
+   ],
+   "detect_errors": 0,
+   "stt_incidents": 0,
+   "stt_finals": [
+    {
+     "channel": "caller",
+     "text": "Hello, am I speaking with Mr. Patil from Delhi?",
+     "latency_ms": 348.0
     },
     {
-     "turn_idx": 15,
-     "stages": [
-      "S1"
-     ],
+     "channel": "receiver",
+     "text": "Yes, speaking. Who is this, please?",
+     "latency_ms": 425.0
+    },
+    {
+     "channel": "caller",
+     "text": "I am Anjali from the City Police Community Outreach Cell, sir. I am calling to let you know that we are seeing a lot of fraud cases in your area lately.",
+     "latency_ms": 491.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Oh dear, is that so? I have been getting many strange calls since morning.",
+     "latency_ms": 477.0
+    },
+    {
+     "channel": "caller",
+     "text": "Exactly why I am calling. We want to warn you that the police or any bank officer will never ask you for an OTP or your PIN over the phone.",
+     "latency_ms": 438.0
+    },
+    {
+     "channel": "receiver",
+     "text": "But what if they say it is for a refund or some government scheme?",
+     "latency_ms": 367.0
+    },
+    {
+     "channel": "caller",
+     "text": "That is the trick, sir. Even if they mention a specific amount like \u20b912,000 or more, just hang up immediately.",
+     "latency_ms": 418.0
+    },
+    {
+     "channel": "receiver",
+     "text": "I see. I was actually worried about a message I got about a payment today.",
+     "latency_ms": 425.0
+    },
+    {
+     "channel": "caller",
+     "text": "Please ignore those messages and do not click any links. Just remember that your Aadhaar and bank details should never be shared with anyone calling you.",
+     "latency_ms": 517.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Thank you for the warning, Beta. You are very kind to call and tell me this.",
+     "latency_ms": 365.0
+    },
+    {
+     "channel": "caller",
+     "text": "It is my duty, Mr. Patil. Stay safe, and please tell your neighbors as well.",
+     "latency_ms": 419.0
+    },
+    {
+     "channel": "receiver",
+     "text": "I will definitely do that. Have a good day.",
+     "latency_ms": 363.0
+    }
+   ],
+   "duration_streamed_s": 85.3
+  },
+  {
+   "id": "hard_negative_safe_mention_09",
+   "label": "legit",
+   "category": "hard_negative",
+   "scam_type": null,
+   "subtype": "safe_mention",
+   "split": "test",
+   "decisive_turn_index": null,
+   "first_s5_s6_turn_index": null,
+   "triggered": false,
+   "trigger_reason": null,
+   "trigger_script_turn": null,
+   "caught_before_s5s6": null,
+   "warning_first_audio_s": null,
+   "decisive_end_s": null,
+   "decisive_to_warning_s": null,
+   "tts_ttfa_ms": null,
+   "turn_end_to_audio_ms": null,
+   "warning_voice_cloned": null,
+   "warning_states": [],
+   "max_risk": 57.8,
+   "detections": [
+    {
+     "turn_idx": 0,
+     "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 567,
+     "llm_ms": 483,
+     "trigger": false
+    },
+    {
+     "turn_idx": 2,
+     "stages": [
+      "S1"
+     ],
+     "risk_llm": 25,
+     "risk_cum": 17.5,
+     "llm_ms": 686,
+     "trigger": false
+    },
+    {
+     "turn_idx": 4,
+     "stages": [
+      "S1",
+      "S2"
+     ],
+     "risk_llm": 75,
+     "risk_cum": 57.8,
+     "llm_ms": 614,
+     "trigger": false
+    },
+    {
+     "turn_idx": 6,
+     "stages": [
+      "S1",
+      "S2"
+     ],
+     "risk_llm": 5,
+     "risk_cum": 53.8,
+     "llm_ms": 573,
+     "trigger": false
+    },
+    {
+     "turn_idx": 8,
+     "stages": [
+      "S1",
+      "S2"
+     ],
+     "risk_llm": 10,
+     "risk_cum": 49.8,
+     "llm_ms": 581,
+     "trigger": false
+    },
+    {
+     "turn_idx": 11,
+     "stages": [
+      "S1",
+      "S2"
+     ],
+     "risk_llm": 5,
+     "risk_cum": 45.8,
+     "llm_ms": 729,
+     "trigger": false
+    }
+   ],
+   "detect_errors": 0,
+   "stt_incidents": 0,
+   "stt_finals": [
+    {
+     "channel": "caller",
+     "text": "Hello, am I speaking with Mr. Gupta from Hyderabad?",
+     "latency_ms": 354.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Yes, this is Gupta speaking. Who is calling, please?",
+     "latency_ms": 393.0
+    },
+    {
+     "channel": "caller",
+     "text": "I am Ananya from the State Bank Fraud Prevention Cell calling to confirm a transaction of \u20b950,000 made this morning.",
+     "latency_ms": 464.0
+    },
+    {
+     "channel": "receiver",
+     "text": "$50,000? I did not make any such payment today.",
+     "latency_ms": 414.0
+    },
+    {
+     "channel": "caller",
+     "text": "That is exactly why I am calling. We noticed a suspicious attempt and have temporarily blocked the transfer for your safety.",
+     "latency_ms": 567.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Oh my goodness, thank you! What do I need to do now to fix this?",
+     "latency_ms": 453.0
+    },
+    {
+     "channel": "caller",
+     "text": "You do not need to do anything on this call. Please just visit your home branch in person tomorrow with your ID to resolve it.",
+     "latency_ms": 570.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Can you not just take my details over the phone to verify it now?",
+     "latency_ms": 301.0
+    },
+    {
+     "channel": "caller",
+     "text": "No, Mr. Gupta, we will never ask for your OTP, PIN, or account details over the phone.",
+     "latency_ms": 473.0
+    },
+    {
+     "channel": "receiver",
+     "text": "I see.",
+     "latency_ms": 300.0
+    },
+    {
+     "channel": "receiver",
+     "text": "I was worried someone would ask me for a code or something.",
+     "latency_ms": 411.0
+    },
+    {
+     "channel": "caller",
+     "text": "Exactly. Please remember that bank officials never ask for such private information. Just go to the branch and they will help you.",
+     "latency_ms": 507.0
+    },
+    {
+     "channel": "receiver",
+     "text": "All right, I will go there tomorrow morning. Thank you for the warning.",
+     "latency_ms": 455.0
+    }
+   ],
+   "duration_streamed_s": 81.2
+  },
+  {
+   "id": "hard_negative_safe_mention_12",
+   "label": "legit",
+   "category": "hard_negative",
+   "scam_type": null,
+   "subtype": "safe_mention",
+   "split": "test",
+   "decisive_turn_index": null,
+   "first_s5_s6_turn_index": null,
+   "triggered": false,
+   "trigger_reason": null,
+   "trigger_script_turn": null,
+   "caught_before_s5s6": null,
+   "warning_first_audio_s": null,
+   "decisive_end_s": null,
+   "decisive_to_warning_s": null,
+   "tts_ttfa_ms": null,
+   "turn_end_to_audio_ms": null,
+   "warning_voice_cloned": null,
+   "warning_states": [],
+   "max_risk": 5.0,
+   "detections": [
+    {
+     "turn_idx": 0,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 524,
+     "trigger": false
+    },
+    {
+     "turn_idx": 2,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 539,
+     "trigger": false
+    },
+    {
+     "turn_idx": 4,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 3.5,
+     "llm_ms": 562,
+     "trigger": false
+    },
+    {
+     "turn_idx": 7,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 4.5,
+     "llm_ms": 597,
+     "trigger": false
+    },
+    {
+     "turn_idx": 10,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 4.9,
+     "llm_ms": 507,
+     "trigger": false
+    },
+    {
+     "turn_idx": 13,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 5.0,
+     "llm_ms": 569,
      "trigger": false
     }
    ],
@@ -796,92 +745,82 @@
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mr. Reddy from your residence in Delhi?",
-     "latency_ms": 324.0
+     "latency_ms": 344.0
     },
     {
      "channel": "receiver",
      "text": "Yes, this is ready. Who is calling, please?",
-     "latency_ms": 437.0
-    },
-    {
-     "channel": "caller",
-     "text": "I am Ananya from the State Bank security team.",
-     "latency_ms": 374.0
-    },
-    {
-     "channel": "caller",
-     "text": "I am calling to confirm if you made a payment of \u20b99,500 this morning.",
-     "latency_ms": 473.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Oh yes, I did.",
      "latency_ms": 375.0
     },
     {
+     "channel": "caller",
+     "text": "I am Ananya from the State Bank security team. I am calling to confirm if you made a payment of \u20b99,500 this morning.",
+     "latency_ms": 468.0
+    },
+    {
      "channel": "receiver",
-     "text": "I sent it to my grandson for his books. Is there a problem?",
-     "latency_ms": 377.0
+     "text": "Oh yes, I did. I sent it to my grandson for his books. Is there a problem?",
+     "latency_ms": 473.0
     },
     {
      "channel": "caller",
      "text": "No, the transaction went through perfectly. We are just doing a routine check for high-value transfers to ensure your account is safe.",
-     "latency_ms": 435.0
+     "latency_ms": 381.0
     },
     {
      "channel": "receiver",
      "text": "I see.",
-     "latency_ms": 374.0
+     "latency_ms": 400.0
     },
     {
      "channel": "receiver",
      "text": "I was worried something happened to the money.",
-     "latency_ms": 386.0
+     "latency_ms": 312.0
     },
     {
      "channel": "caller",
      "text": "Everything is fine, Mr. Reddy. However, please remember that our bank will never call you to ask for your OTP or your secret PIN.",
-     "latency_ms": 392.0
+     "latency_ms": 416.0
     },
     {
      "channel": "receiver",
      "text": "But why would they ask for that?",
-     "latency_ms": 337.0
+     "latency_ms": 356.0
     },
     {
      "channel": "receiver",
      "text": "If they are from the bank.",
-     "latency_ms": 375.0
+     "latency_ms": 475.0
     },
     {
      "channel": "caller",
      "text": "Because scammers pretend to be us to steal your money. If anyone asks for your card number or Aadhaar details over the phone, just hang up immediately.",
-     "latency_ms": 566.0
+     "latency_ms": 430.0
     },
     {
      "channel": "receiver",
      "text": "I will be careful.",
-     "latency_ms": 378.0
+     "latency_ms": 474.0
     },
     {
      "channel": "receiver",
      "text": "Thank you for telling me this, Beta.",
-     "latency_ms": 305.0
+     "latency_ms": 325.0
     },
     {
      "channel": "caller",
      "text": "You are welcome. Just stay alert and never share your passwords with anyone.",
-     "latency_ms": 496.0
+     "latency_ms": 435.0
     },
     {
      "channel": "receiver",
      "text": "Yes, I understand.",
-     "latency_ms": 320.0
+     "latency_ms": 335.0
     },
     {
      "channel": "receiver",
      "text": "Have a good day.",
-     "latency_ms": 336.0
+     "latency_ms": 352.0
     }
    ],
    "duration_streamed_s": 83.5
@@ -913,11 +852,11 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 500,
+     "llm_ms": 491,
      "trigger": false
     },
     {
-     "turn_idx": 3,
+     "turn_idx": 2,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
@@ -925,35 +864,35 @@
      "trigger": false
     },
     {
-     "turn_idx": 5,
+     "turn_idx": 4,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 568,
+     "trigger": false
+    },
+    {
+     "turn_idx": 6,
      "stages": [],
      "risk_llm": 5,
      "risk_cum": 3.5,
-     "llm_ms": 574,
+     "llm_ms": 563,
      "trigger": false
     },
     {
-     "turn_idx": 7,
+     "turn_idx": 8,
      "stages": [],
      "risk_llm": 5,
      "risk_cum": 4.5,
-     "llm_ms": 564,
+     "llm_ms": 531,
      "trigger": false
     },
     {
-     "turn_idx": 9,
+     "turn_idx": 10,
      "stages": [],
      "risk_llm": 5,
      "risk_cum": 4.9,
-     "llm_ms": 545,
-     "trigger": false
-    },
-    {
-     "turn_idx": 11,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.9,
-     "llm_ms": 605,
+     "llm_ms": 548,
      "trigger": false
     }
    ],
@@ -963,67 +902,62 @@
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mr. Gupta from Pune?",
-     "latency_ms": 365.0
+     "latency_ms": 307.0
     },
     {
      "channel": "receiver",
-     "text": "Yes, this is Gupta speaking.",
-     "latency_ms": 344.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Who is this calling?",
-     "latency_ms": 324.0
+     "text": "Yes, this is Gupta speaking. Who is this calling?",
+     "latency_ms": 418.0
     },
     {
      "channel": "caller",
      "text": "Namaste, sir. I am Anjali from the State Bank security team. I am calling just to confirm a transaction of \u20b99,500 made on your account today.",
-     "latency_ms": 465.0
+     "latency_ms": 492.0
     },
     {
      "channel": "receiver",
      "text": "Oh yes, I did that for my grandson's books. Is there some problem?",
-     "latency_ms": 470.0
+     "latency_ms": 479.0
     },
     {
      "channel": "caller",
      "text": "No, sir, everything is fine and the payment was successful. I am calling because we noticed a new device login, so we wanted to ensure it was you.",
-     "latency_ms": 464.0
+     "latency_ms": 479.0
     },
     {
      "channel": "receiver",
      "text": "I did change my phone last week. Does that mean my account is not safe?",
-     "latency_ms": 448.0
+     "latency_ms": 378.0
     },
     {
      "channel": "caller",
      "text": "It is safe, sir, but please remember that the bank will never call you to ask for your password or OTP to verify anything.",
-     "latency_ms": 435.0
+     "latency_ms": 524.0
     },
     {
      "channel": "receiver",
      "text": "But if you are from the bank, you might need some details to check.",
-     "latency_ms": 385.0
+     "latency_ms": 479.0
     },
     {
      "channel": "caller",
      "text": "Never, Mr. Gupta. Please never share your PIN or any OTP with anyone over the phone, even if they claim to be from the bank.",
-     "latency_ms": 468.0
+     "latency_ms": 486.0
     },
     {
      "channel": "receiver",
      "text": "I see. I was a bit worried when the phone rang.",
-     "latency_ms": 485.0
+     "latency_ms": 421.0
     },
     {
      "channel": "caller",
      "text": "It is better to be cautious. Just ignore anyone who asks for your Aadhaar or card numbers over a call.",
-     "latency_ms": 414.0
+     "latency_ms": 520.0
     },
     {
      "channel": "receiver",
      "text": "Thank you for the warning, Beta. I will keep this in mind.",
-     "latency_ms": 444.0
+     "latency_ms": 390.0
     }
    ],
    "duration_streamed_s": 90.1
@@ -1048,14 +982,14 @@
    "turn_end_to_audio_ms": null,
    "warning_voice_cloned": null,
    "warning_states": [],
-   "max_risk": 3.5,
+   "max_risk": 9.1,
    "detections": [
     {
      "turn_idx": 0,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 496,
+     "llm_ms": 521,
      "trigger": false
     },
     {
@@ -1071,47 +1005,47 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 557,
+     "llm_ms": 593,
      "trigger": false
     },
     {
      "turn_idx": 7,
      "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 580,
+     "risk_llm": 10,
+     "risk_cum": 7.0,
+     "llm_ms": 1010,
      "trigger": false
     },
     {
      "turn_idx": 9,
      "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 542,
+     "risk_llm": 10,
+     "risk_cum": 9.1,
+     "llm_ms": 587,
      "trigger": false
     },
     {
      "turn_idx": 12,
      "stages": [],
      "risk_llm": 5,
-     "risk_cum": 3.5,
-     "llm_ms": 579,
+     "risk_cum": 5.1,
+     "llm_ms": 575,
      "trigger": false
     },
     {
      "turn_idx": 15,
      "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 555,
+     "risk_llm": 5,
+     "risk_cum": 5.0,
+     "llm_ms": 1143,
      "trigger": false
     },
     {
      "turn_idx": 18,
      "stages": [],
      "risk_llm": 5,
-     "risk_cum": 3.5,
-     "llm_ms": 545,
+     "risk_cum": 5.0,
+     "llm_ms": 562,
      "trigger": false
     }
    ],
@@ -1121,102 +1055,102 @@
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mr. Singh from Mumbai?",
-     "latency_ms": 333.0
+     "latency_ms": 312.0
     },
     {
      "channel": "receiver",
      "text": "Yes, this is he.",
-     "latency_ms": 371.0
+     "latency_ms": 368.0
     },
     {
      "channel": "receiver",
      "text": "Who is calling, please?",
-     "latency_ms": 344.0
+     "latency_ms": 408.0
     },
     {
      "channel": "caller",
      "text": "Sir, my name is Ananya, and I am calling from the fraud prevention team of your bank.",
-     "latency_ms": 490.0
+     "latency_ms": 460.0
     },
     {
      "channel": "receiver",
      "text": "Fraud team? What happened?",
-     "latency_ms": 330.0
+     "latency_ms": 326.0
     },
     {
      "channel": "receiver",
      "text": "Is something wrong?",
-     "latency_ms": 355.0
+     "latency_ms": 428.0
     },
     {
      "channel": "caller",
      "text": "We have flagged a suspicious transaction attempt of \u20b91 lakh on your account.",
-     "latency_ms": 383.0
+     "latency_ms": 360.0
     },
     {
      "channel": "caller",
      "text": "Did you authorize this payment?",
-     "latency_ms": 423.0
+     "latency_ms": 410.0
     },
     {
      "channel": "receiver",
      "text": "1 lakh? No, no, I did not do any such thing. Oh my God!",
-     "latency_ms": 425.0
+     "latency_ms": 438.0
     },
     {
      "channel": "caller",
      "text": "Please do not worry, sir. Is it correct that you are not making any large purchases today?",
-     "latency_ms": 439.0
+     "latency_ms": 411.0
     },
     {
      "channel": "receiver",
      "text": "Correct.",
-     "latency_ms": 363.0
+     "latency_ms": 345.0
     },
     {
      "channel": "receiver",
      "text": "I am just at home. Do you need my account number to check?",
-     "latency_ms": 441.0
+     "latency_ms": 519.0
     },
     {
      "channel": "caller",
      "text": "No, sir. I have your details here. For your safety, I have gone ahead and blocked your card immediately.",
-     "latency_ms": 493.0
+     "latency_ms": 462.0
     },
     {
      "channel": "receiver",
      "text": "Thank you. Now what should I do?",
-     "latency_ms": 374.0
+     "latency_ms": 372.0
     },
     {
      "channel": "receiver",
      "text": "Do I need to give you some code to fix this?",
-     "latency_ms": 450.0
+     "latency_ms": 368.0
     },
     {
      "channel": "caller",
      "text": "No, absolutely not. Please remember that the bank will never ask you for an OTP, your PIN, or your CVV over the phone.",
-     "latency_ms": 382.0
+     "latency_ms": 442.0
     },
     {
      "channel": "receiver",
      "text": "I see.",
-     "latency_ms": 335.0
+     "latency_ms": 326.0
     },
     {
      "channel": "receiver",
      "text": "I was getting very nervous. So the money is safe?",
-     "latency_ms": 473.0
+     "latency_ms": 468.0
     },
     {
      "channel": "caller",
      "text": "Yes, the transaction was stopped. You can visit your nearest branch tomorrow to apply for a replacement card.",
-     "latency_ms": 482.0
+     "latency_ms": 462.0
     },
     {
      "channel": "receiver",
      "text": "All right, Beta, thank you for calling and helping me.",
-     "latency_ms": 475.0
+     "latency_ms": 466.0
     }
    ],
    "duration_streamed_s": 85.8
@@ -1230,97 +1164,69 @@
    "split": "test",
    "decisive_turn_index": null,
    "first_s5_s6_turn_index": null,
-   "triggered": false,
-   "trigger_reason": null,
-   "trigger_script_turn": null,
+   "triggered": true,
+   "trigger_reason": "threshold",
+   "trigger_script_turn": 6,
    "caught_before_s5s6": null,
-   "warning_first_audio_s": null,
+   "warning_first_audio_s": 47.44,
    "decisive_end_s": null,
    "decisive_to_warning_s": null,
-   "tts_ttfa_ms": null,
+   "tts_ttfa_ms": 399,
    "turn_end_to_audio_ms": null,
-   "warning_voice_cloned": null,
-   "warning_states": [],
-   "max_risk": 54.6,
+   "warning_voice_cloned": true,
+   "warning_states": [
+    "speaking",
+    "interrupted",
+    "speaking"
+   ],
+   "max_risk": 78.2,
    "detections": [
     {
      "turn_idx": 0,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 540,
+     "llm_ms": 534,
      "trigger": false
     },
     {
      "turn_idx": 3,
      "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 576,
+     "risk_llm": 10,
+     "risk_cum": 7.0,
+     "llm_ms": 550,
      "trigger": false
     },
     {
      "turn_idx": 5,
      "stages": [],
      "risk_llm": 10,
-     "risk_cum": 7.0,
-     "llm_ms": 586,
+     "risk_cum": 9.1,
+     "llm_ms": 578,
      "trigger": false
     },
     {
      "turn_idx": 7,
      "stages": [
       "S1",
-      "S2"
+      "S6"
      ],
-     "risk_llm": 75,
-     "risk_cum": 54.6,
-     "llm_ms": 717,
-     "trigger": false
+     "risk_llm": 85,
+     "risk_cum": 62.2,
+     "llm_ms": 688,
+     "trigger": true
     },
     {
      "turn_idx": 9,
      "stages": [
       "S1",
-      "S2"
+      "S2",
+      "S6"
      ],
-     "risk_llm": 0,
-     "risk_cum": 50.6,
-     "llm_ms": 1443,
-     "trigger": false
-    },
-    {
-     "turn_idx": 12,
-     "stages": [
-      "S1",
-      "S2"
-     ],
-     "risk_llm": 5,
-     "risk_cum": 46.6,
-     "llm_ms": 665,
-     "trigger": false
-    },
-    {
-     "turn_idx": 14,
-     "stages": [
-      "S1",
-      "S2"
-     ],
-     "risk_llm": 5,
-     "risk_cum": 42.6,
-     "llm_ms": 712,
-     "trigger": false
-    },
-    {
-     "turn_idx": 15,
-     "stages": [
-      "S1",
-      "S2"
-     ],
-     "risk_llm": 5,
-     "risk_cum": 38.6,
-     "llm_ms": 662,
-     "trigger": false
+     "risk_llm": 85,
+     "risk_cum": 78.2,
+     "llm_ms": 793,
+     "trigger": true
     }
    ],
    "detect_errors": 0,
@@ -1329,90 +1235,55 @@
     {
      "channel": "caller",
      "text": "Good afternoon, am I speaking with Mr. Sharma from LuckNow?",
-     "latency_ms": 471.0
+     "latency_ms": 407.0
     },
     {
      "channel": "receiver",
      "text": "Yes, this is Sharma speaking.",
-     "latency_ms": 381.0
+     "latency_ms": 314.0
     },
     {
      "channel": "receiver",
      "text": "Who is this?",
-     "latency_ms": 422.0
+     "latency_ms": 435.0
     },
     {
      "channel": "caller",
      "text": "My name is Ananya, and I am calling from the fraud prevention team of your bank. We have noticed a very unusual transaction on your account.",
-     "latency_ms": 473.0
+     "latency_ms": 575.0
     },
     {
      "channel": "receiver",
      "text": "What do you mean? What has happened?",
-     "latency_ms": 478.0
+     "latency_ms": 412.0
     },
     {
      "channel": "caller",
      "text": "There is a pending request for \u20b91 lakh to a merchant in another state. Did you authorize this payment?",
-     "latency_ms": 432.0
+     "latency_ms": 369.0
     },
     {
      "channel": "receiver",
      "text": "1 lakh? No, no, I have not done any such transaction today.",
-     "latency_ms": 817.0
+     "latency_ms": 440.0
     },
     {
      "channel": "caller",
      "text": "I see. In that case, I am blocking your debit card immediately to prevent the money from leaving your account. Is that okay?",
-     "latency_ms": 526.0
+     "latency_ms": 472.0
     },
     {
      "channel": "receiver",
      "text": "Yes, please block it quickly, but will I lose my money?",
-     "latency_ms": 382.0
+     "latency_ms": 472.0
     },
     {
      "channel": "caller",
-     "text": "Do not worry, the transaction was flagged, and the card is now disabled. You should visit your branch for a replacement card.",
-     "latency_ms": 413.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Okay, thank you.",
-     "latency_ms": 376.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Do you need any details or a code from me to finish this?",
-     "latency_ms": 486.0
-    },
-    {
-     "channel": "caller",
-     "text": "No, Mr. Sharma, please remember that we will never ask you for your OTP, PIN, or CVV over the phone.",
-     "latency_ms": 567.0
-    },
-    {
-     "channel": "receiver",
-     "text": "I am glad to hear that. I will go to the bank tomorrow morning.",
-     "latency_ms": 378.0
-    },
-    {
-     "channel": "caller",
-     "text": "That is the correct thing to do.",
-     "latency_ms": 372.0
-    },
-    {
-     "channel": "caller",
-     "text": "Have a good day, sir.",
-     "latency_ms": 315.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Thank you, Beta. Goodbye.",
-     "latency_ms": 357.0
+     "text": "Do not worry, the transaction was flagged",
+     "latency_ms": null
     }
    ],
-   "duration_streamed_s": 86.1
+   "duration_streamed_s": 49.0
   },
   {
    "id": "legit_bank_fraud_team_no_otp_05",
@@ -1434,14 +1305,14 @@
    "turn_end_to_audio_ms": null,
    "warning_voice_cloned": null,
    "warning_states": [],
-   "max_risk": 17.5,
+   "max_risk": 31.5,
    "detections": [
     {
      "turn_idx": 0,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 491,
+     "llm_ms": 1194,
      "trigger": false
     },
     {
@@ -1449,9 +1320,9 @@
      "stages": [
       "S1"
      ],
-     "risk_llm": 25,
-     "risk_cum": 17.5,
-     "llm_ms": 563,
+     "risk_llm": 45,
+     "risk_cum": 31.5,
+     "llm_ms": 566,
      "trigger": false
     },
     {
@@ -1460,7 +1331,7 @@
       "S1"
      ],
      "risk_llm": 0,
-     "risk_cum": 13.5,
+     "risk_cum": 27.5,
      "llm_ms": 580,
      "trigger": false
     },
@@ -1469,9 +1340,9 @@
      "stages": [
       "S1"
      ],
-     "risk_llm": 0,
-     "risk_cum": 9.5,
-     "llm_ms": 580,
+     "risk_llm": 10,
+     "risk_cum": 23.5,
+     "llm_ms": 1005,
      "trigger": false
     },
     {
@@ -1479,19 +1350,19 @@
      "stages": [
       "S1"
      ],
-     "risk_llm": 0,
-     "risk_cum": 5.5,
-     "llm_ms": 1415,
+     "risk_llm": 10,
+     "risk_cum": 19.5,
+     "llm_ms": 667,
      "trigger": false
     },
     {
-     "turn_idx": 10,
+     "turn_idx": 9,
      "stages": [
       "S1"
      ],
      "risk_llm": 5,
-     "risk_cum": 5.0,
-     "llm_ms": 532,
+     "risk_cum": 15.5,
+     "llm_ms": 555,
      "trigger": false
     },
     {
@@ -1500,28 +1371,18 @@
       "S1"
      ],
      "risk_llm": 5,
-     "risk_cum": 5.0,
-     "llm_ms": 579,
+     "risk_cum": 11.5,
+     "llm_ms": 574,
      "trigger": false
     },
     {
-     "turn_idx": 13,
+     "turn_idx": 12,
      "stages": [
       "S1"
      ],
      "risk_llm": 0,
-     "risk_cum": 1.0,
-     "llm_ms": 540,
-     "trigger": false
-    },
-    {
-     "turn_idx": 14,
-     "stages": [
-      "S1"
-     ],
-     "risk_llm": 5,
-     "risk_cum": 3.8,
-     "llm_ms": 546,
+     "risk_cum": 7.5,
+     "llm_ms": 1340,
      "trigger": false
     }
    ],
@@ -1531,82 +1392,72 @@
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mr. Sharma from Hyderabad?",
-     "latency_ms": 400.0
+     "latency_ms": 352.0
     },
     {
      "channel": "receiver",
      "text": "Yes, this is Sharma. Who is this?",
-     "latency_ms": 410.0
-    },
-    {
-     "channel": "caller",
-     "text": "Sir, I am Anjali from the bank fraud monitoring team. I am calling because we see a suspicious transaction of \u20b91 lakh on your account.",
-     "latency_ms": 426.0
-    },
-    {
-     "channel": "receiver",
-     "text": "1 lakh? What is this? I have not done any such thing.",
-     "latency_ms": 461.0
-    },
-    {
-     "channel": "caller",
-     "text": "Please do not worry, sir.",
-     "latency_ms": 327.0
-    },
-    {
-     "channel": "caller",
-     "text": "Did you authorize any payment of \u20b91 lakh to an electronics store in the last hour?",
-     "latency_ms": 468.0
-    },
-    {
-     "channel": "receiver",
-     "text": "No, no, absolutely not. This is very worrying.",
-     "latency_ms": 453.0
-    },
-    {
-     "channel": "caller",
-     "text": "I understand. I have gone ahead and blocked your card immediately to prevent any more money from leaving your account.",
-     "latency_ms": 449.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Thank you.",
-     "latency_ms": 363.0
-    },
-    {
-     "channel": "receiver",
-     "text": "But how will I get my money back now?",
-     "latency_ms": 444.0
-    },
-    {
-     "channel": "caller",
-     "text": "Our team will investigate and revert to you.",
      "latency_ms": 365.0
     },
     {
      "channel": "caller",
-     "text": "For your safety, please remember that the bank will never ask you for your OTP, PIN, or CVV over the phone.",
-     "latency_ms": 445.0
+     "text": "Sir, I am Anjali from the bank fraud monitoring team. I am calling because we see a suspicious transaction of \u20b91 lakh on your account.",
+     "latency_ms": 407.0
+    },
+    {
+     "channel": "receiver",
+     "text": "1 lakh? What is this? I have not done any such thing.",
+     "latency_ms": 431.0
+    },
+    {
+     "channel": "caller",
+     "text": "Please do not worry, sir.",
+     "latency_ms": 380.0
+    },
+    {
+     "channel": "caller",
+     "text": "Did you authorize any payment of \u20b91 lakh to an electronics store in the last hour?",
+     "latency_ms": 359.0
+    },
+    {
+     "channel": "receiver",
+     "text": "No, no, absolutely not. This is very worrying.",
+     "latency_ms": 483.0
+    },
+    {
+     "channel": "caller",
+     "text": "I understand. I have gone ahead and blocked your card immediately to prevent any more money from leaving your account.",
+     "latency_ms": 419.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Thank you, but how will I get my money back now?",
+     "latency_ms": 409.0
+    },
+    {
+     "channel": "caller",
+     "text": "Our team will investigate and revert to you. For your safety, please remember that the bank will never ask you for your OTP, PIN, or CVV over the phone.",
+     "latency_ms": 470.0
     },
     {
      "channel": "receiver",
      "text": "Okay, you don't need any of those things from me now.",
-     "latency_ms": 360.0
+     "latency_ms": 415.0
     },
     {
      "channel": "caller",
      "text": "No, sir.",
-     "latency_ms": 324.0
+     "latency_ms": 379.0
     },
     {
      "channel": "caller",
      "text": "We do not need any credentials or payments from you. Just visit your home branch tomorrow to apply for a new card.",
-     "latency_ms": 475.0
+     "latency_ms": 510.0
     },
     {
      "channel": "receiver",
      "text": "All right, I will do that. Thank you for letting me know, Anjali.",
-     "latency_ms": 409.0
+     "latency_ms": 381.0
     }
    ],
    "duration_streamed_s": 84.7
@@ -1631,14 +1482,14 @@
    "turn_end_to_audio_ms": null,
    "warning_voice_cloned": null,
    "warning_states": [],
-   "max_risk": 0.0,
+   "max_risk": 3.5,
    "detections": [
     {
      "turn_idx": 0,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 518,
+     "llm_ms": 527,
      "trigger": false
     },
     {
@@ -1646,7 +1497,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 583,
+     "llm_ms": 572,
      "trigger": false
     },
     {
@@ -1654,7 +1505,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 602,
+     "llm_ms": 545,
      "trigger": false
     },
     {
@@ -1662,23 +1513,23 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 554,
+     "llm_ms": 556,
      "trigger": false
     },
     {
-     "turn_idx": 10,
+     "turn_idx": 9,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 577,
+     "llm_ms": 531,
      "trigger": false
     },
     {
-     "turn_idx": 13,
+     "turn_idx": 11,
      "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 575,
+     "risk_llm": 5,
+     "risk_cum": 3.5,
+     "llm_ms": 1322,
      "trigger": false
     }
    ],
@@ -1688,77 +1539,72 @@
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mrs. Khan?",
-     "latency_ms": 412.0
+     "latency_ms": 434.0
     },
     {
      "channel": "receiver",
      "text": "Yes, this is she. Who is calling, please?",
-     "latency_ms": 440.0
+     "latency_ms": 407.0
     },
     {
      "channel": "caller",
      "text": "Namaste, I am Sameer from the logistics team in Pune. I have a large parcel here for you.",
-     "latency_ms": 513.0
+     "latency_ms": 573.0
     },
     {
      "channel": "receiver",
      "text": "A parcel? I am not expecting anything today.",
-     "latency_ms": 445.0
+     "latency_ms": 414.0
     },
     {
      "channel": "caller",
      "text": "It is the home appliance you ordered last week, the one for \u20b912,000.",
-     "latency_ms": 394.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Oh, the air purifier.",
-     "latency_ms": 380.0
-    },
-    {
-     "channel": "receiver",
-     "text": "My son told me he bought it, but I forgot.",
-     "latency_ms": 448.0
-    },
-    {
-     "channel": "caller",
-     "text": "Yes, that is the one. I am currently near the main market, so I wanted to check if you are home.",
-     "latency_ms": 722.0
-    },
-    {
-     "channel": "receiver",
-     "text": "I am here, but my gate is locked.",
      "latency_ms": 378.0
     },
     {
      "channel": "receiver",
-     "text": "Will you be able to find the side entrance?",
-     "latency_ms": 420.0
+     "text": "Oh, the air purifier.",
+     "latency_ms": 347.0
+    },
+    {
+     "channel": "receiver",
+     "text": "My son told me he bought it, but I forgot.",
+     "latency_ms": 413.0
+    },
+    {
+     "channel": "caller",
+     "text": "Yes, that is the one. I am currently near the main market, so I wanted to check if you are home.",
+     "latency_ms": 463.0
+    },
+    {
+     "channel": "receiver",
+     "text": "I am here, but my gate is locked. Will you be able to find the side entrance?",
+     "latency_ms": 478.0
     },
     {
      "channel": "caller",
      "text": "I can do that. Just please keep the gate open so my helper can carry the box inside.",
-     "latency_ms": 454.0
+     "latency_ms": 434.0
     },
     {
      "channel": "receiver",
-     "text": "Alright, let me go and open it now.",
-     "latency_ms": 382.0
-    },
-    {
-     "channel": "receiver",
-     "text": "How long will you take?",
-     "latency_ms": 382.0
+     "text": "Alright, let me go and open it now. How long will you take?",
+     "latency_ms": 433.0
     },
     {
      "channel": "caller",
      "text": "I will be there in about 10 minutes, Mrs. Khan.",
-     "latency_ms": 415.0
+     "latency_ms": 403.0
     },
     {
      "channel": "receiver",
-     "text": "Okay, Beta, I am waiting. See you soon.",
-     "latency_ms": 420.0
+     "text": "Okay, Beta.",
+     "latency_ms": 309.0
+    },
+    {
+     "channel": "receiver",
+     "text": "I am waiting. See you soon.",
+     "latency_ms": 469.0
     }
    ],
    "duration_streamed_s": 69.0
@@ -1783,14 +1629,14 @@
    "turn_end_to_audio_ms": null,
    "warning_voice_cloned": null,
    "warning_states": [],
-   "max_risk": 0.0,
+   "max_risk": 3.5,
    "detections": [
     {
      "turn_idx": 0,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 513,
+     "llm_ms": 515,
      "trigger": false
     },
     {
@@ -1798,15 +1644,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 518,
-     "trigger": false
-    },
-    {
-     "turn_idx": 3,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 540,
+     "llm_ms": 609,
      "trigger": false
     },
     {
@@ -1814,23 +1652,15 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 644,
+     "llm_ms": 601,
      "trigger": false
     },
     {
      "turn_idx": 6,
      "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 510,
-     "trigger": false
-    },
-    {
-     "turn_idx": 8,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 549,
+     "risk_llm": 5,
+     "risk_cum": 3.5,
+     "llm_ms": 574,
      "trigger": false
     },
     {
@@ -1838,23 +1668,15 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 559,
+     "llm_ms": 553,
      "trigger": false
     },
     {
-     "turn_idx": 10,
+     "turn_idx": 11,
      "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 589,
-     "trigger": false
-    },
-    {
-     "turn_idx": 12,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 519,
+     "risk_llm": 5,
+     "risk_cum": 3.5,
+     "llm_ms": 1663,
      "trigger": false
     },
     {
@@ -1862,118 +1684,87 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 597,
-     "trigger": false
-    },
-    {
-     "turn_idx": 14,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 544,
-     "trigger": false
-    },
-    {
-     "turn_idx": 16,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 586,
+     "llm_ms": 1083,
      "trigger": false
     }
    ],
-   "detect_errors": 0,
+   "detect_errors": 1,
    "stt_incidents": 0,
    "stt_finals": [
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mr. Patel?",
-     "latency_ms": 486.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Yes, speaking. Who is this?",
-     "latency_ms": 383.0
-    },
-    {
-     "channel": "caller",
-     "text": "Namaste, sir.",
-     "latency_ms": 387.0
-    },
-    {
-     "channel": "caller",
-     "text": "I am Rajesh from the Electronics Logistics team.",
-     "latency_ms": 386.0
-    },
-    {
-     "channel": "caller",
-     "text": "I have a large parcel here for you in Nagpur.",
-     "latency_ms": 423.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Logistics, I am not expecting any parcel today.",
-     "latency_ms": 437.0
-    },
-    {
-     "channel": "caller",
-     "text": "It is the high-end television set, sir. The invoice shows a total value of \u20b925,000.",
      "latency_ms": 380.0
     },
     {
      "channel": "receiver",
-     "text": "Oh, the one my son ordered for my birthday, yes, that is correct.",
-     "latency_ms": 417.0
+     "text": "Yes, speaking. Who is this?",
+     "latency_ms": 446.0
     },
     {
      "channel": "caller",
-     "text": "Great!",
-     "latency_ms": 382.0
-    },
-    {
-     "channel": "caller",
-     "text": "I am currently near the Hanuman Temple area.",
-     "latency_ms": 386.0
-    },
-    {
-     "channel": "caller",
-     "text": "Is your house nearby?",
-     "latency_ms": 368.0
+     "text": "Namaste sir, I am Rajesh from the Electronics Logistics team. I have a large parcel here for you in Nagpur.",
+     "latency_ms": 477.0
     },
     {
      "channel": "receiver",
-     "text": "Yes, it is just 2 streets away, but I am not sure if the gate is open.",
-     "latency_ms": 435.0
+     "text": "Logistics, I am not expecting any parcel today.",
+     "latency_ms": 426.0
     },
     {
      "channel": "caller",
-     "text": "No problem, sir.",
-     "latency_ms": 381.0
-    },
-    {
-     "channel": "caller",
-     "text": "I can wait for 10 minutes.",
-     "latency_ms": 344.0
-    },
-    {
-     "channel": "caller",
-     "text": "Just let me know if I should call you again when I reach the gate.",
+     "text": "It is the high-end television set, sir. The invoice shows a total value of \u20b925,000.",
      "latency_ms": 443.0
     },
     {
      "channel": "receiver",
+     "text": "Oh, the one my son ordered for my birthday, yes, that is correct.",
+     "latency_ms": 481.0
+    },
+    {
+     "channel": "caller",
+     "text": "Great, I am currently near the Hanuman Temple area. Is your house nearby?",
+     "latency_ms": 424.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Yes, it is just 2 streets away.",
+     "latency_ms": 381.0
+    },
+    {
+     "channel": "receiver",
+     "text": "But I am not sure if the gate is open.",
+     "latency_ms": 475.0
+    },
+    {
+     "channel": "caller",
+     "text": "No problem, sir.",
+     "latency_ms": 363.0
+    },
+    {
+     "channel": "caller",
+     "text": "I can wait for 10 minutes.",
+     "latency_ms": 322.0
+    },
+    {
+     "channel": "caller",
+     "text": "Just let me know if I should call you again when I reach the gate.",
+     "latency_ms": 421.0
+    },
+    {
+     "channel": "receiver",
      "text": "Yes, please do. I will tell my wife to keep the door open.",
-     "latency_ms": 536.0
+     "latency_ms": 511.0
     },
     {
      "channel": "caller",
      "text": "Perfect, Mr. Patil. I will see you in a few minutes then.",
-     "latency_ms": 366.0
+     "latency_ms": 425.0
     },
     {
      "channel": "receiver",
      "text": "Thank you, Beta. Drive safely.",
-     "latency_ms": 316.0
+     "latency_ms": 310.0
     }
    ],
    "duration_streamed_s": 67.7
@@ -2005,31 +1796,23 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 535,
+     "llm_ms": 516,
      "trigger": false
     },
     {
-     "turn_idx": 2,
+     "turn_idx": 3,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 571,
+     "llm_ms": 569,
      "trigger": false
     },
     {
-     "turn_idx": 4,
+     "turn_idx": 5,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 540,
-     "trigger": false
-    },
-    {
-     "turn_idx": 6,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 547,
+     "llm_ms": 574,
      "trigger": false
     },
     {
@@ -2037,15 +1820,23 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 626,
+     "llm_ms": 564,
      "trigger": false
     },
     {
-     "turn_idx": 11,
+     "turn_idx": 10,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 529,
+     "llm_ms": 595,
+     "trigger": false
+    },
+    {
+     "turn_idx": 13,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 874,
      "trigger": false
     }
    ],
@@ -2055,67 +1846,77 @@
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mr. Gupta?",
-     "latency_ms": 391.0
+     "latency_ms": 412.0
     },
     {
      "channel": "receiver",
-     "text": "Yes, speaking. Who is this?",
-     "latency_ms": 458.0
+     "text": "Yes, speaking.",
+     "latency_ms": 374.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Who is this?",
+     "latency_ms": 415.0
     },
     {
      "channel": "caller",
      "text": "Sir, this is Naveen from the logistics hub in Bengaluru. I have a large shipment here for you.",
-     "latency_ms": 530.0
+     "latency_ms": 472.0
     },
     {
      "channel": "receiver",
      "text": "Shipment? I am not expecting anything right now.",
-     "latency_ms": 472.0
+     "latency_ms": 433.0
     },
     {
      "channel": "caller",
      "text": "It is the industrial equipment order, the one valued at \u20b980,000. Did you not order this?",
-     "latency_ms": 388.0
+     "latency_ms": 415.0
     },
     {
      "channel": "receiver",
-     "text": "Oh, the machinery for the workshop. Yes, yes, I forgot about that.",
-     "latency_ms": 418.0
+     "text": "Oh, the machinery for the workshop.",
+     "latency_ms": 372.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Yes, yes, I forgot about that.",
+     "latency_ms": 371.0
     },
     {
      "channel": "caller",
      "text": "Okay, sir, I just want to confirm if the address in Indiranagar is still correct?",
-     "latency_ms": 430.0
+     "latency_ms": 373.0
     },
     {
      "channel": "receiver",
      "text": "Yes, it is correct, but the main gate is currently closed for repairs.",
-     "latency_ms": 479.0
+     "latency_ms": 433.0
     },
     {
      "channel": "caller",
      "text": "No problem, sir. Should I ask the driver to wait at the side entrance instead?",
-     "latency_ms": 431.0
+     "latency_ms": 370.0
     },
     {
      "channel": "receiver",
      "text": "Yes, please do that.",
-     "latency_ms": 438.0
+     "latency_ms": 473.0
     },
     {
      "channel": "receiver",
      "text": "Will he be here today?",
-     "latency_ms": 312.0
+     "latency_ms": 354.0
     },
     {
      "channel": "caller",
      "text": "Yes, he is about 20 minutes away. Please keep someone ready to receive the goods.",
-     "latency_ms": 446.0
+     "latency_ms": 473.0
     },
     {
      "channel": "receiver",
      "text": "All right, Naveen, I will tell my son to go to the gate.",
-     "latency_ms": 471.0
+     "latency_ms": 515.0
     }
    ],
    "duration_streamed_s": 66.5
@@ -2147,7 +1948,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 555,
+     "llm_ms": 561,
      "trigger": false
     },
     {
@@ -2155,7 +1956,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 564,
+     "llm_ms": 583,
      "trigger": false
     },
     {
@@ -2163,7 +1964,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 624,
+     "llm_ms": 566,
      "trigger": false
     },
     {
@@ -2171,7 +1972,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 574,
+     "llm_ms": 564,
      "trigger": false
     },
     {
@@ -2179,23 +1980,23 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 526,
+     "llm_ms": 560,
      "trigger": false
     },
     {
      "turn_idx": 10,
      "stages": [],
-     "risk_llm": 5,
-     "risk_cum": 3.5,
-     "llm_ms": 642,
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 1015,
      "trigger": false
     },
     {
      "turn_idx": 12,
      "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 629,
+     "risk_llm": 5,
+     "risk_cum": 3.5,
+     "llm_ms": 1372,
      "trigger": false
     },
     {
@@ -2203,15 +2004,15 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 551,
+     "llm_ms": 574,
      "trigger": false
     },
     {
      "turn_idx": 15,
      "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 1004,
+     "risk_llm": 5,
+     "risk_cum": 3.5,
+     "llm_ms": 1077,
      "trigger": false
     },
     {
@@ -2219,7 +2020,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 561,
+     "llm_ms": 817,
      "trigger": false
     }
    ],
@@ -2229,97 +2030,97 @@
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mrs. Aya?",
-     "latency_ms": 374.0
+     "latency_ms": 463.0
     },
     {
      "channel": "receiver",
      "text": "Yes, this is she.",
-     "latency_ms": 448.0
+     "latency_ms": 444.0
     },
     {
      "channel": "receiver",
      "text": "Who is calling, please?",
-     "latency_ms": 388.0
+     "latency_ms": 318.0
     },
     {
      "channel": "caller",
      "text": "I am Ananya from the City Care Clinic in Hyderabad. I am calling about your cardiology reports.",
-     "latency_ms": 376.0
+     "latency_ms": 463.0
     },
     {
      "channel": "receiver",
      "text": "Oh, the reports. Are they ready? I was waiting for the call.",
-     "latency_ms": 428.0
+     "latency_ms": 426.0
     },
     {
      "channel": "caller",
      "text": "Yes, they are ready for pickup. While you are coming, can we confirm your follow-up appointment for Tuesday at 10?",
-     "latency_ms": 421.0
+     "latency_ms": 418.0
     },
     {
      "channel": "receiver",
      "text": "Tuesday, let me check my diary. Yes, I think 10 is fine.",
-     "latency_ms": 448.0
+     "latency_ms": 364.0
     },
     {
      "channel": "caller",
      "text": "Perfect, I have booked that for you.",
-     "latency_ms": 337.0
+     "latency_ms": 344.0
     },
     {
      "channel": "caller",
      "text": "Please bring the previous files along with you.",
-     "latency_ms": 336.0
+     "latency_ms": 344.0
     },
     {
      "channel": "receiver",
      "text": "Will there be any payment for the reports today?",
-     "latency_ms": 448.0
+     "latency_ms": 363.0
     },
     {
      "channel": "caller",
      "text": "The total for the scans and consultation is \u20b912,000, but you can just settle it at the billing counter when you visit.",
-     "latency_ms": 575.0
+     "latency_ms": 427.0
     },
     {
      "channel": "receiver",
      "text": "$12,000? That is a bit more than I thought.",
-     "latency_ms": 489.0
+     "latency_ms": 411.0
     },
     {
      "channel": "caller",
      "text": "It includes the advanced imaging, Mrs. Iyer. You can pay by card or cash at the clinic.",
-     "latency_ms": 434.0
+     "latency_ms": 447.0
     },
     {
      "channel": "receiver",
      "text": "Okay, I understand. I will come on Tuesday then.",
-     "latency_ms": 429.0
+     "latency_ms": 425.0
     },
     {
      "channel": "caller",
      "text": "Thank you.",
-     "latency_ms": 383.0
+     "latency_ms": 312.0
     },
     {
      "channel": "caller",
      "text": "We will see you then.",
-     "latency_ms": 356.0
+     "latency_ms": 326.0
     },
     {
      "channel": "caller",
      "text": "Have a good day.",
-     "latency_ms": 439.0
+     "latency_ms": 366.0
     },
     {
      "channel": "receiver",
      "text": "Thank you, dear.",
-     "latency_ms": 392.0
+     "latency_ms": 310.0
     },
     {
      "channel": "receiver",
      "text": "Bye.",
-     "latency_ms": 348.0
+     "latency_ms": 343.0
     }
    ],
    "duration_streamed_s": 80.2
@@ -2351,47 +2152,47 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 503,
+     "llm_ms": 542,
      "trigger": false
     },
     {
-     "turn_idx": 3,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 556,
-     "trigger": false
-    },
-    {
-     "turn_idx": 5,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 534,
-     "trigger": false
-    },
-    {
-     "turn_idx": 8,
+     "turn_idx": 2,
      "stages": [],
      "risk_llm": 5,
      "risk_cum": 3.5,
-     "llm_ms": 563,
+     "llm_ms": 579,
      "trigger": false
     },
     {
-     "turn_idx": 10,
+     "turn_idx": 4,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 606,
+     "trigger": false
+    },
+    {
+     "turn_idx": 7,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 3.5,
+     "llm_ms": 587,
+     "trigger": false
+    },
+    {
+     "turn_idx": 9,
      "stages": [],
      "risk_llm": 5,
      "risk_cum": 4.5,
-     "llm_ms": 528,
+     "llm_ms": 664,
      "trigger": false
     },
     {
-     "turn_idx": 14,
+     "turn_idx": 13,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.5,
-     "llm_ms": 570,
+     "llm_ms": 1486,
      "trigger": false
     },
     {
@@ -2409,90 +2210,90 @@
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mr. Gupta?",
-     "latency_ms": 420.0
+     "latency_ms": 431.0
     },
     {
      "channel": "receiver",
-     "text": "Yes, this is Gupta speaking.",
-     "latency_ms": 327.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Who is this?",
-     "latency_ms": 368.0
+     "text": "Yes, this is Gupta speaking. Who is this?",
+     "latency_ms": 511.0
     },
     {
      "channel": "caller",
      "text": "I am Anjali from the City Clinic in Jaipur. I am calling to confirm your cardiology report is ready for pickup.",
-     "latency_ms": 518.0
+     "latency_ms": 447.0
     },
     {
      "channel": "receiver",
      "text": "Oh, the heart test. Is everything all right with the results?",
-     "latency_ms": 425.0
-    },
-    {
-     "channel": "caller",
-     "text": "The doctor has reviewed them and wants to discuss them with you in person. Do you have time for an appointment tomorrow at 11 AM?",
-     "latency_ms": 518.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Tomorrow?",
-     "latency_ms": 317.0
-    },
-    {
-     "channel": "receiver",
-     "text": "I think I can come, but would it take long?",
-     "latency_ms": 369.0
-    },
-    {
-     "channel": "caller",
-     "text": "It should be a quick 15-minute consultation. Please just bring your previous file along with you.",
-     "latency_ms": 518.0
-    },
-    {
-     "channel": "receiver",
-     "text": "I see. And about the billing, how much was the total for the tests?",
      "latency_ms": 381.0
     },
     {
      "channel": "caller",
+     "text": "The doctor has reviewed them and wants to discuss them with you in person. Do you have time for an appointment tomorrow at 11 AM?",
+     "latency_ms": 487.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Tomorrow?",
+     "latency_ms": 416.0
+    },
+    {
+     "channel": "receiver",
+     "text": "I think I can come, but would it take long?",
+     "latency_ms": 481.0
+    },
+    {
+     "channel": "caller",
+     "text": "It should be a quick 15-minute consultation. Please just bring your previous file along with you.",
+     "latency_ms": 441.0
+    },
+    {
+     "channel": "receiver",
+     "text": "I see. And about the billing, how much was the total for the tests?",
+     "latency_ms": 471.0
+    },
+    {
+     "channel": "caller",
      "text": "The total bill is \u20b91 lakh, including the specialized scan.",
-     "latency_ms": 468.0
+     "latency_ms": 410.0
     },
     {
      "channel": "receiver",
      "text": "1 lakh?",
-     "latency_ms": 427.0
+     "latency_ms": 442.0
     },
     {
      "channel": "receiver",
      "text": "That is quite high.",
-     "latency_ms": 365.0
+     "latency_ms": 321.0
     },
     {
      "channel": "receiver",
      "text": "Do I need to pay it now over the phone?",
-     "latency_ms": 415.0
+     "latency_ms": 435.0
     },
     {
      "channel": "caller",
      "text": "No, no, not at all. You can settle everything at the reception desk when you visit tomorrow.",
-     "latency_ms": 428.0
+     "latency_ms": 373.0
     },
     {
      "channel": "receiver",
-     "text": "Okay, that is a relief. I will see you tomorrow at 11 then.",
-     "latency_ms": 429.0
+     "text": "Okay, that is a relief.",
+     "latency_ms": 376.0
+    },
+    {
+     "channel": "receiver",
+     "text": "I will see you tomorrow at 11 then.",
+     "latency_ms": 379.0
     },
     {
      "channel": "caller",
      "text": "Perfect, we will see you then, Mr. Gupta. Have a good day.",
-     "latency_ms": 428.0
+     "latency_ms": 367.0
     }
    ],
-   "duration_streamed_s": 77.4
+   "duration_streamed_s": 77.5
   },
   {
    "id": "legit_family_chat_02",
@@ -2521,7 +2322,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 530,
+     "llm_ms": 564,
      "trigger": false
     },
     {
@@ -2529,7 +2330,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 511,
+     "llm_ms": 497,
      "trigger": false
     },
     {
@@ -2537,35 +2338,11 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 536,
+     "llm_ms": 533,
      "trigger": false
     },
     {
-     "turn_idx": 5,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 589,
-     "trigger": false
-    },
-    {
-     "turn_idx": 7,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 554,
-     "trigger": false
-    },
-    {
-     "turn_idx": 9,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 550,
-     "trigger": false
-    },
-    {
-     "turn_idx": 12,
+     "turn_idx": 6,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
@@ -2573,11 +2350,35 @@
      "trigger": false
     },
     {
-     "turn_idx": 13,
+     "turn_idx": 8,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 564,
+     "llm_ms": 853,
+     "trigger": false
+    },
+    {
+     "turn_idx": 11,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 538,
+     "trigger": false
+    },
+    {
+     "turn_idx": 14,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 1118,
+     "trigger": false
+    },
+    {
+     "turn_idx": 15,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 593,
      "trigger": false
     }
    ],
@@ -2587,77 +2388,97 @@
     {
      "channel": "caller",
      "text": "Hello, Mr. Patel, it is Rohan here. How are you doing today?",
-     "latency_ms": 573.0
+     "latency_ms": 471.0
     },
     {
      "channel": "receiver",
      "text": "Oh Rohan beta, I am fine, just resting. You are calling after a long time.",
-     "latency_ms": 402.0
+     "latency_ms": 454.0
     },
     {
      "channel": "caller",
      "text": "Yes, sorry about that.",
-     "latency_ms": 386.0
+     "latency_ms": 364.0
     },
     {
      "channel": "caller",
      "text": "I was actually thinking about the Diwali holidays and if you are coming to visit us.",
-     "latency_ms": 548.0
+     "latency_ms": 449.0
     },
     {
      "channel": "receiver",
-     "text": "I want to come, but my knee is bothering me again. The doctor said I should avoid long travel.",
-     "latency_ms": 552.0
+     "text": "I want to come.",
+     "latency_ms": 378.0
+    },
+    {
+     "channel": "receiver",
+     "text": "But my knee is bothering me again. The doctor said I should avoid long travel.",
+     "latency_ms": 475.0
     },
     {
      "channel": "caller",
      "text": "That is a shame. Maybe we can just come to Nagpur and spend the festival with you instead.",
-     "latency_ms": 469.0
+     "latency_ms": 377.0
     },
     {
      "channel": "receiver",
      "text": "That would be very nice, but will you be able to manage the travel with the kids?",
-     "latency_ms": 400.0
+     "latency_ms": 479.0
     },
     {
      "channel": "caller",
      "text": "Of course we will. By the way, I remember you mentioned the house renovation last month.",
-     "latency_ms": 469.0
+     "latency_ms": 371.0
     },
     {
      "channel": "receiver",
-     "text": "Yes, the painting is almost done. It took a bit more time than I thought.",
-     "latency_ms": 424.0
+     "text": "Yes, the painting is almost done.",
+     "latency_ms": 378.0
+    },
+    {
+     "channel": "receiver",
+     "text": "It took a bit more time than I thought.",
+     "latency_ms": 418.0
     },
     {
      "channel": "caller",
      "text": "I saw the photos you sent. The new color looks very elegant.",
-     "latency_ms": 475.0
+     "latency_ms": 373.0
     },
     {
      "channel": "receiver",
      "text": "Thank you.",
-     "latency_ms": 357.0
+     "latency_ms": 358.0
     },
     {
      "channel": "receiver",
      "text": "It cost me about 50,000 rupees more than the budget, but it was worth it.",
-     "latency_ms": 400.0
+     "latency_ms": 475.0
     },
     {
      "channel": "caller",
      "text": "It definitely looks premium.",
-     "latency_ms": 400.0
+     "latency_ms": 385.0
     },
     {
      "channel": "caller",
      "text": "We will see it in person when we visit next month.",
-     "latency_ms": 409.0
+     "latency_ms": 474.0
     },
     {
      "channel": "receiver",
-     "text": "I will wait for you all. Take care of yourself and give my love to everyone.",
-     "latency_ms": 466.0
+     "text": "I will wait for you all.",
+     "latency_ms": 339.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Take care of yourself.",
+     "latency_ms": 375.0
+    },
+    {
+     "channel": "receiver",
+     "text": "And give my love to everyone.",
+     "latency_ms": 456.0
     }
    ],
    "duration_streamed_s": 78.8
@@ -2682,14 +2503,14 @@
    "turn_end_to_audio_ms": null,
    "warning_voice_cloned": null,
    "warning_states": [],
-   "max_risk": 0.0,
+   "max_risk": 7.0,
    "detections": [
     {
      "turn_idx": 0,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 520,
+     "llm_ms": 505,
      "trigger": false
     },
     {
@@ -2697,7 +2518,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 537,
+     "llm_ms": 520,
      "trigger": false
     },
     {
@@ -2705,7 +2526,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 618,
+     "llm_ms": 1439,
      "trigger": false
     },
     {
@@ -2713,7 +2534,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 659,
+     "llm_ms": 567,
      "trigger": false
     },
     {
@@ -2721,7 +2542,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 603,
+     "llm_ms": 531,
      "trigger": false
     },
     {
@@ -2729,15 +2550,15 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 559,
+     "llm_ms": 947,
      "trigger": false
     },
     {
      "turn_idx": 12,
      "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 558,
+     "risk_llm": 10,
+     "risk_cum": 7.0,
+     "llm_ms": 1120,
      "trigger": false
     }
    ],
@@ -2747,72 +2568,72 @@
     {
      "channel": "caller",
      "text": "Assalamu alaikum, Mrs. Khan. This is Sameer calling from Delhi.",
-     "latency_ms": 325.0
+     "latency_ms": 337.0
     },
     {
      "channel": "receiver",
      "text": "Wa alaikum assalam, Samir Beta. How are you?",
-     "latency_ms": 359.0
+     "latency_ms": 357.0
     },
     {
      "channel": "receiver",
      "text": "It has been so long.",
-     "latency_ms": 414.0
+     "latency_ms": 323.0
     },
     {
      "channel": "caller",
      "text": "I am doing well. I was just thinking about you and wondering how your knee pain is these days.",
-     "latency_ms": 366.0
+     "latency_ms": 377.0
     },
     {
      "channel": "receiver",
      "text": "It is better now, but I still struggle with the stairs. Why are you calling so suddenly?",
-     "latency_ms": 489.0
+     "latency_ms": 488.0
     },
     {
      "channel": "caller",
      "text": "No reason, just calling to chat. By the way, are you planning to come to Lucknow for the Diwali holidays?",
-     "latency_ms": 409.0
+     "latency_ms": 423.0
     },
     {
      "channel": "receiver",
      "text": "I am thinking about it, but the tickets are getting very expensive now.",
-     "latency_ms": 420.0
+     "latency_ms": 348.0
     },
     {
      "channel": "caller",
      "text": "Don't worry about that, I have already checked the train fare for your dates.",
-     "latency_ms": 561.0
+     "latency_ms": 576.0
     },
     {
      "channel": "receiver",
      "text": "Oh really? How much is it showing?",
-     "latency_ms": 559.0
+     "latency_ms": 407.0
     },
     {
      "channel": "caller",
      "text": "It is exactly \u20b99,500 for the AC tier.",
-     "latency_ms": 360.0
+     "latency_ms": 376.0
     },
     {
      "channel": "caller",
      "text": "I can book it for you if you like.",
-     "latency_ms": 411.0
+     "latency_ms": 413.0
     },
     {
      "channel": "receiver",
      "text": "That is a bit high, isn't it? Let me check with my daughter first.",
-     "latency_ms": 412.0
+     "latency_ms": 407.0
     },
     {
      "channel": "caller",
      "text": "Take your time, just let me know by tomorrow so I can grab the seat.",
-     "latency_ms": 469.0
+     "latency_ms": 483.0
     },
     {
      "channel": "receiver",
      "text": "Yes, I will call you back in the evening. Give my love to everyone there.",
-     "latency_ms": 459.0
+     "latency_ms": 457.0
     }
    ],
    "duration_streamed_s": 73.1
@@ -2844,47 +2665,47 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 540,
+     "llm_ms": 516,
      "trigger": false
     },
     {
      "turn_idx": 2,
      "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 559,
+     "risk_llm": 5,
+     "risk_cum": 3.5,
+     "llm_ms": 565,
      "trigger": false
     },
     {
      "turn_idx": 4,
      "stages": [],
-     "risk_llm": 5,
-     "risk_cum": 3.5,
-     "llm_ms": 575,
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 566,
      "trigger": false
     },
     {
-     "turn_idx": 6,
+     "turn_idx": 7,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 544,
+     "llm_ms": 543,
      "trigger": false
     },
     {
-     "turn_idx": 8,
+     "turn_idx": 9,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 552,
+     "llm_ms": 550,
      "trigger": false
     },
     {
-     "turn_idx": 11,
+     "turn_idx": 12,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 570,
+     "llm_ms": 559,
      "trigger": false
     }
    ],
@@ -2894,67 +2715,72 @@
     {
      "channel": "caller",
      "text": "Good afternoon, am I speaking with Mrs. Iyer from Kolkata?",
-     "latency_ms": 312.0
+     "latency_ms": 309.0
     },
     {
      "channel": "receiver",
      "text": "Yes, this is she. Who is calling, please?",
-     "latency_ms": 476.0
+     "latency_ms": 406.0
     },
     {
      "channel": "caller",
      "text": "Hello ma'am, my name is Rohan from Zenith Finance. I am calling to offer you a premium credit card with a limit of \u20b91 lakh.",
-     "latency_ms": 420.0
+     "latency_ms": 584.0
     },
     {
      "channel": "receiver",
      "text": "1 lakh? Why do you need to tell me this now? I do not use such cards.",
-     "latency_ms": 515.0
+     "latency_ms": 436.0
     },
     {
      "channel": "caller",
      "text": "It is just a special offer for senior citizens with zero annual fees for the first year. It helps with medical expenses and travel.",
-     "latency_ms": 382.0
+     "latency_ms": 386.0
     },
     {
      "channel": "receiver",
-     "text": "I have my pension, and that is enough for me. I don't like these new things.",
-     "latency_ms": 426.0
+     "text": "I have my pension.",
+     "latency_ms": 371.0
+    },
+    {
+     "channel": "receiver",
+     "text": "And that is enough for me. I don't like these new things.",
+     "latency_ms": 464.0
     },
     {
      "channel": "caller",
      "text": "I completely understand your hesitation, Mrs. Iyer. Would you prefer if I sent the brochure and details to your email instead?",
-     "latency_ms": 431.0
+     "latency_ms": 430.0
     },
     {
      "channel": "receiver",
      "text": "Email? My son handles that for me. Can you send it to him?",
-     "latency_ms": 474.0
+     "latency_ms": 477.0
     },
     {
      "channel": "caller",
      "text": "Of course, if you can provide the email address, I will send all the documents for you to review at your own pace.",
-     "latency_ms": 530.0
+     "latency_ms": 462.0
     },
     {
      "channel": "receiver",
      "text": "Let me check the diary first.",
-     "latency_ms": 375.0
+     "latency_ms": 372.0
     },
     {
      "channel": "receiver",
      "text": "Give me a minute, I am not sure if I remember it correctly.",
-     "latency_ms": 435.0
+     "latency_ms": 354.0
     },
     {
      "channel": "caller",
      "text": "No problem at all. Please take your time. I can also call you back tomorrow morning if that is easier.",
-     "latency_ms": 432.0
+     "latency_ms": 514.0
     },
     {
      "channel": "receiver",
-     "text": "Yes, call tomorrow morning. I will ask my son, and then we will see.",
-     "latency_ms": 481.0
+     "text": "Yes, call tomorrow morning, I will ask my son, and then we will see.",
+     "latency_ms": 395.0
     }
    ],
    "duration_streamed_s": 83.4
@@ -2979,14 +2805,14 @@
    "turn_end_to_audio_ms": null,
    "warning_voice_cloned": null,
    "warning_states": [],
-   "max_risk": 0.0,
+   "max_risk": 9.1,
    "detections": [
     {
      "turn_idx": 0,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 581,
+     "llm_ms": 502,
      "trigger": false
     },
     {
@@ -2994,7 +2820,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 561,
+     "llm_ms": 544,
      "trigger": false
     },
     {
@@ -3002,7 +2828,7 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 539,
+     "llm_ms": 555,
      "trigger": false
     },
     {
@@ -3010,31 +2836,31 @@
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 538,
+     "llm_ms": 525,
+     "trigger": false
+    },
+    {
+     "turn_idx": 8,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 532,
      "trigger": false
     },
     {
      "turn_idx": 9,
      "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 544,
+     "risk_llm": 10,
+     "risk_cum": 7.0,
+     "llm_ms": 1286,
      "trigger": false
     },
     {
-     "turn_idx": 10,
+     "turn_idx": 11,
      "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 587,
-     "trigger": false
-    },
-    {
-     "turn_idx": 12,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 540,
+     "risk_llm": 10,
+     "risk_cum": 9.1,
+     "llm_ms": 1217,
      "trigger": false
     }
    ],
@@ -3044,77 +2870,72 @@
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mr. Reddy in Mumbai?",
-     "latency_ms": 302.0
+     "latency_ms": 296.0
     },
     {
      "channel": "receiver",
      "text": "Yes, this is ready. Who is this calling, please?",
-     "latency_ms": 324.0
+     "latency_ms": 375.0
     },
     {
      "channel": "caller",
      "text": "Sir, my name is Sameer, and I am calling from Vista Broadband regarding a special family plan for your area.",
-     "latency_ms": 438.0
+     "latency_ms": 410.0
     },
     {
      "channel": "receiver",
      "text": "Broadband? I already have a connection in my house, Beta.",
-     "latency_ms": 355.0
+     "latency_ms": 316.0
     },
     {
      "channel": "caller",
      "text": "I understand, sir, but our new high-speed plan is only \u20b99,500 for the entire year.",
-     "latency_ms": 525.0
+     "latency_ms": 413.0
     },
     {
      "channel": "receiver",
      "text": "$9,500? That sounds a bit expensive for me.",
-     "latency_ms": 445.0
+     "latency_ms": 570.0
     },
     {
      "channel": "caller",
      "text": "It includes a free router upgrade and unlimited data for all your devices, sir.",
-     "latency_ms": 443.0
+     "latency_ms": 423.0
     },
     {
      "channel": "receiver",
-     "text": "I don't know.",
+     "text": "I don't know, I have to ask my son first about these things.",
      "latency_ms": 367.0
-    },
-    {
-     "channel": "receiver",
-     "text": "I have to ask my son first about these things.",
-     "latency_ms": 483.0
     },
     {
      "channel": "caller",
      "text": "That is perfectly fine.",
-     "latency_ms": 342.0
+     "latency_ms": 313.0
     },
     {
      "channel": "caller",
      "text": "Would it be okay if I send the plan details to your WhatsApp?",
-     "latency_ms": 441.0
+     "latency_ms": 413.0
     },
     {
      "channel": "receiver",
      "text": "Yes, you can send a message. I will check it later.",
-     "latency_ms": 462.0
+     "latency_ms": 425.0
     },
     {
      "channel": "caller",
      "text": "I will send it right away, Mr. Reddy. Have a very nice day.",
-     "latency_ms": 425.0
+     "latency_ms": 475.0
     },
     {
      "channel": "receiver",
      "text": "Okay, thank you.",
-     "latency_ms": 444.0
+     "latency_ms": 367.0
     },
     {
      "channel": "receiver",
      "text": "Bye.",
-     "latency_ms": 328.0
+     "latency_ms": 372.0
     }
    ],
    "duration_streamed_s": 71.4
@@ -3132,23 +2953,24 @@
    "trigger_reason": "threshold",
    "trigger_script_turn": 4,
    "caught_before_s5s6": true,
-   "warning_first_audio_s": 29.98,
+   "warning_first_audio_s": 29.91,
    "decisive_end_s": 28.581,
-   "decisive_to_warning_s": 1.4,
-   "tts_ttfa_ms": 401,
-   "turn_end_to_audio_ms": 1529,
+   "decisive_to_warning_s": 1.33,
+   "tts_ttfa_ms": 393,
+   "turn_end_to_audio_ms": 1452,
    "warning_voice_cloned": true,
    "warning_states": [
-    "speaking"
+    "speaking",
+    "interrupted"
    ],
-   "max_risk": 65.0,
+   "max_risk": 71.3,
    "detections": [
     {
      "turn_idx": 0,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 608,
+     "llm_ms": 537,
      "trigger": false
     },
     {
@@ -3156,9 +2978,9 @@
      "stages": [
       "S1"
      ],
-     "risk_llm": 65,
-     "risk_cum": 45.5,
-     "llm_ms": 567,
+     "risk_llm": 62,
+     "risk_cum": 43.4,
+     "llm_ms": 592,
      "trigger": false
     },
     {
@@ -3167,8 +2989,8 @@
       "S1"
      ],
      "risk_llm": 25,
-     "risk_cum": 41.5,
-     "llm_ms": 591,
+     "risk_cum": 39.4,
+     "llm_ms": 579,
      "trigger": false
     },
     {
@@ -3178,9 +3000,9 @@
       "S2",
       "S4"
      ],
-     "risk_llm": 75,
-     "risk_cum": 65.0,
-     "llm_ms": 642,
+     "risk_llm": 85,
+     "risk_cum": 71.3,
+     "llm_ms": 627,
      "trigger": true
     }
    ],
@@ -3190,45 +3012,45 @@
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mr. Sharma from Nagpur?",
-     "latency_ms": 358.0
+     "latency_ms": 306.0
     },
     {
      "channel": "receiver",
      "text": "Yes, this is Sharma speaking.",
-     "latency_ms": 401.0
+     "latency_ms": 354.0
     },
     {
      "channel": "receiver",
      "text": "Who is this?",
-     "latency_ms": 602.0
+     "latency_ms": 339.0
     },
     {
      "channel": "caller",
      "text": "Sir, I am Rohan from the Reserve Bank Auditing Wing. I am calling regarding a pending KYC update for your savings account.",
-     "latency_ms": 385.0
+     "latency_ms": 388.0
     },
     {
      "channel": "receiver",
      "text": "KYC? But I gave all my documents to the branch last year.",
-     "latency_ms": 506.0
+     "latency_ms": 406.0
     },
     {
      "channel": "caller",
      "text": "That was for the old portal, sir.",
-     "latency_ms": 372.0
+     "latency_ms": 307.0
     },
     {
      "channel": "caller",
      "text": "The new RBI guidelines require a digital refresh, or your account will be blocked by tonight.",
-     "latency_ms": 476.0
+     "latency_ms": 419.0
     },
     {
      "channel": "receiver",
-     "text": "Blocked tonight? That is very sudden.",
+     "text": "Blocked tonight? That is very sad.",
      "latency_ms": null
     }
    ],
-   "duration_streamed_s": 31.5
+   "duration_streamed_s": 31.4
   },
   {
    "id": "scam_bank_kyc_05",
@@ -3243,24 +3065,24 @@
    "trigger_reason": "threshold",
    "trigger_script_turn": 4,
    "caught_before_s5s6": true,
-   "warning_first_audio_s": 33.85,
+   "warning_first_audio_s": 33.9,
    "decisive_end_s": 45.407,
-   "decisive_to_warning_s": -11.56,
-   "tts_ttfa_ms": 376,
-   "turn_end_to_audio_ms": 1643,
+   "decisive_to_warning_s": -11.51,
+   "tts_ttfa_ms": 418,
+   "turn_end_to_audio_ms": 1690,
    "warning_voice_cloned": true,
    "warning_states": [
     "speaking",
     "interrupted"
    ],
-   "max_risk": 75.2,
+   "max_risk": 71.0,
    "detections": [
     {
      "turn_idx": 0,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 506,
+     "llm_ms": 562,
      "trigger": false
     },
     {
@@ -3269,9 +3091,9 @@
       "S1",
       "S2"
      ],
-     "risk_llm": 75,
-     "risk_cum": 52.5,
-     "llm_ms": 662,
+     "risk_llm": 55,
+     "risk_cum": 38.5,
+     "llm_ms": 1466,
      "trigger": false
     },
     {
@@ -3282,8 +3104,8 @@
       "S4"
      ],
      "risk_llm": 85,
-     "risk_cum": 75.2,
-     "llm_ms": 740,
+     "risk_cum": 71.0,
+     "llm_ms": 686,
      "trigger": true
     }
    ],
@@ -3293,31 +3115,31 @@
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mr. Singh from Nagpur?",
-     "latency_ms": 333.0
+     "latency_ms": 345.0
     },
     {
      "channel": "receiver",
      "text": "Yes, this is he. Who is calling, please?",
-     "latency_ms": 326.0
+     "latency_ms": 440.0
     },
     {
      "channel": "caller",
      "text": "I am Amit Sharma from the RBI Regional Monitoring Cell. Sir, your bank account KYC has expired, and we have received a request to freeze your funds.",
-     "latency_ms": 367.0
+     "latency_ms": 421.0
     },
     {
      "channel": "receiver",
      "text": "Freeze! But I have not done anything wrong. Why is this happening?",
-     "latency_ms": 466.0
+     "latency_ms": 440.0
     },
     {
      "channel": "caller",
      "text": "It is just a routine update, sir. However, if we do not fix this now, your balance of \u20b91 lakh will be locked, and you cannot withdraw it.",
-     "latency_ms": 517.0
+     "latency_ms": 574.0
     },
     {
      "channel": "receiver",
-     "text": "Oh no, I need that money for my",
+     "text": "Oh no, I need that money for my medical",
      "latency_ms": null
     }
    ],
@@ -3336,24 +3158,24 @@
    "trigger_reason": "threshold",
    "trigger_script_turn": 4,
    "caught_before_s5s6": true,
-   "warning_first_audio_s": 30.21,
+   "warning_first_audio_s": 30.22,
    "decisive_end_s": 49.845,
-   "decisive_to_warning_s": -19.63,
-   "tts_ttfa_ms": 399,
-   "turn_end_to_audio_ms": 1457,
+   "decisive_to_warning_s": -19.62,
+   "tts_ttfa_ms": 433,
+   "turn_end_to_audio_ms": 1464,
    "warning_voice_cloned": true,
    "warning_states": [
     "speaking",
     "interrupted"
    ],
-   "max_risk": 66.2,
+   "max_risk": 68.2,
    "detections": [
     {
      "turn_idx": 0,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 506,
+     "llm_ms": 512,
      "trigger": false
     },
     {
@@ -3361,9 +3183,9 @@
      "stages": [
       "S1"
      ],
-     "risk_llm": 65,
-     "risk_cum": 45.5,
-     "llm_ms": 604,
+     "risk_llm": 75,
+     "risk_cum": 52.5,
+     "llm_ms": 574,
      "trigger": false
     },
     {
@@ -3373,8 +3195,8 @@
       "S2"
      ],
      "risk_llm": 75,
-     "risk_cum": 66.2,
-     "llm_ms": 637,
+     "risk_cum": 68.2,
+     "llm_ms": 588,
      "trigger": true
     }
    ],
@@ -3384,40 +3206,40 @@
     {
      "channel": "caller",
      "text": "Good afternoon, am I speaking with Mrs. Banerjee from Lucknow?",
-     "latency_ms": 328.0
+     "latency_ms": 315.0
     },
     {
      "channel": "receiver",
      "text": "Yes, this is she.",
-     "latency_ms": 467.0
+     "latency_ms": 415.0
     },
     {
      "channel": "receiver",
      "text": "Who's calling, please?",
-     "latency_ms": 303.0
+     "latency_ms": 320.0
     },
     {
      "channel": "caller",
      "text": "I am Rohan from the RBI Regional Monitoring Cell calling regarding your savings account KYC status.",
-     "latency_ms": 416.0
+     "latency_ms": 423.0
     },
     {
      "channel": "receiver",
      "text": "KYC? But I gave my documents to the branch manager last year.",
-     "latency_ms": 447.0
+     "latency_ms": 458.0
     },
     {
      "channel": "caller",
      "text": "Madam, those files were not uploaded correctly in the new system, and your account will be blocked by tonight.",
-     "latency_ms": 412.0
+     "latency_ms": 431.0
     },
     {
      "channel": "receiver",
-     "text": "Oh dear, please tell me what",
+     "text": "Oh dear, please tell me why.",
      "latency_ms": null
     }
    ],
-   "duration_streamed_s": 31.7
+   "duration_streamed_s": 31.8
   },
   {
    "id": "scam_courier_customs_02",
@@ -3432,24 +3254,24 @@
    "trigger_reason": "threshold",
    "trigger_script_turn": 4,
    "caught_before_s5s6": true,
-   "warning_first_audio_s": 36.67,
+   "warning_first_audio_s": 36.73,
    "decisive_end_s": 48.242,
-   "decisive_to_warning_s": -11.57,
-   "tts_ttfa_ms": 382,
-   "turn_end_to_audio_ms": 1420,
+   "decisive_to_warning_s": -11.52,
+   "tts_ttfa_ms": 397,
+   "turn_end_to_audio_ms": 1471,
    "warning_voice_cloned": true,
    "warning_states": [
     "speaking",
     "interrupted"
    ],
-   "max_risk": 66.2,
+   "max_risk": 68.2,
    "detections": [
     {
      "turn_idx": 0,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 507,
+     "llm_ms": 537,
      "trigger": false
     },
     {
@@ -3460,18 +3282,19 @@
      ],
      "risk_llm": 75,
      "risk_cum": 52.5,
-     "llm_ms": 664,
+     "llm_ms": 650,
      "trigger": false
     },
     {
      "turn_idx": 7,
      "stages": [
       "S1",
-      "S2"
+      "S2",
+      "S4"
      ],
-     "risk_llm": 72,
-     "risk_cum": 66.2,
-     "llm_ms": 612,
+     "risk_llm": 75,
+     "risk_cum": 68.2,
+     "llm_ms": 640,
      "trigger": true
     }
    ],
@@ -3481,47 +3304,47 @@
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mrs. Aya from Pune?",
-     "latency_ms": 346.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Yes.",
-     "latency_ms": 318.0
-    },
-    {
-     "channel": "receiver",
-     "text": "This is she.",
-     "latency_ms": 440.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Who is calling, please?",
-     "latency_ms": 459.0
-    },
-    {
-     "channel": "caller",
-     "text": "Ma'am, I am Rohan from the International Logistics Hub. We have a parcel for you held at customs because the documentation is incomplete.",
-     "latency_ms": 523.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Parcel.",
      "latency_ms": 377.0
     },
     {
      "channel": "receiver",
+     "text": "Yes.",
+     "latency_ms": 323.0
+    },
+    {
+     "channel": "receiver",
+     "text": "This is she.",
+     "latency_ms": 371.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Who is calling, please?",
+     "latency_ms": 312.0
+    },
+    {
+     "channel": "caller",
+     "text": "Ma'am, I am Rohan from the International Logistics Hub. We have a parcel for you held at customs because the documentation is incomplete.",
+     "latency_ms": 451.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Parcel.",
+     "latency_ms": 315.0
+    },
+    {
+     "channel": "receiver",
      "text": "I am not expecting anything from outside. Is there some mistake?",
-     "latency_ms": 378.0
+     "latency_ms": 465.0
     },
     {
      "channel": "caller",
      "text": "It is marked as a high-value gift, ma'am. If you do not clear the customs holding today, the government will impose a legal penalty on your address.",
-     "latency_ms": 415.0
+     "latency_ms": 423.0
     },
     {
      "channel": "receiver",
      "text": "Penalty.",
-     "latency_ms": 320.0
+     "latency_ms": 345.0
     },
     {
      "channel": "receiver",
@@ -3529,7 +3352,7 @@
      "latency_ms": null
     }
    ],
-   "duration_streamed_s": 38.2
+   "duration_streamed_s": 38.3
   },
   {
    "id": "scam_courier_customs_05",
@@ -3541,38 +3364,74 @@
    "decisive_turn_index": 4,
    "first_s5_s6_turn_index": 6,
    "triggered": true,
-   "trigger_reason": "combo",
-   "trigger_script_turn": 2,
-   "caught_before_s5s6": true,
-   "warning_first_audio_s": 16.69,
+   "trigger_reason": "threshold",
+   "trigger_script_turn": 6,
+   "caught_before_s5s6": false,
+   "warning_first_audio_s": 47.68,
    "decisive_end_s": 32.187,
-   "decisive_to_warning_s": -15.5,
-   "tts_ttfa_ms": 382,
-   "turn_end_to_audio_ms": 1433,
+   "decisive_to_warning_s": 15.49,
+   "tts_ttfa_ms": 391,
+   "turn_end_to_audio_ms": 1625,
    "warning_voice_cloned": true,
    "warning_states": [
     "speaking",
     "interrupted"
    ],
-   "max_risk": 52.5,
+   "max_risk": 76.5,
    "detections": [
     {
      "turn_idx": 0,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 616,
+     "llm_ms": 513,
      "trigger": false
     },
     {
      "turn_idx": 2,
      "stages": [
       "S1",
-      "S6"
+      "S2"
      ],
      "risk_llm": 75,
      "risk_cum": 52.5,
-     "llm_ms": 664,
+     "llm_ms": 617,
+     "trigger": false
+    },
+    {
+     "turn_idx": 5,
+     "stages": [
+      "S1",
+      "S2"
+     ],
+     "risk_llm": 10,
+     "risk_cum": 48.5,
+     "llm_ms": 575,
+     "trigger": false
+    },
+    {
+     "turn_idx": 6,
+     "stages": [
+      "S1",
+      "S2",
+      "S4"
+     ],
+     "risk_llm": 60,
+     "risk_cum": 56.5,
+     "llm_ms": 1589,
+     "trigger": false
+    },
+    {
+     "turn_idx": 9,
+     "stages": [
+      "S1",
+      "S2",
+      "S4",
+      "S6"
+     ],
+     "risk_llm": 85,
+     "risk_cum": 76.5,
+     "llm_ms": 802,
      "trigger": true
     }
    ],
@@ -3582,25 +3441,60 @@
     {
      "channel": "caller",
      "text": "Hello, is this Mrs. Banerjee from Nagpur?",
-     "latency_ms": 316.0
+     "latency_ms": 361.0
     },
     {
      "channel": "receiver",
      "text": "Yes, who is speaking please?",
-     "latency_ms": 364.0
+     "latency_ms": 416.0
     },
     {
      "channel": "caller",
      "text": "I am Vikram, from the International Logistics Wing. We have an imported package for you, but it has been flagged by customs for an unpaid duty.",
-     "latency_ms": 377.0
+     "latency_ms": 577.0
     },
     {
      "channel": "receiver",
-     "text": "Package? I am not expecting",
-     "latency_ms": null
+     "text": "Package?",
+     "latency_ms": 355.0
+    },
+    {
+     "channel": "receiver",
+     "text": "I am not expecting any parcel from abroad.",
+     "latency_ms": 362.0
+    },
+    {
+     "channel": "caller",
+     "text": "It is marked as an urgent gift.",
+     "latency_ms": 373.0
+    },
+    {
+     "channel": "caller",
+     "text": "But since the tax is unpaid, we cannot release it. If it stays in the warehouse for another 2 hours, it will be sent back, and you will face a legal penalty.",
+     "latency_ms": 577.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Penalty?",
+     "latency_ms": 357.0
+    },
+    {
+     "channel": "receiver",
+     "text": "But please check again, there must be some mistake.",
+     "latency_ms": 382.0
+    },
+    {
+     "channel": "caller",
+     "text": "Madam, there is no mistake. You just need to pay a clearance fee of \u20b925,000 to settle the customs account immediately.",
+     "latency_ms": 420.0
+    },
+    {
+     "channel": "receiver",
+     "text": "That is a very large amount.",
+     "latency_ms": 1231.0
     }
    ],
-   "duration_streamed_s": 18.2
+   "duration_streamed_s": 49.2
   },
   {
    "id": "scam_courier_customs_07",
@@ -3613,59 +3507,48 @@
    "first_s5_s6_turn_index": 8,
    "triggered": true,
    "trigger_reason": "threshold",
-   "trigger_script_turn": 6,
+   "trigger_script_turn": 4,
    "caught_before_s5s6": true,
-   "warning_first_audio_s": 42.87,
+   "warning_first_audio_s": 28.87,
    "decisive_end_s": 41.348,
-   "decisive_to_warning_s": 1.52,
-   "tts_ttfa_ms": 401,
-   "turn_end_to_audio_ms": 1519,
+   "decisive_to_warning_s": -12.48,
+   "tts_ttfa_ms": 391,
+   "turn_end_to_audio_ms": 1514,
    "warning_voice_cloned": true,
    "warning_states": [
     "speaking",
     "interrupted"
    ],
-   "max_risk": 76.6,
+   "max_risk": 63.4,
    "detections": [
     {
      "turn_idx": 0,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 495,
+     "llm_ms": 502,
      "trigger": false
     },
     {
      "turn_idx": 2,
      "stages": [
-      "S1"
+      "S1",
+      "S2"
      ],
-     "risk_llm": 55,
-     "risk_cum": 38.5,
-     "llm_ms": 633,
+     "risk_llm": 75,
+     "risk_cum": 52.5,
+     "llm_ms": 661,
      "trigger": false
     },
     {
-     "turn_idx": 5,
+     "turn_idx": 4,
      "stages": [
       "S1",
       "S2"
      ],
-     "risk_llm": 65,
-     "risk_cum": 57.0,
-     "llm_ms": 689,
-     "trigger": false
-    },
-    {
-     "turn_idx": 8,
-     "stages": [
-      "S1",
-      "S2",
-      "S6"
-     ],
-     "risk_llm": 85,
-     "risk_cum": 76.6,
-     "llm_ms": 633,
+     "risk_llm": 68,
+     "risk_cum": 63.4,
+     "llm_ms": 637,
      "trigger": true
     }
    ],
@@ -3675,60 +3558,40 @@
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mr. Sharma of Jaipur city?",
-     "latency_ms": 411.0
+     "latency_ms": 439.0
     },
     {
      "channel": "receiver",
      "text": "Yes, this is Sharma. Who is calling?",
-     "latency_ms": 315.0
+     "latency_ms": 430.0
     },
     {
      "channel": "caller",
      "text": "I am Rohan from the International Shipping Hub. Your overseas parcel is currently stuck at the customs office.",
-     "latency_ms": 427.0
+     "latency_ms": 433.0
     },
     {
      "channel": "receiver",
-     "text": "Overseas Parcel?",
-     "latency_ms": 356.0
-    },
-    {
-     "channel": "receiver",
-     "text": "I am not expecting any package from outside.",
-     "latency_ms": 407.0
+     "text": "Overseas parcel? I am not expecting any package from outside.",
+     "latency_ms": 405.0
     },
     {
      "channel": "caller",
      "text": "Sir, it is a registered shipment containing documents. The customs officer has flagged it for a missing clearance fee.",
-     "latency_ms": 469.0
-    },
-    {
-     "channel": "receiver",
-     "text": "I don't understand.",
-     "latency_ms": 344.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Why would I have documents from outside?",
-     "latency_ms": 306.0
-    },
-    {
-     "channel": "caller",
-     "text": "It could be from a relative, but if you don't settle the \u20b99,500 fine now, the police will be notified for illegal import.",
      "latency_ms": 475.0
     },
     {
      "channel": "receiver",
-     "text": "Police?",
-     "latency_ms": 359.0
+     "text": "I don't understand.",
+     "latency_ms": 328.0
     },
     {
      "channel": "receiver",
-     "text": "This is very stressful.",
+     "text": "Why would",
      "latency_ms": null
     }
    ],
-   "duration_streamed_s": 44.4
+   "duration_streamed_s": 30.4
   },
   {
    "id": "scam_digital_arrest_02",
@@ -3743,24 +3606,24 @@
    "trigger_reason": "threshold",
    "trigger_script_turn": 4,
    "caught_before_s5s6": true,
-   "warning_first_audio_s": 37.11,
+   "warning_first_audio_s": 37.08,
    "decisive_end_s": 35.609,
-   "decisive_to_warning_s": 1.5,
-   "tts_ttfa_ms": 457,
-   "turn_end_to_audio_ms": 1653,
+   "decisive_to_warning_s": 1.47,
+   "tts_ttfa_ms": 402,
+   "turn_end_to_audio_ms": 1625,
    "warning_voice_cloned": true,
    "warning_states": [
     "speaking",
     "interrupted"
    ],
-   "max_risk": 75.2,
+   "max_risk": 77.3,
    "detections": [
     {
      "turn_idx": 0,
      "stages": [],
      "risk_llm": 0,
      "risk_cum": 0.0,
-     "llm_ms": 533,
+     "llm_ms": 523,
      "trigger": false
     },
     {
@@ -3769,9 +3632,9 @@
       "S1",
       "S2"
      ],
-     "risk_llm": 75,
-     "risk_cum": 52.5,
-     "llm_ms": 681,
+     "risk_llm": 85,
+     "risk_cum": 59.5,
+     "llm_ms": 702,
      "trigger": false
     },
     {
@@ -3782,8 +3645,8 @@
       "S3"
      ],
      "risk_llm": 85,
-     "risk_cum": 75.2,
-     "llm_ms": 679,
+     "risk_cum": 77.3,
+     "llm_ms": 704,
      "trigger": true
     }
    ],
@@ -3793,32 +3656,32 @@
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mr. Gupta from Chennai?",
-     "latency_ms": 313.0
+     "latency_ms": 307.0
     },
     {
      "channel": "receiver",
      "text": "Yes, this is he.",
-     "latency_ms": 331.0
+     "latency_ms": 324.0
     },
     {
      "channel": "receiver",
      "text": "Who is calling, please?",
-     "latency_ms": 375.0
+     "latency_ms": 361.0
     },
     {
      "channel": "caller",
      "text": "I am Inspector Vikram, from the Cyber Crime Cell. Your Aadhaar card has been flagged in connection with a narcotics smuggling case across state borders.",
-     "latency_ms": 570.0
+     "latency_ms": 564.0
     },
     {
      "channel": "receiver",
      "text": "What? Narcotics? There must be some mistake. I am a retired teacher.",
-     "latency_ms": 416.0
+     "latency_ms": 410.0
     },
     {
      "channel": "caller",
      "text": "That is why we are calling you, but the digital trail leads to your ID. Because this is a sensitive national security matter, you are now under digital arrest and must not hang up or tell anyone.",
-     "latency_ms": 507.0
+     "latency_ms": 511.0
     },
     {
      "channel": "receiver",
@@ -3826,7 +3689,7 @@
      "latency_ms": null
     }
    ],
-   "duration_streamed_s": 38.7
+   "duration_streamed_s": 38.6
   },
   {
    "id": "scam_digital_arrest_04",
@@ -3841,15 +3704,16 @@
    "trigger_reason": "threshold",
    "trigger_script_turn": 2,
    "caught_before_s5s6": true,
-   "warning_first_audio_s": 23.58,
+   "warning_first_audio_s": 23.57,
    "decisive_end_s": 36.894,
-   "decisive_to_warning_s": -13.31,
-   "tts_ttfa_ms": 380,
-   "turn_end_to_audio_ms": 1529,
+   "decisive_to_warning_s": -13.32,
+   "tts_ttfa_ms": 393,
+   "turn_end_to_audio_ms": 1520,
    "warning_voice_cloned": true,
    "warning_states": [
     "speaking",
-    "interrupted"
+    "interrupted",
+    "speaking"
    ],
    "max_risk": 75.2,
    "detections": [
@@ -3860,18 +3724,19 @@
      ],
      "risk_llm": 75,
      "risk_cum": 52.5,
-     "llm_ms": 538,
+     "llm_ms": 548,
      "trigger": false
     },
     {
-     "turn_idx": 3,
+     "turn_idx": 4,
      "stages": [
       "S1",
-      "S2"
+      "S2",
+      "S3"
      ],
      "risk_llm": 85,
      "risk_cum": 75.2,
-     "llm_ms": 675,
+     "llm_ms": 636,
      "trigger": true
     }
    ],
@@ -3881,27 +3746,32 @@
     {
      "channel": "caller",
      "text": "Hello, am I speaking with Mr. Reddy of Chennai? This is Inspector Vikram from the Cyber Cell.",
-     "latency_ms": 359.0
+     "latency_ms": 391.0
     },
     {
      "channel": "receiver",
      "text": "Yes, this is ready.",
-     "latency_ms": 299.0
+     "latency_ms": 320.0
     },
     {
      "channel": "receiver",
-     "text": "Is something wrong? Why are you calling?",
-     "latency_ms": 303.0
+     "text": "Is something wrong?",
+     "latency_ms": 381.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Why are you calling?",
+     "latency_ms": 388.0
     },
     {
      "channel": "caller",
      "text": "Sir, we have intercepted a courier from Mumbai containing illegal narcotics, and your Aadhaar number is linked to the sender's address.",
-     "latency_ms": 463.0
+     "latency_ms": 479.0
     },
     {
      "channel": "receiver",
      "text": "What?",
-     "latency_ms": 365.0
+     "latency_ms": 379.0
     },
     {
      "channel": "receiver",
@@ -3924,1036 +3794,16 @@
    "trigger_reason": "threshold",
    "trigger_script_turn": 2,
    "caught_before_s5s6": true,
-   "warning_first_audio_s": null,
+   "warning_first_audio_s": 22.08,
    "decisive_end_s": 52.949,
-   "decisive_to_warning_s": null,
-   "tts_ttfa_ms": null,
-   "turn_end_to_audio_ms": null,
-   "warning_voice_cloned": true,
-   "warning_states": [
-    "speaking",
-    "interrupted"
-   ],
-   "max_risk": 94.0,
-   "detections": [
-    {
-     "turn_idx": 0,
-     "stages": [
-      "S1"
-     ],
-     "risk_llm": 75,
-     "risk_cum": 52.5,
-     "llm_ms": 956,
-     "trigger": false
-    },
-    {
-     "turn_idx": 3,
-     "stages": [
-      "S1",
-      "S2"
-     ],
-     "risk_llm": 75,
-     "risk_cum": 68.2,
-     "llm_ms": 627,
-     "trigger": true
-    },
-    {
-     "turn_idx": 5,
-     "stages": [
-      "S1",
-      "S2",
-      "S3"
-     ],
-     "risk_llm": 75,
-     "risk_cum": 73.0,
-     "llm_ms": 678,
-     "trigger": true
-    },
-    {
-     "turn_idx": 7,
-     "stages": [
-      "S1",
-      "S2",
-      "S3"
-     ],
-     "risk_llm": 85,
-     "risk_cum": 81.4,
-     "llm_ms": 690,
-     "trigger": true
-    },
-    {
-     "turn_idx": 9,
-     "stages": [
-      "S1",
-      "S2",
-      "S3"
-     ],
-     "risk_llm": 85,
-     "risk_cum": 83.9,
-     "llm_ms": 667,
-     "trigger": true
-    },
-    {
-     "turn_idx": 11,
-     "stages": [
-      "S1",
-      "S2",
-      "S3",
-      "S4",
-      "S6"
-     ],
-     "risk_llm": 95,
-     "risk_cum": 91.7,
-     "llm_ms": 831,
-     "trigger": true
-    },
-    {
-     "turn_idx": 13,
-     "stages": [
-      "S1",
-      "S2",
-      "S3",
-      "S4",
-      "S5",
-      "S6"
-     ],
-     "risk_llm": 95,
-     "risk_cum": 94.0,
-     "llm_ms": 869,
-     "trigger": true
-    }
-   ],
-   "detect_errors": 0,
-   "stt_incidents": 0,
-   "stt_finals": [
-    {
-     "channel": "caller",
-     "text": "Hello, is this Mr. Patil from Pune? I am Inspector Vikram from the Cyber Crime Division office.",
-     "latency_ms": 424.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Yes, I am Patil. What happened, sir?",
-     "latency_ms": 376.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Why are you calling?",
-     "latency_ms": 311.0
-    },
-    {
-     "channel": "caller",
-     "text": "Sir, we intercepted a courier package from Mumbai containing illegal narcotics and several fake passports.",
-     "latency_ms": 376.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Narcotics? But I have never sent any such parcel in my life.",
-     "latency_ms": 415.0
-    },
-    {
-     "channel": "caller",
-     "text": "The problem is, your Aadhaar number is listed as the primary contact for the sender. This is a very serious criminal matter.",
-     "latency_ms": 511.0
-    },
-    {
-     "channel": "receiver",
-     "text": "This must be a mistake. Please check again. I am a retired government employee.",
-     "latency_ms": 414.0
-    },
-    {
-     "channel": "caller",
-     "text": "Listen carefully. Because of the sensitivity of this case, you are now under digital arrest. You must stay on this call and not tell a soul, or we will have to come and pick you up.",
-     "latency_ms": 491.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Digital arrest? I don't understand. Can I call my son to help me?",
-     "latency_ms": 415.0
-    },
-    {
-     "channel": "caller",
-     "text": "Absolutely not. If you leak this information, it will be treated as obstructing a government investigation.",
-     "latency_ms": 472.0
-    },
-    {
-     "channel": "receiver",
-     "text": "I am very scared now. Please tell me how to clear my name.",
-     "latency_ms": 417.0
-    },
-    {
-     "channel": "caller",
-     "text": "To verify your innocence and clear your Aadhaar from the blacklist, you must deposit \u20b950,000 into our secure government verification account.",
-     "latency_ms": 402.0
-    },
-    {
-     "channel": "receiver",
-     "text": "50,000? I don't have that much ready in my hand right now.",
-     "latency_ms": 404.0
-    },
-    {
-     "channel": "caller",
-     "text": "You have 1 hour to transfer the amount, otherwise the local Pune police will arrive at your door with handcuffs.",
-     "latency_ms": 452.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Please give me some time. I will try to arrange it.",
-     "latency_ms": 357.0
-    }
-   ],
-   "duration_streamed_s": 105.6
-  },
-  {
-   "id": "scam_digital_arrest_09",
-   "label": "scam",
-   "category": "scam",
-   "scam_type": "digital_arrest",
-   "subtype": "digital_arrest",
-   "split": "test",
-   "decisive_turn_index": 6,
-   "first_s5_s6_turn_index": 8,
-   "triggered": true,
-   "trigger_reason": "threshold",
-   "trigger_script_turn": 4,
-   "caught_before_s5s6": true,
-   "warning_first_audio_s": 35.16,
-   "decisive_end_s": 47.937,
-   "decisive_to_warning_s": -12.78,
-   "tts_ttfa_ms": 389,
-   "turn_end_to_audio_ms": 1501,
-   "warning_voice_cloned": true,
-   "warning_states": [
-    "speaking",
-    "interrupted"
-   ],
-   "max_risk": 77.3,
-   "detections": [
-    {
-     "turn_idx": 0,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 512,
-     "trigger": false
-    },
-    {
-     "turn_idx": 2,
-     "stages": [
-      "S1",
-      "S2"
-     ],
-     "risk_llm": 85,
-     "risk_cum": 59.5,
-     "llm_ms": 638,
-     "trigger": false
-    },
-    {
-     "turn_idx": 5,
-     "stages": [
-      "S1",
-      "S2",
-      "S3"
-     ],
-     "risk_llm": 85,
-     "risk_cum": 77.3,
-     "llm_ms": 656,
-     "trigger": true
-    }
-   ],
-   "detect_errors": 0,
-   "stt_incidents": 0,
-   "stt_finals": [
-    {
-     "channel": "caller",
-     "text": "Hello, am I speaking with Mr. Patil from Pune?",
-     "latency_ms": 404.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Yes, this is Patil. Who is calling, please?",
-     "latency_ms": 419.0
-    },
-    {
-     "channel": "caller",
-     "text": "I am Inspector Vikram Singh from the Cyber Intelligence Unit. We have intercepted a package containing illegal narcotics and several fake passports sent in your name.",
-     "latency_ms": 565.0
-    },
-    {
-     "channel": "receiver",
-     "text": "What?",
-     "latency_ms": 319.0
-    },
-    {
-     "channel": "receiver",
-     "text": "It is impossible. I have not sent any package.",
-     "latency_ms": 313.0
-    },
-    {
-     "channel": "caller",
-     "text": "That is why we are calling you. Your Aadhaar card has been used for this crime, and you are now under digital arrest until this is cleared.",
-     "latency_ms": 446.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Digital arrest? I do not",
-     "latency_ms": null
-    }
-   ],
-   "duration_streamed_s": 36.7
-  },
-  {
-   "id": "scam_fake_relative_01",
-   "label": "scam",
-   "category": "scam",
-   "scam_type": "fake_relative",
-   "subtype": "fake_relative",
-   "split": "test",
-   "decisive_turn_index": 6,
-   "first_s5_s6_turn_index": 6,
-   "triggered": true,
-   "trigger_reason": "threshold",
-   "trigger_script_turn": 4,
-   "caught_before_s5s6": true,
-   "warning_first_audio_s": 37.19,
-   "decisive_end_s": 50.83,
-   "decisive_to_warning_s": -13.64,
-   "tts_ttfa_ms": 374,
-   "turn_end_to_audio_ms": 1432,
-   "warning_voice_cloned": true,
-   "warning_states": [
-    "speaking",
-    "interrupted"
-   ],
-   "max_risk": 63.4,
-   "detections": [
-    {
-     "turn_idx": 0,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 645,
-     "trigger": false
-    },
-    {
-     "turn_idx": 3,
-     "stages": [
-      "S1",
-      "S2"
-     ],
-     "risk_llm": 75,
-     "risk_cum": 52.5,
-     "llm_ms": 544,
-     "trigger": false
-    },
-    {
-     "turn_idx": 6,
-     "stages": [
-      "S1",
-      "S2",
-      "S3"
-     ],
-     "risk_llm": 68,
-     "risk_cum": 63.4,
-     "llm_ms": 586,
-     "trigger": true
-    }
-   ],
-   "detect_errors": 0,
-   "stt_incidents": 0,
-   "stt_finals": [
-    {
-     "channel": "caller",
-     "text": "Dadaaji, it is me, Rohan. I am calling from a friend's phone because mine smashed.",
-     "latency_ms": 468.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Rohan? Which Rohan?",
-     "latency_ms": 311.0
-    },
-    {
-     "channel": "receiver",
-     "text": "My nephew is in Bangalore, not using a friend's phone.",
-     "latency_ms": 455.0
-    },
-    {
-     "channel": "caller",
-     "text": "Yes, I came to Pune for a project and had a small accident with a bike. I am okay, but the police are here and it is very stressful.",
-     "latency_ms": 513.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Oh my God, what happened? Are you hurt?",
-     "latency_ms": 405.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Where in Pune are you?",
-     "latency_ms": 452.0
-    },
-    {
-     "channel": "caller",
-     "text": "I am just shaken up, Mr. Sharma. Please do not tell my parents yet because they will panic and scold me.",
-     "latency_ms": 462.0
-    },
-    {
-     "channel": "receiver",
-     "text": "But I must call your father.",
-     "latency_ms": null
-    }
-   ],
-   "duration_streamed_s": 38.7
-  },
-  {
-   "id": "scam_fake_relative_03",
-   "label": "scam",
-   "category": "scam",
-   "scam_type": "fake_relative",
-   "subtype": "fake_relative",
-   "split": "test",
-   "decisive_turn_index": 8,
-   "first_s5_s6_turn_index": 8,
-   "triggered": true,
-   "trigger_reason": "threshold",
-   "trigger_script_turn": 4,
-   "caught_before_s5s6": true,
-   "warning_first_audio_s": 33.29,
-   "decisive_end_s": 58.179,
-   "decisive_to_warning_s": -24.89,
-   "tts_ttfa_ms": 479,
-   "turn_end_to_audio_ms": 1935,
+   "decisive_to_warning_s": -30.87,
+   "tts_ttfa_ms": 387,
+   "turn_end_to_audio_ms": 1522,
    "warning_voice_cloned": true,
    "warning_states": [
     "speaking"
    ],
-   "max_risk": 68.2,
-   "detections": [
-    {
-     "turn_idx": 0,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 568,
-     "trigger": false
-    },
-    {
-     "turn_idx": 2,
-     "stages": [
-      "S1",
-      "S2"
-     ],
-     "risk_llm": 75,
-     "risk_cum": 52.5,
-     "llm_ms": 569,
-     "trigger": false
-    },
-    {
-     "turn_idx": 4,
-     "stages": [
-      "S1",
-      "S2",
-      "S3"
-     ],
-     "risk_llm": 75,
-     "risk_cum": 68.2,
-     "llm_ms": 919,
-     "trigger": true
-    }
-   ],
-   "detect_errors": 0,
-   "stt_incidents": 0,
-   "stt_finals": [
-    {
-     "channel": "caller",
-     "text": "Hello, Nani, it is me, Rahul. Please tell me you can hear me clearly.",
-     "latency_ms": 378.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Rahul, Beta, why are you calling from this new number? Is everything okay?",
-     "latency_ms": 471.0
-    },
-    {
-     "channel": "caller",
-     "text": "Nani, I'm in a big mess. I had a small accident with a car in Pune and the police are very angry.",
-     "latency_ms": 478.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Oh my God, are you hurt? Do I need to call your father right now?",
-     "latency_ms": 371.0
-    },
-    {
-     "channel": "caller",
-     "text": "No, no, please do not tell Papa. He will kill me. I just need to settle this with the police quickly and go home.",
-     "latency_ms": 529.0
-    },
-    {
-     "channel": "receiver",
-     "text": "But how can you settle it alone? What exactly happened?",
-     "latency_ms": null
-    }
-   ],
-   "duration_streamed_s": 34.8
-  },
-  {
-   "id": "scam_fake_relative_05",
-   "label": "scam",
-   "category": "scam",
-   "scam_type": "fake_relative",
-   "subtype": "fake_relative",
-   "split": "test",
-   "decisive_turn_index": 6,
-   "first_s5_s6_turn_index": 6,
-   "triggered": true,
-   "trigger_reason": "threshold",
-   "trigger_script_turn": 4,
-   "caught_before_s5s6": true,
-   "warning_first_audio_s": 34.51,
-   "decisive_end_s": 46.643,
-   "decisive_to_warning_s": -12.14,
-   "tts_ttfa_ms": 403,
-   "turn_end_to_audio_ms": 1451,
-   "warning_voice_cloned": true,
-   "warning_states": [
-    "speaking",
-    "interrupted"
-   ],
-   "max_risk": 63.4,
-   "detections": [
-    {
-     "turn_idx": 0,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 591,
-     "trigger": false
-    },
-    {
-     "turn_idx": 1,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 551,
-     "trigger": false
-    },
-    {
-     "turn_idx": 4,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 563,
-     "trigger": false
-    },
-    {
-     "turn_idx": 5,
-     "stages": [
-      "S1",
-      "S2"
-     ],
-     "risk_llm": 75,
-     "risk_cum": 52.5,
-     "llm_ms": 698,
-     "trigger": false
-    },
-    {
-     "turn_idx": 7,
-     "stages": [
-      "S1",
-      "S2",
-      "S3"
-     ],
-     "risk_llm": 68,
-     "risk_cum": 63.4,
-     "llm_ms": 618,
-     "trigger": true
-    }
-   ],
-   "detect_errors": 0,
-   "stt_incidents": 0,
-   "stt_finals": [
-    {
-     "channel": "caller",
-     "text": "Data?",
-     "latency_ms": 318.0
-    },
-    {
-     "channel": "caller",
-     "text": "It is me, Arjun. I am calling from a friend's phone because mine is broken.",
-     "latency_ms": 429.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Arjun, is that you, beta?",
-     "latency_ms": 369.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Why is your voice sounding so strange?",
-     "latency_ms": 466.0
-    },
-    {
-     "channel": "caller",
-     "text": "I have had a very bad accident here in Mumbai, and I am in a lot of trouble.",
-     "latency_ms": 425.0
-    },
-    {
-     "channel": "caller",
-     "text": "I am at the police station right now.",
-     "latency_ms": 427.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Police station! What happened? Are you hurt? I will call your father immediately!",
-     "latency_ms": 366.0
-    },
-    {
-     "channel": "caller",
-     "text": "No, please, Mr. Singh, do not call Papa. He will be very angry, and I cannot face him right now.",
-     "latency_ms": 421.0
-    },
-    {
-     "channel": "receiver",
-     "text": "But how can I not tell him?",
-     "latency_ms": 305.0
-    }
-   ],
-   "duration_streamed_s": 36.1
-  },
-  {
-   "id": "scam_investment_task_02",
-   "label": "scam",
-   "category": "scam",
-   "scam_type": "investment_task",
-   "subtype": "investment_task",
-   "split": "test",
-   "decisive_turn_index": 6,
-   "first_s5_s6_turn_index": 6,
-   "triggered": true,
-   "trigger_reason": "threshold",
-   "trigger_script_turn": 6,
-   "caught_before_s5s6": false,
-   "warning_first_audio_s": 50.49,
-   "decisive_end_s": 48.662,
-   "decisive_to_warning_s": 1.83,
-   "tts_ttfa_ms": 377,
-   "turn_end_to_audio_ms": 1541,
-   "warning_voice_cloned": true,
-   "warning_states": [
-    "speaking"
-   ],
-   "max_risk": 61.6,
-   "detections": [
-    {
-     "turn_idx": 0,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 543,
-     "trigger": false
-    },
-    {
-     "turn_idx": 2,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 568,
-     "trigger": false
-    },
-    {
-     "turn_idx": 5,
-     "stages": [],
-     "risk_llm": 10,
-     "risk_cum": 7.0,
-     "llm_ms": 576,
-     "trigger": false
-    },
-    {
-     "turn_idx": 8,
-     "stages": [
-      "S6"
-     ],
-     "risk_llm": 85,
-     "risk_cum": 61.6,
-     "llm_ms": 740,
-     "trigger": true
-    }
-   ],
-   "detect_errors": 0,
-   "stt_incidents": 0,
-   "stt_finals": [
-    {
-     "channel": "caller",
-     "text": "Hello, am I speaking with Mr. Gupta from Hyderabad?",
-     "latency_ms": 385.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Yes, this is Gupta. Who is this calling?",
-     "latency_ms": 411.0
-    },
-    {
-     "channel": "caller",
-     "text": "Sir, my name is Rohan from Global Tech Solutions. I am calling regarding the part-time data optimization work you expressed interest in online.",
-     "latency_ms": 423.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Oh, I remember clicking something, but I am not sure how it works.",
-     "latency_ms": 357.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Is it really easy?",
-     "latency_ms": 416.0
-    },
-    {
-     "channel": "caller",
-     "text": "Very easy, sir. You just like some videos and we pay you. In fact, your account already shows a profit of \u20b912,000 from the trial tasks.",
-     "latency_ms": 472.0
-    },
-    {
-     "channel": "receiver",
-     "text": "12,000? Really?",
-     "latency_ms": 316.0
-    },
-    {
-     "channel": "receiver",
-     "text": "How do I get this money in my bank?",
-     "latency_ms": 396.0
-    },
-    {
-     "channel": "caller",
-     "text": "That is why I called. To activate the withdrawal portal, you just need to pay a small security deposit of \u20b92,000 first.",
-     "latency_ms": 415.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Wait, why should I pay money to get my",
-     "latency_ms": null
-    }
-   ],
-   "duration_streamed_s": 52.0
-  },
-  {
-   "id": "scam_investment_task_04",
-   "label": "scam",
-   "category": "scam",
-   "scam_type": "investment_task",
-   "subtype": "investment_task",
-   "split": "test",
-   "decisive_turn_index": 4,
-   "first_s5_s6_turn_index": 4,
-   "triggered": true,
-   "trigger_reason": "threshold",
-   "trigger_script_turn": 4,
-   "caught_before_s5s6": false,
-   "warning_first_audio_s": 45.41,
-   "decisive_end_s": 42.973,
-   "decisive_to_warning_s": 2.44,
-   "tts_ttfa_ms": 426,
-   "turn_end_to_audio_ms": 1356,
-   "warning_voice_cloned": true,
-   "warning_states": [
-    "speaking"
-   ],
-   "max_risk": 60.5,
-   "detections": [
-    {
-     "turn_idx": 0,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 538,
-     "trigger": false
-    },
-    {
-     "turn_idx": 2,
-     "stages": [],
-     "risk_llm": 5,
-     "risk_cum": 3.5,
-     "llm_ms": 560,
-     "trigger": false
-    },
-    {
-     "turn_idx": 4,
-     "stages": [
-      "S6"
-     ],
-     "risk_llm": 85,
-     "risk_cum": 60.5,
-     "llm_ms": 571,
-     "trigger": true
-    }
-   ],
-   "detect_errors": 0,
-   "stt_incidents": 0,
-   "stt_finals": [
-    {
-     "channel": "caller",
-     "text": "Hello, Mr. Sharma. I am Rohan from the Global Task Center in Bengaluru. I am calling regarding the part-time data optimization project you expressed interest in.",
-     "latency_ms": 447.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Hello? I do not remember applying for any project. Which website was this?",
-     "latency_ms": 575.0
-    },
-    {
-     "channel": "caller",
-     "text": "It was through the social media advertisement, sir. You can earn \u20b95,000 daily just by liking videos on your phone.",
-     "latency_ms": 566.0
-    },
-    {
-     "channel": "receiver",
-     "text": "5,000? That sounds very high for just liking videos. Is it really possible?",
-     "latency_ms": 438.0
-    },
-    {
-     "channel": "caller",
-     "text": "Yes, sir, it is a very simple system. Just to start your account and activate the first batch, you need to deposit a small security fee of \u20b912,000.",
-     "latency_ms": 351.0
-    },
-    {
-     "channel": "receiver",
-     "text": "$12,000 is a lot of money for me to just give like that.",
-     "latency_ms": null
-    }
-   ],
-   "duration_streamed_s": 47.0
-  },
-  {
-   "id": "scam_investment_task_06",
-   "label": "scam",
-   "category": "scam",
-   "scam_type": "investment_task",
-   "subtype": "investment_task",
-   "split": "test",
-   "decisive_turn_index": 6,
-   "first_s5_s6_turn_index": 6,
-   "triggered": true,
-   "trigger_reason": "threshold",
-   "trigger_script_turn": 8,
-   "caught_before_s5s6": false,
-   "warning_first_audio_s": 60.31,
-   "decisive_end_s": 46.201,
-   "decisive_to_warning_s": 14.11,
-   "tts_ttfa_ms": 448,
-   "turn_end_to_audio_ms": 1557,
-   "warning_voice_cloned": true,
-   "warning_states": [
-    "speaking",
-    "interrupted"
-   ],
-   "max_risk": 70.3,
-   "detections": [
-    {
-     "turn_idx": 0,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 520,
-     "trigger": false
-    },
-    {
-     "turn_idx": 2,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 567,
-     "trigger": false
-    },
-    {
-     "turn_idx": 4,
-     "stages": [],
-     "risk_llm": 0,
-     "risk_cum": 0.0,
-     "llm_ms": 502,
-     "trigger": false
-    },
-    {
-     "turn_idx": 6,
-     "stages": [
-      "S6"
-     ],
-     "risk_llm": 85,
-     "risk_cum": 59.5,
-     "llm_ms": 607,
-     "trigger": false
-    },
-    {
-     "turn_idx": 8,
-     "stages": [
-      "S6"
-     ],
-     "risk_llm": 75,
-     "risk_cum": 70.3,
-     "llm_ms": 579,
-     "trigger": true
-    }
-   ],
-   "detect_errors": 0,
-   "stt_incidents": 0,
-   "stt_finals": [
-    {
-     "channel": "caller",
-     "text": "Hello, am I speaking with Mr. Patil from Delhi?",
-     "latency_ms": 349.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Yes, this is he. Who is calling, please?",
-     "latency_ms": 510.0
-    },
-    {
-     "channel": "caller",
-     "text": "I am Sarah from Global Task Solutions. I saw your profile and wanted to offer you a simple part-time job where you just rate products online for easy money.",
-     "latency_ms": 488.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Rating products. I am retired. I do not know how to do such things.",
-     "latency_ms": 411.0
-    },
-    {
-     "channel": "caller",
-     "text": "It is very simple, Mr. Patel. Just click a few buttons on your phone and you can earn \u20b93,000 every day.",
-     "latency_ms": 465.0
-    },
-    {
-     "channel": "receiver",
-     "text": "That sounds too much for such a small thing. How do I start?",
-     "latency_ms": 410.0
-    },
-    {
-     "channel": "caller",
-     "text": "You just need to activate your worker account first. Please transfer \u20b912,000 as a refundable security deposit to this link I am sending.",
-     "latency_ms": 412.0
-    },
-    {
-     "channel": "receiver",
-     "text": "$12,000 is a lot of money. Why should I pay to get a job?",
-     "latency_ms": 440.0
-    },
-    {
-     "channel": "caller",
-     "text": "This is just for verification to show you are a serious worker. You will get it back with your first payment in 2 hours.",
-     "latency_ms": 519.0
-    },
-    {
-     "channel": "receiver",
-     "text": "I am very worried about this.",
-     "latency_ms": null
-    }
-   ],
-   "duration_streamed_s": 61.9
-  },
-  {
-   "id": "scam_remote_access_02",
-   "label": "scam",
-   "category": "scam",
-   "scam_type": "remote_access",
-   "subtype": "remote_access",
-   "split": "test",
-   "decisive_turn_index": 4,
-   "first_s5_s6_turn_index": 6,
-   "triggered": true,
-   "trigger_reason": "threshold",
-   "trigger_script_turn": 2,
-   "caught_before_s5s6": true,
-   "warning_first_audio_s": 26.65,
-   "decisive_end_s": 38.563,
-   "decisive_to_warning_s": -11.92,
-   "tts_ttfa_ms": 427,
-   "turn_end_to_audio_ms": 1691,
-   "warning_voice_cloned": true,
-   "warning_states": [
-    "speaking",
-    "interrupted"
-   ],
-   "max_risk": 67.5,
-   "detections": [
-    {
-     "turn_idx": 0,
-     "stages": [],
-     "risk_llm": 5,
-     "risk_cum": 3.5,
-     "llm_ms": 564,
-     "trigger": false
-    },
-    {
-     "turn_idx": 2,
-     "stages": [
-      "S1",
-      "S2",
-      "S3",
-      "S4",
-      "S5",
-      "S6",
-      "S7"
-     ],
-     "risk_llm": 95,
-     "risk_cum": 67.5,
-     "llm_ms": 688,
-     "trigger": true
-    }
-   ],
-   "detect_errors": 0,
-   "stt_incidents": 0,
-   "stt_finals": [
-    {
-     "channel": "caller",
-     "text": "Hello, Mr. Patel. I am Rohan from the Secure Banking Department. I am calling regarding a synchronization error with your mobile app account based in Nagpur.",
-     "latency_ms": 435.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Hello? What error? Everything was working fine yesterday.",
-     "latency_ms": 417.0
-    },
-    {
-     "channel": "caller",
-     "text": "It is a backend server issue, sir, but if not fixed, your account will be frozen. I just need you to download a small tool called AnyDesk so I can guide you.",
-     "latency_ms": 567.0
-    },
-    {
-     "channel": "receiver",
-     "text": "Any desk?",
-     "latency_ms": 379.0
-    },
-    {
-     "channel": "receiver",
-     "text": "I do not know this.",
-     "latency_ms": null
-    }
-   ],
-   "duration_streamed_s": 28.2
-  },
-  {
-   "id": "scam_remote_access_05",
-   "label": "scam",
-   "category": "scam",
-   "scam_type": "remote_access",
-   "subtype": "remote_access",
-   "split": "test",
-   "decisive_turn_index": 4,
-   "first_s5_s6_turn_index": 8,
-   "triggered": true,
-   "trigger_reason": "threshold",
-   "trigger_script_turn": 2,
-   "caught_before_s5s6": true,
-   "warning_first_audio_s": 26.08,
-   "decisive_end_s": 41.314,
-   "decisive_to_warning_s": -15.24,
-   "tts_ttfa_ms": 405,
-   "turn_end_to_audio_ms": 1571,
-   "warning_voice_cloned": true,
-   "warning_states": [
-    "speaking",
-    "interrupted"
-   ],
-   "max_risk": 68.2,
+   "max_risk": 75.2,
    "detections": [
     {
      "turn_idx": 0,
@@ -4969,11 +3819,966 @@
      "turn_idx": 2,
      "stages": [
       "S1",
+      "S2"
+     ],
+     "risk_llm": 85,
+     "risk_cum": 75.2,
+     "llm_ms": 647,
+     "trigger": true
+    }
+   ],
+   "detect_errors": 0,
+   "stt_incidents": 0,
+   "stt_finals": [
+    {
+     "channel": "caller",
+     "text": "Hello, is this Mr. Patil from Pune? I am Inspector Vikram from the Cyber Crime Division office.",
+     "latency_ms": 433.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Yes, I am Patil. What happened, sir? Why are you calling?",
+     "latency_ms": 469.0
+    },
+    {
+     "channel": "caller",
+     "text": "Sir, we intercepted a courier package from Mumbai containing illegal narcotics and several fake passports.",
+     "latency_ms": 476.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Narcotics? But I have never sent any",
+     "latency_ms": null
+    }
+   ],
+   "duration_streamed_s": 23.6
+  },
+  {
+   "id": "scam_digital_arrest_09",
+   "label": "scam",
+   "category": "scam",
+   "scam_type": "digital_arrest",
+   "subtype": "digital_arrest",
+   "split": "test",
+   "decisive_turn_index": 6,
+   "first_s5_s6_turn_index": 8,
+   "triggered": true,
+   "trigger_reason": "threshold",
+   "trigger_script_turn": 4,
+   "caught_before_s5s6": true,
+   "warning_first_audio_s": 35.21,
+   "decisive_end_s": 47.937,
+   "decisive_to_warning_s": -12.73,
+   "tts_ttfa_ms": 384,
+   "turn_end_to_audio_ms": 1552,
+   "warning_voice_cloned": true,
+   "warning_states": [
+    "speaking",
+    "interrupted"
+   ],
+   "max_risk": 77.3,
+   "detections": [
+    {
+     "turn_idx": 0,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 506,
+     "trigger": false
+    },
+    {
+     "turn_idx": 2,
+     "stages": [
+      "S1",
+      "S2"
+     ],
+     "risk_llm": 85,
+     "risk_cum": 59.5,
+     "llm_ms": 632,
+     "trigger": false
+    },
+    {
+     "turn_idx": 5,
+     "stages": [
+      "S1",
+      "S2",
+      "S3"
+     ],
+     "risk_llm": 85,
+     "risk_cum": 77.3,
+     "llm_ms": 728,
+     "trigger": true
+    }
+   ],
+   "detect_errors": 0,
+   "stt_incidents": 0,
+   "stt_finals": [
+    {
+     "channel": "caller",
+     "text": "Hello, am I speaking with Mr. Patil from Pune?",
+     "latency_ms": 403.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Yes, this is Patil. Who is calling, please?",
+     "latency_ms": 414.0
+    },
+    {
+     "channel": "caller",
+     "text": "I am Inspector Vikram Singh from the Cyber Intelligence Unit. We have intercepted a package containing illegal narcotics and several fake passports sent in your name.",
+     "latency_ms": 463.0
+    },
+    {
+     "channel": "receiver",
+     "text": "What?",
+     "latency_ms": 321.0
+    },
+    {
+     "channel": "receiver",
+     "text": "It is impossible. I have not sent any package.",
+     "latency_ms": 435.0
+    },
+    {
+     "channel": "caller",
+     "text": "That is why we are calling you. Your Aadhaar card has been used for this crime, and you are now under digital arrest until this is cleared.",
+     "latency_ms": 428.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Digital arrest? I do not understand.",
+     "latency_ms": null
+    }
+   ],
+   "duration_streamed_s": 36.8
+  },
+  {
+   "id": "scam_fake_relative_01",
+   "label": "scam",
+   "category": "scam",
+   "scam_type": "fake_relative",
+   "subtype": "fake_relative",
+   "split": "test",
+   "decisive_turn_index": 6,
+   "first_s5_s6_turn_index": 6,
+   "triggered": true,
+   "trigger_reason": "threshold",
+   "trigger_script_turn": 6,
+   "caught_before_s5s6": false,
+   "warning_first_audio_s": 52.16,
+   "decisive_end_s": 50.83,
+   "decisive_to_warning_s": 1.33,
+   "tts_ttfa_ms": 375,
+   "turn_end_to_audio_ms": 1604,
+   "warning_voice_cloned": true,
+   "warning_states": [
+    "speaking",
+    "interrupted"
+   ],
+   "max_risk": 81.0,
+   "detections": [
+    {
+     "turn_idx": 0,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 523,
+     "trigger": false
+    },
+    {
+     "turn_idx": 2,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 585,
+     "trigger": false
+    },
+    {
+     "turn_idx": 3,
+     "stages": [
+      "S1",
+      "S2"
+     ],
+     "risk_llm": 75,
+     "risk_cum": 52.5,
+     "llm_ms": 559,
+     "trigger": false
+    },
+    {
+     "turn_idx": 5,
+     "stages": [
+      "S1",
+      "S2",
+      "S3"
+     ],
+     "risk_llm": 40,
+     "risk_cum": 48.5,
+     "llm_ms": 1384,
+     "trigger": false
+    },
+    {
+     "turn_idx": 7,
+     "stages": [
+      "S1",
+      "S2",
+      "S3",
+      "S6"
+     ],
+     "risk_llm": 95,
+     "risk_cum": 81.0,
+     "llm_ms": 729,
+     "trigger": true
+    }
+   ],
+   "detect_errors": 0,
+   "stt_incidents": 0,
+   "stt_finals": [
+    {
+     "channel": "caller",
+     "text": "Dadaaji, it is me, Rohan. I am calling from a friend's phone because mine smashed.",
+     "latency_ms": 486.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Rohan? Which Rohan? My nephew is in Bangalore, not using a friend's phone.",
+     "latency_ms": 483.0
+    },
+    {
+     "channel": "caller",
+     "text": "Yes, I came to Pune for a project and had a small accident with a bike.",
+     "latency_ms": 387.0
+    },
+    {
+     "channel": "caller",
+     "text": "I am okay, but the police are here, and it is very stressful.",
+     "latency_ms": 490.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Oh my God, what happened? Are you hurt? Where in Pune are you?",
+     "latency_ms": 534.0
+    },
+    {
+     "channel": "caller",
+     "text": "I am just shaken up, Mr. Sharma. Please do not tell my parents yet because they will panic and scold me.",
+     "latency_ms": 488.0
+    },
+    {
+     "channel": "receiver",
+     "text": "But I must call your father. We need to know which police station you are in.",
+     "latency_ms": 423.0
+    },
+    {
+     "channel": "caller",
+     "text": "No, please, just for today. I just need to pay \u20b912,000 to the owner of the bike to settle it quickly, or they will lock me up.",
+     "latency_ms": 488.0
+    },
+    {
+     "channel": "receiver",
+     "text": "12,000? That is a lot of money.",
+     "latency_ms": null
+    }
+   ],
+   "duration_streamed_s": 53.7
+  },
+  {
+   "id": "scam_fake_relative_03",
+   "label": "scam",
+   "category": "scam",
+   "scam_type": "fake_relative",
+   "subtype": "fake_relative",
+   "split": "test",
+   "decisive_turn_index": 8,
+   "first_s5_s6_turn_index": 8,
+   "triggered": true,
+   "trigger_reason": "threshold",
+   "trigger_script_turn": 4,
+   "caught_before_s5s6": true,
+   "warning_first_audio_s": 32.87,
+   "decisive_end_s": 58.179,
+   "decisive_to_warning_s": -25.31,
+   "tts_ttfa_ms": 400,
+   "turn_end_to_audio_ms": 1516,
+   "warning_voice_cloned": true,
+   "warning_states": [
+    "speaking"
+   ],
+   "max_risk": 68.2,
+   "detections": [
+    {
+     "turn_idx": 0,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 519,
+     "trigger": false
+    },
+    {
+     "turn_idx": 2,
+     "stages": [
+      "S1",
+      "S2"
+     ],
+     "risk_llm": 75,
+     "risk_cum": 52.5,
+     "llm_ms": 546,
+     "trigger": false
+    },
+    {
+     "turn_idx": 4,
+     "stages": [
+      "S1",
+      "S2",
       "S3"
      ],
      "risk_llm": 75,
      "risk_cum": 68.2,
-     "llm_ms": 645,
+     "llm_ms": 638,
+     "trigger": true
+    }
+   ],
+   "detect_errors": 0,
+   "stt_incidents": 0,
+   "stt_finals": [
+    {
+     "channel": "caller",
+     "text": "Hello, Nani, it is me, Rahul. Please tell me you can hear me clearly.",
+     "latency_ms": 473.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Rahul, Beta, why are you calling from this new number? Is everything okay?",
+     "latency_ms": 406.0
+    },
+    {
+     "channel": "caller",
+     "text": "Nani, I'm in a big mess. I had a small accident with a car in Pune and the police are very angry.",
+     "latency_ms": 418.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Oh my God, are you hurt? Do I need to call your father right now?",
+     "latency_ms": 476.0
+    },
+    {
+     "channel": "caller",
+     "text": "No, no, please do not tell Papa. He will kill me. I just need to settle this with the police quickly and go home.",
+     "latency_ms": 468.0
+    },
+    {
+     "channel": "receiver",
+     "text": "But how can you settle it alone? What exactly",
+     "latency_ms": null
+    }
+   ],
+   "duration_streamed_s": 34.4
+  },
+  {
+   "id": "scam_fake_relative_05",
+   "label": "scam",
+   "category": "scam",
+   "scam_type": "fake_relative",
+   "subtype": "fake_relative",
+   "split": "test",
+   "decisive_turn_index": 6,
+   "first_s5_s6_turn_index": 6,
+   "triggered": true,
+   "trigger_reason": "threshold",
+   "trigger_script_turn": 6,
+   "caught_before_s5s6": false,
+   "warning_first_audio_s": 48.17,
+   "decisive_end_s": 46.643,
+   "decisive_to_warning_s": 1.53,
+   "tts_ttfa_ms": 440,
+   "turn_end_to_audio_ms": 1619,
+   "warning_voice_cloned": true,
+   "warning_states": [
+    "speaking"
+   ],
+   "max_risk": 80.8,
+   "detections": [
+    {
+     "turn_idx": 0,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 607,
+     "trigger": false
+    },
+    {
+     "turn_idx": 3,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 540,
+     "trigger": false
+    },
+    {
+     "turn_idx": 4,
+     "stages": [],
+     "risk_llm": 20,
+     "risk_cum": 14.0,
+     "llm_ms": 1563,
+     "trigger": false
+    },
+    {
+     "turn_idx": 6,
+     "stages": [
+      "S1",
+      "S3"
+     ],
+     "risk_llm": 62,
+     "risk_cum": 47.6,
+     "llm_ms": 611,
+     "trigger": false
+    },
+    {
+     "turn_idx": 9,
+     "stages": [
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S6"
+     ],
+     "risk_llm": 95,
+     "risk_cum": 80.8,
+     "llm_ms": 748,
+     "trigger": true
+    }
+   ],
+   "detect_errors": 0,
+   "stt_incidents": 0,
+   "stt_finals": [
+    {
+     "channel": "caller",
+     "text": "Dada, it is me, Arjun. I am calling from a friend's phone because mine is broken.",
+     "latency_ms": 423.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Arjun, is that you, beta?",
+     "latency_ms": 369.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Why is your voice sounding so strange?",
+     "latency_ms": 485.0
+    },
+    {
+     "channel": "caller",
+     "text": "I have had a very bad accident here in Mumbai, and I am in a lot of trouble.",
+     "latency_ms": 419.0
+    },
+    {
+     "channel": "caller",
+     "text": "I am at the police station right now.",
+     "latency_ms": 415.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Police station! What happened? Are you hurt? I will call your father immediately!",
+     "latency_ms": 439.0
+    },
+    {
+     "channel": "caller",
+     "text": "No, please, Mr. Singh, do not call Papa. He will be very angry, and I cannot face him right now.",
+     "latency_ms": 479.0
+    },
+    {
+     "channel": "receiver",
+     "text": "But how can I not tell him?",
+     "latency_ms": 380.0
+    },
+    {
+     "channel": "receiver",
+     "text": "You are in police custody, Arjun.",
+     "latency_ms": 345.0
+    },
+    {
+     "channel": "caller",
+     "text": "They just need a small bail deposit to let me go. If you can send \u20b912,000 quickly, I can come home today.",
+     "latency_ms": 420.0
+    },
+    {
+     "channel": "receiver",
+     "text": "12,000? I do not keep that",
+     "latency_ms": null
+    }
+   ],
+   "duration_streamed_s": 49.7
+  },
+  {
+   "id": "scam_investment_task_02",
+   "label": "scam",
+   "category": "scam",
+   "scam_type": "investment_task",
+   "subtype": "investment_task",
+   "split": "test",
+   "decisive_turn_index": 6,
+   "first_s5_s6_turn_index": 6,
+   "triggered": true,
+   "trigger_reason": "threshold",
+   "trigger_script_turn": 8,
+   "caught_before_s5s6": false,
+   "warning_first_audio_s": 63.3,
+   "decisive_end_s": 48.662,
+   "decisive_to_warning_s": 14.64,
+   "tts_ttfa_ms": 436,
+   "turn_end_to_audio_ms": 1551,
+   "warning_voice_cloned": true,
+   "warning_states": [
+    "speaking",
+    "interrupted"
+   ],
+   "max_risk": 75.9,
+   "detections": [
+    {
+     "turn_idx": 0,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 542,
+     "trigger": false
+    },
+    {
+     "turn_idx": 2,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 607,
+     "trigger": false
+    },
+    {
+     "turn_idx": 4,
+     "stages": [],
+     "risk_llm": 10,
+     "risk_cum": 7.0,
+     "llm_ms": 556,
+     "trigger": false
+    },
+    {
+     "turn_idx": 6,
+     "stages": [
+      "S6"
+     ],
+     "risk_llm": 75,
+     "risk_cum": 54.6,
+     "llm_ms": 676,
+     "trigger": false
+    },
+    {
+     "turn_idx": 8,
+     "stages": [
+      "S6"
+     ],
+     "risk_llm": 85,
+     "risk_cum": 75.9,
+     "llm_ms": 673,
+     "trigger": true
+    }
+   ],
+   "detect_errors": 0,
+   "stt_incidents": 0,
+   "stt_finals": [
+    {
+     "channel": "caller",
+     "text": "Hello, am I speaking with Mr. Gupta from Hyderabad?",
+     "latency_ms": 404.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Yes, this is Gupta. Who is this calling?",
+     "latency_ms": 428.0
+    },
+    {
+     "channel": "caller",
+     "text": "Sir, my name is Rohan from Global Tech Solutions. I am calling regarding the part-time data optimization work you expressed interest in online.",
+     "latency_ms": 426.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Oh, I remember clicking something, but I am not sure how it works. Is it really easy?",
+     "latency_ms": 366.0
+    },
+    {
+     "channel": "caller",
+     "text": "Very easy, sir. You just like some videos and we pay you. In fact, your account already shows a profit of \u20b912,000 from the trial tasks.",
+     "latency_ms": 404.0
+    },
+    {
+     "channel": "receiver",
+     "text": "$12,000? Really? How do I get this money in my bank?",
+     "latency_ms": 426.0
+    },
+    {
+     "channel": "caller",
+     "text": "That is why I called. To activate the withdrawal portal, you just need to pay a small security deposit of \u20b92,000 first.",
+     "latency_ms": 429.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Wait, why should I pay money to get my own profit?",
+     "latency_ms": 406.0
+    },
+    {
+     "channel": "caller",
+     "text": "It is just a standard verification fee for tax purposes, Mr. Gupta. Once you pay, the full amount will be credited instantly.",
+     "latency_ms": 431.0
+    },
+    {
+     "channel": "receiver",
+     "text": "I don't know, this sounds a bit strange.",
+     "latency_ms": null
+    }
+   ],
+   "duration_streamed_s": 64.9
+  },
+  {
+   "id": "scam_investment_task_04",
+   "label": "scam",
+   "category": "scam",
+   "scam_type": "investment_task",
+   "subtype": "investment_task",
+   "split": "test",
+   "decisive_turn_index": 4,
+   "first_s5_s6_turn_index": 4,
+   "triggered": true,
+   "trigger_reason": "threshold",
+   "trigger_script_turn": 6,
+   "caught_before_s5s6": false,
+   "warning_first_audio_s": 62.21,
+   "decisive_end_s": 42.973,
+   "decisive_to_warning_s": 19.24,
+   "tts_ttfa_ms": 408,
+   "turn_end_to_audio_ms": 1609,
+   "warning_voice_cloned": true,
+   "warning_states": [
+    "speaking",
+    "interrupted"
+   ],
+   "max_risk": 75.6,
+   "detections": [
+    {
+     "turn_idx": 0,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 549,
+     "trigger": false
+    },
+    {
+     "turn_idx": 2,
+     "stages": [],
+     "risk_llm": 5,
+     "risk_cum": 3.5,
+     "llm_ms": 569,
+     "trigger": false
+    },
+    {
+     "turn_idx": 4,
+     "stages": [
+      "S6"
+     ],
+     "risk_llm": 75,
+     "risk_cum": 53.5,
+     "llm_ms": 717,
+     "trigger": false
+    },
+    {
+     "turn_idx": 6,
+     "stages": [
+      "S6"
+     ],
+     "risk_llm": 85,
+     "risk_cum": 75.6,
+     "llm_ms": 711,
+     "trigger": true
+    }
+   ],
+   "detect_errors": 0,
+   "stt_incidents": 0,
+   "stt_finals": [
+    {
+     "channel": "caller",
+     "text": "Hello, Mr. Sharma. I am Rohan from the Global Task Center in Bengaluru. I am calling regarding the part-time data optimization project you expressed interest in.",
+     "latency_ms": 361.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Hello? I do not remember applying for any project. Which website was this?",
+     "latency_ms": 561.0
+    },
+    {
+     "channel": "caller",
+     "text": "It was through the social media advertisement, sir. You can earn \u20b95,000 daily just by liking videos on your phone.",
+     "latency_ms": 401.0
+    },
+    {
+     "channel": "receiver",
+     "text": "5,000? That sounds very high for just liking videos. Is it really possible?",
+     "latency_ms": 422.0
+    },
+    {
+     "channel": "caller",
+     "text": "Yes, sir, it is a very simple system. Just to start your account and activate the first batch, you need to deposit a small security fee of \u20b912,000.",
+     "latency_ms": 343.0
+    },
+    {
+     "channel": "receiver",
+     "text": "$12,000 is a lot of money for me to just give like that. Why do I have to pay first?",
+     "latency_ms": 464.0
+    },
+    {
+     "channel": "caller",
+     "text": "This is only for verification of your bank account so we can send your daily commissions. Once you pay, you get the amount back with a 20% bonus immediately.",
+     "latency_ms": 479.0
+    },
+    {
+     "channel": "receiver",
+     "text": "I am still not sure.",
+     "latency_ms": 362.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Can you send me an",
+     "latency_ms": null
+    }
+   ],
+   "duration_streamed_s": 63.7
+  },
+  {
+   "id": "scam_investment_task_06",
+   "label": "scam",
+   "category": "scam",
+   "scam_type": "investment_task",
+   "subtype": "investment_task",
+   "split": "test",
+   "decisive_turn_index": 6,
+   "first_s5_s6_turn_index": 6,
+   "triggered": true,
+   "trigger_reason": "threshold",
+   "trigger_script_turn": 6,
+   "caught_before_s5s6": false,
+   "warning_first_audio_s": 47.67,
+   "decisive_end_s": 46.201,
+   "decisive_to_warning_s": 1.47,
+   "tts_ttfa_ms": 439,
+   "turn_end_to_audio_ms": 1468,
+   "warning_voice_cloned": true,
+   "warning_states": [
+    "speaking",
+    "interrupted"
+   ],
+   "max_risk": 75.2,
+   "detections": [
+    {
+     "turn_idx": 0,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 532,
+     "trigger": false
+    },
+    {
+     "turn_idx": 2,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 522,
+     "trigger": false
+    },
+    {
+     "turn_idx": 5,
+     "stages": [
+      "S6"
+     ],
+     "risk_llm": 75,
+     "risk_cum": 52.5,
+     "llm_ms": 624,
+     "trigger": false
+    },
+    {
+     "turn_idx": 7,
+     "stages": [
+      "S6"
+     ],
+     "risk_llm": 85,
+     "risk_cum": 75.2,
+     "llm_ms": 598,
+     "trigger": true
+    }
+   ],
+   "detect_errors": 0,
+   "stt_incidents": 0,
+   "stt_finals": [
+    {
+     "channel": "caller",
+     "text": "Hello, am I speaking with Mr. Patil from Delhi?",
+     "latency_ms": 355.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Yes, this is he. Who is calling, please?",
+     "latency_ms": 370.0
+    },
+    {
+     "channel": "caller",
+     "text": "I am Sarah from Global Task Solutions. I saw your profile and wanted to offer you a simple part-time job where you just rate products online for easy money.",
+     "latency_ms": 410.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Rating products.",
+     "latency_ms": 371.0
+    },
+    {
+     "channel": "receiver",
+     "text": "I am retired, I do not know how to do such things.",
+     "latency_ms": 432.0
+    },
+    {
+     "channel": "caller",
+     "text": "It is very simple, Mr. Patel. Just click a few buttons on your phone and you can earn \u20b93,000 every day.",
+     "latency_ms": 461.0
+    },
+    {
+     "channel": "receiver",
+     "text": "That sounds too much for such a small thing. How do I start?",
+     "latency_ms": 433.0
+    },
+    {
+     "channel": "caller",
+     "text": "You just need to activate your worker account first. Please transfer \u20b912,000 as a refundable security deposit to this link I am sending.",
+     "latency_ms": 420.0
+    },
+    {
+     "channel": "receiver",
+     "text": "$12,000 is a lot of money.",
+     "latency_ms": null
+    }
+   ],
+   "duration_streamed_s": 49.2
+  },
+  {
+   "id": "scam_remote_access_02",
+   "label": "scam",
+   "category": "scam",
+   "scam_type": "remote_access",
+   "subtype": "remote_access",
+   "split": "test",
+   "decisive_turn_index": 4,
+   "first_s5_s6_turn_index": 6,
+   "triggered": true,
+   "trigger_reason": "threshold",
+   "trigger_script_turn": 2,
+   "caught_before_s5s6": true,
+   "warning_first_audio_s": 26.52,
+   "decisive_end_s": 38.563,
+   "decisive_to_warning_s": -12.04,
+   "tts_ttfa_ms": 406,
+   "turn_end_to_audio_ms": 1566,
+   "warning_voice_cloned": true,
+   "warning_states": [
+    "speaking",
+    "interrupted"
+   ],
+   "max_risk": 66.5,
+   "detections": [
+    {
+     "turn_idx": 0,
+     "stages": [],
+     "risk_llm": 0,
+     "risk_cum": 0.0,
+     "llm_ms": 581,
+     "trigger": false
+    },
+    {
+     "turn_idx": 2,
+     "stages": [
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S5",
+      "S6",
+      "S7"
+     ],
+     "risk_llm": 95,
+     "risk_cum": 66.5,
+     "llm_ms": 704,
+     "trigger": true
+    }
+   ],
+   "detect_errors": 0,
+   "stt_incidents": 0,
+   "stt_finals": [
+    {
+     "channel": "caller",
+     "text": "Hello, Mr. Patel. I am Rohan from the Secure Banking Department. I am calling regarding a synchronization error with your mobile app account based in Nagpur.",
+     "latency_ms": 506.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Hello? What error? Everything was working fine yesterday.",
+     "latency_ms": 460.0
+    },
+    {
+     "channel": "caller",
+     "text": "It is a backend server issue, sir, but if not fixed, your account will be frozen. I just need you to download a small tool called AnyDesk so I can guide you.",
+     "latency_ms": 444.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Any desk? I do not know this.",
+     "latency_ms": null
+    }
+   ],
+   "duration_streamed_s": 28.0
+  },
+  {
+   "id": "scam_remote_access_05",
+   "label": "scam",
+   "category": "scam",
+   "scam_type": "remote_access",
+   "subtype": "remote_access",
+   "split": "test",
+   "decisive_turn_index": 4,
+   "first_s5_s6_turn_index": 8,
+   "triggered": true,
+   "trigger_reason": "threshold",
+   "trigger_script_turn": 2,
+   "caught_before_s5s6": true,
+   "warning_first_audio_s": 26.06,
+   "decisive_end_s": 41.314,
+   "decisive_to_warning_s": -15.25,
+   "tts_ttfa_ms": 392,
+   "turn_end_to_audio_ms": 1555,
+   "warning_voice_cloned": true,
+   "warning_states": [
+    "speaking",
+    "interrupted"
+   ],
+   "max_risk": 63.4,
+   "detections": [
+    {
+     "turn_idx": 0,
+     "stages": [
+      "S1"
+     ],
+     "risk_llm": 75,
+     "risk_cum": 52.5,
+     "llm_ms": 593,
+     "trigger": false
+    },
+    {
+     "turn_idx": 4,
+     "stages": [
+      "S1",
+      "S3"
+     ],
+     "risk_llm": 68,
+     "risk_cum": 63.4,
+     "llm_ms": 666,
      "trigger": true
     }
    ],
@@ -4983,17 +4788,27 @@
     {
      "channel": "caller",
      "text": "Hello, is this Mrs. Iyer from Delhi? This is Sameer from the digital security wing regarding your banking app.",
-     "latency_ms": 472.0
+     "latency_ms": 361.0
     },
     {
      "channel": "receiver",
-     "text": "Yes, I am Mrs. Aya. What is the problem? Everything is working fine.",
-     "latency_ms": 411.0
+     "text": "Yes, I am Mrs. Aya.",
+     "latency_ms": 356.0
+    },
+    {
+     "channel": "receiver",
+     "text": "What is the problem?",
+     "latency_ms": 317.0
+    },
+    {
+     "channel": "receiver",
+     "text": "Everything is working fine.",
+     "latency_ms": 454.0
     },
     {
      "channel": "caller",
      "text": "Actually, we have detected a security loophole in your version of the app that could lead to unauthorized access. I need to push a quick security patch to your phone right now.",
-     "latency_ms": 512.0
+     "latency_ms": 488.0
     },
     {
      "channel": "receiver",
@@ -5003,6 +4818,5 @@
    ],
    "duration_streamed_s": 27.6
   }
- ],
- "rescored": true
+ ]
 }

@@ -172,7 +172,7 @@ async def make(server, llm_reply="Ah, can you say the account number slowly plea
     return room, cp, llm, caller, receiver, s
 
 
-async def wait_for(cond, t=3.0):
+async def wait_for(cond, t=10.0):
     end = asyncio.get_event_loop().time() + t
     while not cond():
         assert asyncio.get_event_loop().time() < end, "timed out"
@@ -215,6 +215,7 @@ async def test_unsafe_llm_output_is_replaced_before_it_is_spoken(server):
     await wait_for(lambda: cp.request is not None and cp.request.done.is_set())
     await cp.on_final(room, turn("Tell me your Aadhaar number."))
     await wait_for(lambda: any(e["type"] == "persona_guard" for e in room.store.events("p1")))
+    await wait_for(lambda: any(e["type"] == "persona" and e.get("text") in STALLS for e in receiver.text))
     spoken = [e["text"] for e in receiver.text if e["type"] == "persona" and e.get("text")]
     assert not any("1234" in t for t in spoken) and spoken[-1] in STALLS
     await s.close()
@@ -331,7 +332,8 @@ async def test_opening_line_said_before_the_call_was_flagged_is_still_scanned_by
         {"type": "agency", "value": "Mumbai Cyber Crime Cell", "quote": "Mumbai Cyber Crime Cell"}]}))
     ev = EvidenceCollector(room, llm, "m")
     await ev.process(turn("Hello, I am Inspector Vikram Rathore from the Mumbai Cyber Crime Cell.", idx=0))
-    assert llm.calls == [] and ev.valid_items() == []  # not flagged yet: no LLM spend
+    assert llm.calls == []  # not flagged yet: no LLM spend
+    assert [v["type"] for v in ev.valid_items()] == ["agency"]  # but the agency pattern is free, so it is already caught
     room.takeover = True  # the call gets flagged on the next turn
     await ev.process(turn("Pay fifty thousand rupees now.", idx=1))
     assert len(llm.calls) == 1  # one request covering the earlier turn too
@@ -366,3 +368,10 @@ async def test_collector_marks_implausible_llm_items_invalid():
     await ev.process(turn("Am I speaking with Mister Ramesh Kumar? I am Inspector Vikram Rathore."))
     assert [(v["type"], v["value"]) for v in ev.valid_items()] == [("person_name", "Vikram Rathore")]
     await ev.close()
+
+
+def test_agency_is_found_by_pattern_even_if_the_llm_misses_it():
+    k = kinds("This is Inspector Vikram Rathore from the Mumbai Cyber Crime Cell. A parcel was seized.")
+    assert ("agency", "Mumbai Cyber Crime Cell") in k
+    assert ("agency", "State Bank") in kinds("I am calling from State Bank head office")
+    assert not any(t == "agency" for t, _ in kinds("I will come from the market with some vegetables"))

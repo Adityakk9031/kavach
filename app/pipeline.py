@@ -84,7 +84,6 @@ class CallPipeline:
             self.triggered = True
             trig = {**payload, "turn_end_at": turn_end_at}
             room.log_event("trigger", {k: v for k, v in trig.items() if k != "turn_end_at"}, now)
-            room.store.update_call(room.call_id, warned_at=time.time())
             for hook in self.on_trigger:
                 self._spawn(hook, decision, {**trig, "turn": turn})
         if decision.new_stages:

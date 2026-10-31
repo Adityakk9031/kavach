@@ -329,3 +329,25 @@ async def test_rearm_is_capped_ignores_takeover_and_caller_turns(server):
     await asyncio.sleep(1.2)
     assert w.count == Warner.MAX_WARNINGS + 1  # only the one warning this test spoke: no re-arm during takeover
     await s.close()
+
+
+async def test_no_warning_is_spoken_over_the_persona_and_warned_at_means_audio_started(server):
+    s = TtsSession(settings_for(server), "v")
+    await s.start()
+    room = CallRoom("wt", NoStt, Store(":memory:"))
+    receiver = FakeWs()
+    await room.join("receiver", receiver)
+    w = CallWarning(Warner(settings_for(server), FakePool(s)), room)
+    room.takeover = True
+    await w.speak("Papa, stop.", "S2", trigger_at=0.0, turn_end_at=None)
+    assert receiver.binary == [] and any(e["type"] == "warn_skipped" for e in room.store.events("wt"))
+    assert room.store.query("SELECT warned_at FROM calls WHERE id='wt'")[0]["warned_at"] is None  # nothing was played
+    room.takeover = False
+    task = asyncio.create_task(w.speak("Papa, stop.", "S2", trigger_at=0.0, turn_end_at=None))
+    while w.first_audio_at is None:
+        await asyncio.sleep(0.01)
+    assert room.store.query("SELECT warned_at FROM calls WHERE id='wt'")[0]["warned_at"] is not None
+    await asyncio.sleep(Warner.ECHO_GUARD_S)
+    await w.barge_in("takeover")
+    await asyncio.wait_for(task, 3)
+    await s.close()

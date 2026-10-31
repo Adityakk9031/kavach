@@ -29,6 +29,8 @@ URL_RE = re.compile(r"\b(?:https?://\S+|(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(
 PHONE_RE = re.compile(r"(?:\+?91[\s-]?)?\b[6-9](?:[\s-]?\d){9}\b")
 ACCOUNT_RE = re.compile(r"\b\d(?:[\s-]?\d){8,17}\b")
 AMOUNT_RE = re.compile(r"(?:rs\.?|₹|inr)\s?[\d,]+(?:\.\d+)?|\b[\d,]{4,}\s?(?:rupees|rs)\b|\b\d+(?:\.\d+)?\s?(?:lakh|lakhs|crore)\b", re.I)
+AGENCY_RE = re.compile(r"\b(?:from|with|of|at)\s+(?:the\s+)?((?:[A-Z][A-Za-z&.-]*\s+){0,4}(?:Cell|Branch|Department|Bureau|Police|Bank|"
+                       r"Customs|Office|Unit|Agency|Division|Commission|Directorate|Court|Authority|Ministry|Team))\b")
 KNOWN_APPS = ["anydesk", "teamviewer", "quicksupport", "rustdesk", "ammyy", "airdroid", "phonepe", "google pay", "gpay",
               "paytm", "whatsapp", "telegram", "skype", "zoom"]
 
@@ -77,6 +79,8 @@ def regex_items(text: str) -> list[Item]:
             if kind == "url" and "@" in text[max(0, m.start() - 1):m.start()]:
                 continue  # the domain part of an e-mail or UPI ID
             add(kind, m)
+    for m in AGENCY_RE.finditer(text):
+        items.append(Item("agency", m.group(1).strip(), text[max(0, m.start() - 40):m.end() + 40].strip(), "regex"))
     low = text.lower()
     for app in KNOWN_APPS:
         i = low.find(app)
