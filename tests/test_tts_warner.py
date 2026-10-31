@@ -256,3 +256,76 @@ async def test_barge_in_after_delivery_but_during_playback_still_flushes(server)
     states = [e.get("state") for e in receiver.text if e["type"] == "warning"]
     assert states[-1] == "interrupted"
     await s.close()
+
+
+async def _rearm_setup(server):
+    s = TtsSession(settings_for(server), "v")
+    await s.start()
+    room = CallRoom("rw", NoStt, Store(":memory:"))
+    receiver = FakeWs()
+    await room.join("receiver", receiver)
+    w = CallWarning(Warner(settings_for(server), FakePool(s)), room)
+    room.on_final_hooks.append(w.on_receiver_final)
+    return s, room, receiver, w
+
+
+def _final(i, ch="receiver"):
+    return {"channel": ch, "text": "yes?", "idx": i, "turn_id": i + 1, "audio_end_ms": 1000}
+
+
+async def test_warning_cut_off_before_it_was_heard_is_repeated_when_the_person_stops_talking(server):
+    s, room, receiver, w = await _rearm_setup(server)
+    task = asyncio.create_task(w.speak("Papa, stop.", "S2", trigger_at=0.0, turn_end_at=None))
+    while w.first_audio_at is None:
+        await asyncio.sleep(0.01)
+    await asyncio.sleep(Warner.ECHO_GUARD_S)
+    await w.barge_in("stt_speech_started")  # the person replied to the scammer: <3 s of the warning was heard
+    await asyncio.wait_for(task, 3)
+    assert w.rearm is not None and w.count == 1
+    n_before = len(receiver.binary)
+    await w.on_receiver_final(room, _final(1))  # they finished their sentence
+    for _ in range(300):
+        if w.count == 2 and w.request is not None and w.request.done.is_set():
+            break
+        await asyncio.sleep(0.01)
+    assert w.count == 2 and len(receiver.binary) > n_before  # said again, audio delivered
+    assert [e["type"] for e in room.store.events("rw")].count("warn_tts_sent") == 2
+    assert any(e["type"] == "warn_rearmed" for e in room.store.events("rw"))
+    await w.barge_in("browser_vad")
+    await s.close()
+
+
+async def test_warning_that_was_mostly_heard_is_not_repeated(server):
+    s, room, receiver, w = await _rearm_setup(server)
+    task = asyncio.create_task(w.speak("Papa, stop.", "S2", trigger_at=0.0, turn_end_at=None))
+    while w.first_audio_at is None:
+        await asyncio.sleep(0.01)
+    w.first_audio_at -= 4.0  # pretend 4 s of it already played
+    await asyncio.sleep(Warner.ECHO_GUARD_S)
+    await w.barge_in("browser_vad")
+    await asyncio.wait_for(task, 3)
+    assert w.rearm is None
+    await w.on_receiver_final(room, _final(1))
+    await asyncio.sleep(1.2)
+    assert w.count == 1
+    await s.close()
+
+
+async def test_rearm_is_capped_ignores_takeover_and_caller_turns(server):
+    s, room, receiver, w = await _rearm_setup(server)
+    w.count = Warner.MAX_WARNINGS  # already warned the maximum number of times
+    task = asyncio.create_task(w.speak("Papa, stop.", "S2", trigger_at=0.0, turn_end_at=None))
+    while w.first_audio_at is None:
+        await asyncio.sleep(0.01)
+    await asyncio.sleep(Warner.ECHO_GUARD_S)
+    await w.barge_in("browser_vad")
+    await asyncio.wait_for(task, 3)
+    assert w.rearm is None  # capped
+    w.rearm = ("S2", "x")
+    await w.on_receiver_final(room, _final(2, ch="caller"))  # a caller turn never re-arms
+    assert w.rearm is not None
+    room.takeover = True  # the persona is in charge now
+    await w.on_receiver_final(room, _final(3))
+    await asyncio.sleep(1.2)
+    assert w.count == Warner.MAX_WARNINGS + 1  # only the one warning this test spoke: no re-arm during takeover
+    await s.close()

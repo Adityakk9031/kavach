@@ -1,4 +1,4 @@
-"""M5 live gate: an LLM-driven scammer bot calls; the receiver hands over to Kavach; the persona keeps it talking.
+"""M5 live gate / demo caller: an LLM-driven scammer bot calls; the receiver hands over to Kavach; the persona keeps it talking.
 
     uv run uvicorn app.main:app --port 8000
     uv run python scripts/smoke_takeover.py --seconds 120
@@ -15,6 +15,7 @@ audio itself is still counted on the caller socket.
 
 import argparse
 import asyncio
+import contextlib
 import json
 import re
 import sys
@@ -81,113 +82,140 @@ async def stream_pcm(ws, pcm: bytes) -> None:
         await ws.send(pcm[i:i + CHUNK])
 
 
+class State:
+    """Everything the readers and the scripted loop share."""
+
+    def __init__(self):
+        self.persona_texts: list[str] = []
+        self.speaking = False
+        self.done_at = 0.0
+        self.persona_frames = 0
+        self.frames_after_takeback = 0
+        self.peer_frames_after_takeback = 0
+        self.marks: dict = {}
+        self.pre_takeback_speaking = None
+
+
+async def caller_reader(ws, st: State):
+    async for raw in ws:
+        if isinstance(raw, bytes):
+            if raw[0] == SOURCE_PERSONA:
+                st.persona_frames += 1
+                if "takeback_sent" in st.marks and time.monotonic() > st.marks["takeback_sent"] + 0.4:
+                    st.frames_after_takeback += 1
+            elif raw[0] == 0 and "takeback_sent" in st.marks:
+                st.peer_frames_after_takeback += 1
+            continue
+        ev = json.loads(raw)
+        if ev["type"] == "persona":
+            if ev.get("text"):
+                st.persona_texts.append(ev["text"])
+                st.speaking = True
+                print(f"  [persona] {ev['text']}")
+            elif ev["state"] == "done":
+                st.speaking = False
+                st.done_at = time.monotonic()
+        elif ev["type"] == "takeover" and ev["state"] == "off":
+            st.marks["takeback_event"] = time.monotonic()
+
+
+async def drain(ws):
+    async for _ in ws:
+        pass
+
+
+async def scammer_loop(a, caller, receiver, client, llm, st: State) -> int:
+    """Speak, wait for the persona (if the receiver handed over), let the LLM scammer answer, repeat."""
+    history: list[dict] = []
+    line, turn, t_start = OPENING, 0, time.monotonic()
+    while time.monotonic() - t_start < a.seconds:
+        print(f"[scammer {turn}] {line}")
+        history.append({"role": "assistant", "content": line})
+        await stream_pcm(caller, await tts(client, line))
+        if receiver is not None and turn == 1:  # scripted run: the "user" hands over after the second scammer line
+            await receiver.send(json.dumps({"type": "takeover"}))
+        turn += 1
+        if a.demo:
+            await asyncio.sleep(7)  # time for the warning to play and for the human to react / hand over
+            heard = st.persona_texts[-1] if st.persona_texts else "(the listener says nothing)"
+        elif turn <= 1:
+            await asyncio.sleep(1.5)
+            line = "Mister Kumar, are you there? Please stay on the line, this is very serious."
+            continue
+        else:
+            t_wait = time.monotonic()
+            while time.monotonic() - t_wait < 22:  # bounded wait for the persona to answer and finish
+                await asyncio.sleep(0.2)
+                if len(st.persona_texts) >= turn - 1 and not st.speaking and st.done_at > t_wait:
+                    break
+            heard = st.persona_texts[-1] if st.persona_texts else "(silence)"
+        history.append({"role": "user", "content": heard})
+        line, _ = await llm.chat(S.script_gen_model, [{"role": "system", "content": SYSTEM}] + history[-14:],
+                                 max_tokens=120, temperature=0.8, timeout=40)
+        line = line.strip().strip('"')
+    return turn
+
+
 async def main(a) -> int:
     if not S.assemblyai_api_key:
         print("no ASSEMBLYAI_API_KEY")
         return 2
-    base, ws_base = a.base, a.base.replace("http", "ws", 1)
-    call_id = a.call_id
-    persona_texts: list[str] = []
-    persona_state = {"speaking": False, "done_at": 0.0}
-    persona_frames = {"n": 0, "after_takeback": 0}
-    marks: dict = {}
-    receiver_events: list[dict] = []
-    caller_frames_from_peer = {"n": 0}
-
-    async def caller_reader(ws):
-        async for raw in ws:
-            if isinstance(raw, bytes):
-                if raw[0] == SOURCE_PERSONA:
-                    persona_frames["n"] += 1
-                    if "takeback_sent" in marks and time.monotonic() > marks["takeback_sent"] + 0.4:
-                        persona_frames["after_takeback"] += 1
-                elif raw[0] == 0 and "takeback_sent" in marks:
-                    caller_frames_from_peer["n"] += 1
-                continue
-            ev = json.loads(raw)
-            if ev["type"] == "persona":
-                if ev.get("text"):
-                    persona_texts.append(ev["text"])
-                    persona_state["speaking"] = True
-                    print(f"  [persona] {ev['text']}")
-                elif ev["state"] == "done":
-                    persona_state["speaking"] = False
-                    persona_state["done_at"] = time.monotonic()
-            elif ev["type"] == "takeover" and ev["state"] == "off":
-                marks["takeback_event"] = time.monotonic()
-            elif ev["type"] == "flush_playback":
-                marks.setdefault("flush", time.monotonic())
-
-    async def receiver_reader(ws):
-        async for raw in ws:
-            if isinstance(raw, str):
-                receiver_events.append(json.loads(raw))
-
+    ws_base = a.base.replace("http", "ws", 1)
+    st = State()
     llm = LLM(S)
-    history: list[dict] = []
     t_start = time.monotonic()
-    async with httpx.AsyncClient(timeout=60) as client, \
-            websockets.connect(f"{ws_base}/ws/call/{call_id}/caller?mode=eval&caller_number=%2B919820133456") as caller, \
-            websockets.connect(f"{ws_base}/ws/call/{call_id}/receiver?mode=eval") as receiver:
-        tasks = [asyncio.create_task(caller_reader(caller)), asyncio.create_task(receiver_reader(receiver))]
+    # --demo is a real call (mode=live, family alerts go out) and a human is the receiver; otherwise it is a test.
+    mode = "live" if a.demo else "eval"
+    async with contextlib.AsyncExitStack() as stack:
+        client = await stack.enter_async_context(httpx.AsyncClient(timeout=60))
+        caller = await stack.enter_async_context(
+            websockets.connect(f"{ws_base}/ws/call/{a.call_id}/caller?mode={mode}&caller_number=%2B919820133456"))
+        receiver = None if a.demo else await stack.enter_async_context(
+            websockets.connect(f"{ws_base}/ws/call/{a.call_id}/receiver?mode=eval"))
+        tasks = [asyncio.create_task(caller_reader(caller, st))] + ([asyncio.create_task(drain(receiver))] if receiver else [])
         await asyncio.sleep(2.5)
-        line, turn = OPENING, 0
-        while time.monotonic() - t_start < a.seconds:
-            print(f"[scammer {turn}] {line}")
-            history.append({"role": "assistant", "content": line})
-            await stream_pcm(caller, await tts(client, line))
-            if turn == 1:  # the user hands over after the second scammer line
-                await receiver.send(json.dumps({"type": "takeover"}))
-                marks["takeover_sent"] = time.monotonic()
-            turn += 1
-            if turn <= 1:
-                # before takeover there is no persona: give the user a beat, then keep pushing
-                await asyncio.sleep(1.5)
-                line = "Mister Kumar, are you there? Please stay on the line, this is very serious."
-                continue
-            # wait (bounded) for the persona to answer and finish speaking
-            t_wait = time.monotonic()
-            while time.monotonic() - t_wait < 22:
-                await asyncio.sleep(0.2)
-                if len(persona_texts) >= turn - 1 and not persona_state["speaking"] and persona_state["done_at"] > t_wait:
-                    break
-            heard = persona_texts[-1] if persona_texts else "(silence)"
-            history.append({"role": "user", "content": heard})
-            line, _ = await llm.chat(S.script_gen_model, [{"role": "system", "content": SYSTEM}] + history[-14:],
-                                     max_tokens=120, temperature=0.8, timeout=40)
-            line = line.strip().strip('"')
-        # take back while the persona is (probably) mid-sentence: speak once more to provoke a reply, then take over
-        marks["pre_takeback_speaking"] = persona_state["speaking"]
-        await receiver.send(json.dumps({"type": "takeback"}))
-        marks["takeback_sent"] = time.monotonic()
-        await asyncio.sleep(1.0)
-        await receiver.send(b"\x01\x00" * 1600)  # the user's voice must now reach the caller
-        await asyncio.sleep(1.0)
-        await caller.send(json.dumps({"type": "end_call"}))
-        await asyncio.sleep(6)
+        turns = await scammer_loop(a, caller, receiver, client, llm, st)
+        if a.demo:
+            await caller.send(json.dumps({"type": "end_call"}))
+            await asyncio.sleep(3)
+        else:
+            st.pre_takeback_speaking = st.speaking
+            await receiver.send(json.dumps({"type": "takeback"}))
+            st.marks["takeback_sent"] = time.monotonic()
+            await asyncio.sleep(1.0)
+            await receiver.send(b"\x01\x00" * 1600)  # the user's voice must now reach the caller
+            await asyncio.sleep(1.0)
+            await caller.send(json.dumps({"type": "end_call"}))
+            await asyncio.sleep(6)
         for t in tasks:
             t.cancel()
     await llm.aclose()
+    if a.demo:
+        print("demo call finished")
+        return 0
+    return await grade(a, st, turns, t_start)
 
+
+async def grade(a, st: State, turns: int, t_start: float) -> int:
     async with httpx.AsyncClient(timeout=20) as client:
-        evidence = (await client.get(f"{base}/api/calls/{call_id}/evidence")).json()
-        events = (await client.get(f"{base}/api/calls/{call_id}/events")).json()
-        turns = (await client.get(f"{base}/api/calls/{call_id}/turns")).json()
+        evidence = (await client.get(f"{a.base}/api/calls/{a.call_id}/evidence")).json()
+        events = (await client.get(f"{a.base}/api/calls/{a.call_id}/events")).json()
+        call_turns = (await client.get(f"{a.base}/api/calls/{a.call_id}/turns")).json()
     found = {}
     for kind, (label, ok) in CHECKS.items():
         hit = [e for e in evidence if e["type"] == kind and ok(e["value"])]
         if hit:
             found[label] = hit[0]["value"]
-    ev_by = {}
+    ev_by: dict = {}
     for e in events:
         ev_by.setdefault(e["type"], []).append(e["payload"])
     takeback = (ev_by.get("takeback") or [{}])[0]
-    persona_turns = [t for t in turns if t["channel"] == "persona"]
+    persona_turns = [t for t in call_turns if t["channel"] == "persona"]
     unsafe = [t["text"] for t in persona_turns if re.search(r"\d|@|http|www", t["text"])]
     first_audio = [p.get("turn_end_to_audio_ms") for p in ev_by.get("persona_first_audio", []) if p.get("turn_end_to_audio_ms")]
     result = {
-        "call_id": call_id, "seconds": round(time.monotonic() - t_start), "scammer_turns": turn,
-        "persona_replies": len(persona_turns), "persona_audio_frames_heard_by_caller": persona_frames["n"],
+        "call_id": a.call_id, "seconds": round(time.monotonic() - t_start), "scammer_turns": turns,
+        "persona_replies": len(persona_turns), "persona_audio_frames_heard_by_caller": st.persona_frames,
         "planted_details_found_in_evidence": found, "n_found": len(found), "of": len(CHECKS),
         "all_valid_evidence": [(e["type"], e["value"]) for e in evidence],
         "persona_guard_replacements": len(ev_by.get("persona_guard", [])),
@@ -195,21 +223,20 @@ async def main(a) -> int:
         "persona_lines_with_digits_or_addresses": unsafe,
         "persona_reply_after_caller_stops_ms": {"median": sorted(first_audio)[len(first_audio) // 2] if first_audio else None,
                                                 "n": len(first_audio)},
-        "takeback": {"persona_was_speaking": marks.get("pre_takeback_speaking"), "server_ms": takeback.get("total_ms"),
+        "takeback": {"persona_was_speaking": st.pre_takeback_speaking, "server_ms": takeback.get("total_ms"),
                      "cancel_sent_ms": takeback.get("cancel_sent_ms"),
-                     "persona_frames_after_400ms": persona_frames["after_takeback"],
-                     "receiver_voice_reached_caller_frames": caller_frames_from_peer["n"],
-                     "ui_state_off_event": "takeback_event" in marks},
+                     "persona_frames_after_400ms": st.frames_after_takeback,
+                     "receiver_voice_reached_caller_frames": st.peer_frames_after_takeback,
+                     "ui_state_off_event": "takeback_event" in st.marks},
         "stt_incidents": len(ev_by.get("stt_closed", [])) + len(ev_by.get("stt_error", [])),
     }
     out = Path("data/takeover")
     out.mkdir(parents=True, exist_ok=True)
-    (out / f"{call_id}.json").write_text(json.dumps({**result, "persona_texts": persona_texts,
-                                                    "transcript": [(t["channel"], t["text"]) for t in turns]}, indent=1))
+    (out / f"{a.call_id}.json").write_text(json.dumps({**result, "persona_texts": st.persona_texts,
+                                                      "transcript": [(t["channel"], t["text"]) for t in call_turns]}, indent=1))
     print(json.dumps(result, indent=1))
     ok = (len(found) >= 3 and not unsafe and result["persona_turns_flagged_decoy_in_db"]
-          and result["takeback"]["persona_frames_after_400ms"] == 0
-          and result["takeback"]["receiver_voice_reached_caller_frames"] > 0 and result["takeback"]["ui_state_off_event"]
+          and st.frames_after_takeback == 0 and st.peer_frames_after_takeback > 0 and "takeback_event" in st.marks
           and (takeback.get("total_ms") or 9999) < 500 and len(persona_turns) >= 4)
     print("PASS" if ok else "FAIL")
     return 0 if ok else 1
@@ -220,4 +247,7 @@ if __name__ == "__main__":
     ap.add_argument("--base", default="http://localhost:8000")
     ap.add_argument("--call-id", default=f"takeover-{int(time.time())}")
     ap.add_argument("--seconds", type=int, default=120)
+    ap.add_argument("--demo", action="store_true",
+                    help="caller only: a human plays the protected person in the Receiver tab (same --call-id) and "
+                         "clicks Hand over / Take back; real call, so family alerts are sent")
     sys.exit(asyncio.run(main(ap.parse_args())))

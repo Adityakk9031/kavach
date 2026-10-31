@@ -44,6 +44,9 @@ def pick_template(stages: list[str], parent: str) -> tuple[str, str]:
 
 class Warner:
     ECHO_GUARD_S = 0.4  # ignore receiver speech this soon after the warning starts (speaker leak)
+    HEARD_ENOUGH_S = 3.0  # a warning cut off before this much was heard is repeated when the person stops talking
+    MAX_WARNINGS = 3
+    REARM_DELAY_S = 0.8
 
     def __init__(self, settings: Settings, pool: TtsPool):
         self.settings, self.pool = settings, pool
@@ -52,6 +55,7 @@ class Warner:
         w = CallWarning(self, room)
         pipeline.on_trigger.append(w.on_trigger)
         room.on_speech_started_hooks.append(w.on_speech_started)
+        room.on_final_hooks.append(w.on_receiver_final)
         room.control_handlers["barge_in"] = w.on_browser_barge_in
         room.warning = w
         return w
@@ -72,8 +76,11 @@ class CallWarning:
         self.session: TtsSession | None = None
         self.started_at: float | None = None
         self.play_until = 0.0  # when the receiver's player finishes the audio we sent (it plays gaplessly)
+        self.first_audio_at: float | None = None
+        self.rearm: tuple[str, str] | None = None  # (stage, text) to repeat once the person stops talking
         self.interrupted = False
         self.count = 0
+        self.last_stage, self.last_text = "default", ""
 
     @property
     def delivering(self) -> bool:
@@ -109,6 +116,7 @@ class CallWarning:
             self.play_until = max(self.play_until, now) + len(pcm) / 2 / self.warner.settings.sample_rate
             if first:
                 first = False
+                self.first_audio_at = now
                 room.log_event("warn_first_audio", {
                     "ttfa_ms": round(self.request.ttfa_ms) if self.request else None,
                     "trigger_to_audio_ms": round((now - trigger_at) * 1000),
@@ -117,9 +125,12 @@ class CallWarning:
             await room.send_audio("receiver", SOURCE_WARNING, pcm)
 
         self.session = session
+        self.last_stage, self.last_text = stage, text
         self.count += 1
         self.interrupted = False
         self.play_until = 0.0
+        self.first_audio_at = None
+        self.rearm = None
         self.started_at = time.monotonic()
         room.log_event("warn_tts_sent", {"stage": stage, "cloned": cloned, "voice": session.voice_id,
                                          "resolved_voice": session.resolved_voice_id, "text": text})
@@ -140,7 +151,10 @@ class CallWarning:
             self.room.log_event("barge_in_ignored", {"source": source, "reason": "echo guard"})
             return
         t0 = time.monotonic()
+        heard_s = (t0 - self.first_audio_at) if self.first_audio_at else 0.0
         self.interrupted = True
+        if heard_s < Warner.HEARD_ENOUGH_S and self.count < Warner.MAX_WARNINGS and source != "takeover":
+            self.rearm = (self.last_stage, self.last_text)  # the person did not hear it: say it again when they finish
         sent = await self.session.cancel() if self.delivering else None  # None: already fully delivered
         self.play_until = 0.0
         await self.room.flush_playback("receiver", SOURCE_WARNING)
@@ -149,6 +163,21 @@ class CallWarning:
                                          "tts_still_generating": sent is not None,
                                          "warning_playing_ms": round((t0 - (self.started_at or t0)) * 1000)}, t0)
         await self.room.broadcast({"type": "warning", "state": "interrupted", "source": source})
+
+    async def on_receiver_final(self, room: CallRoom, turn: dict) -> None:
+        """The person finished a sentence. If their speech cut the warning off before they heard it, repeat it now."""
+        if turn["channel"] != "receiver" or self.rearm is None or self.active or room.ended or room.takeover:
+            return
+        stage, text = self.rearm
+        self.rearm = None
+        room.log_event("warn_rearmed", {"count": self.count + 1, "after_turn": turn["idx"]})
+
+        async def again():
+            await asyncio.sleep(Warner.REARM_DELAY_S)
+            if not room.ended and not room.takeover and not self.active:
+                await self.speak(text, stage, trigger_at=time.monotonic(), turn_end_at=None)
+
+        asyncio.create_task(again())
 
     async def on_speech_started(self, room: CallRoom, channel: str, ev: dict) -> None:
         if channel == "receiver" and room.parties.get("receiver"):
