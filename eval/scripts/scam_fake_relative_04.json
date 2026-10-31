@@ -1,0 +1,62 @@
+{
+ "id": "scam_fake_relative_04",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "fake_relative",
+ "subtype": "fake_relative",
+ "split": "train",
+ "caller_number": "+91 98204XXXXX",
+ "decisive_turn_index": 8,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, Dadi? It is me, Aryan. Can you hear me properly?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Aryan? Beta, is that you? Your voice sounds very strange, why are you calling from this number?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I broke my phone during a fight, Dadi. Please listen, I am in a very big trouble right now in Nagpur."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Nagpur? What are you doing there? What has happened, beta?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I had a small accident with a local man's car and the police have detained me. I am so scared and I do not want to tell Papa because he will kill me."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh my goodness, this is terrible. Let me call your father right now, he will handle it."
+  },
+  {
+   "speaker": "caller",
+   "text": "No, Dadi, please do not tell anyone! If the police call home, it will be a huge scandal and my career will be ruined."
+  },
+  {
+   "speaker": "receiver",
+   "text": "But how can I help you from here? What do they want?"
+  },
+  {
+   "speaker": "caller",
+   "text": "The lawyer says if I pay twenty five thousand rupees immediately for the settlement, I can go home today. Can you send it to me via UPI?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twenty five thousand? I do not have that much in my hand, I have to check the bank."
+  },
+  {
+   "speaker": "caller",
+   "text": "Please hurry, Mrs. Khan, the police are shouting at me. Just send it quickly to the number I will SMS you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Wait, why did you call me Mrs. Khan? You always call me Dadi."
+  }
+ ]
+}

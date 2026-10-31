@@ -1,0 +1,62 @@
+{
+ "id": "scam_digital_arrest_05",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "digital_arrest",
+ "subtype": "digital_arrest",
+ "split": "train",
+ "caller_number": "+91 98200X4122",
+ "decisive_turn_index": 4,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, is this Mr. Sharma from Pune? I am Inspector Vikram Singh from the Cyber Crime Cell."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Sharma. Is there some problem? Why are you calling?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, we have intercepted a narcotics parcel sent to your address and your Aadhaar is linked to the sender. This is a serious criminal offense."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What narcotics? I have never sent any such parcel in my life, there must be a mistake."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is why we need to verify your identity. You are now under digital arrest, so do not hang up or tell anyone, otherwise we will send a team to arrest you immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Digital arrest? I don't understand. Can I speak to my son or come to the station?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No, you are not allowed to contact anyone until this is cleared. If you cooperate, we can settle this through a security verification process."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am very worried now. Please tell me what I have to do to clear my name."
+  },
+  {
+   "speaker": "caller",
+   "text": "You must transfer fifty thousand rupees to our government verification account. Once the audit is done, the money will be refunded and the case closed."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Fifty thousand is a lot of money for me. Are you sure this is the only way?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, it is either this amount or a jail term. Send the money now or I will have to issue the warrant for your home."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, okay, please don't do that. I will try to arrange it from my savings."
+  }
+ ]
+}

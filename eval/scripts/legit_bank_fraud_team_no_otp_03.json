@@ -1,0 +1,70 @@
+{
+ "id": "legit_bank_fraud_team_no_otp_03",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "bank_fraud_team_no_otp",
+ "split": "test",
+ "caller_number": "+91 98210XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Good afternoon, am I speaking with Mr. Sharma from Lucknow?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Sharma speaking. Who is this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "My name is Ananya and I am calling from the fraud prevention team of your bank. We have noticed a very unusual transaction on your account."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What do you mean? What has happened?"
+  },
+  {
+   "speaker": "caller",
+   "text": "There is a pending request for one lakh rupees to a merchant in another state. Did you authorize this payment?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "One lakh? No, no, I have not done any such transaction today!"
+  },
+  {
+   "speaker": "caller",
+   "text": "I see. In that case, I am blocking your debit card immediately to prevent the money from leaving your account. Is that okay?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, please block it quickly. But will I lose my money?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Do not worry, the transaction was flagged and the card is now disabled. You should visit your branch for a replacement card."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, thank you. Do you need any details or a code from me to finish this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No, Mr. Sharma. Please remember that we will never ask you for your OTP, PIN, or CVV over the phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am glad to hear that. I will go to the bank tomorrow morning."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is the correct thing to do. Have a good day, sir."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you, beta. Goodbye."
+  }
+ ]
+}

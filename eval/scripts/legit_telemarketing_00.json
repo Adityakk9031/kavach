@@ -1,0 +1,62 @@
+{
+ "id": "legit_telemarketing_00",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "telemarketing",
+ "split": "train",
+ "caller_number": "+91 98201XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Reddy from Delhi?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, speaking. Who is this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Ananya from Global Connect. I am calling to offer you a special upgrade on your home broadband plan."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Broadband? I already have a connection. Why are you calling?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, we have a high-speed fiber plan that provides unlimited data for only nine thousand five hundred rupees for the entire year."
+  },
+  {
+   "speaker": "receiver",
+   "text": "That sounds like a lot of money to pay at once. I am not sure."
+  },
+  {
+   "speaker": "caller",
+   "text": "I understand your concern. It is actually a discounted annual package to save you from monthly billing hassles."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I don't know if I need more speed. My grandson handles these things."
+  },
+  {
+   "speaker": "caller",
+   "text": "No problem at all, Mr. Reddy. Would you like me to send the plan details to your email or via WhatsApp?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, please send it on WhatsApp. I will ask him to look at it."
+  },
+  {
+   "speaker": "caller",
+   "text": "Certainly. I will send the brochure over right away."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, thank you. Goodbye."
+  }
+ ]
+}

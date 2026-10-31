@@ -1,0 +1,70 @@
+{
+ "id": "legit_doctor_clinic_02",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "doctor_clinic",
+ "split": "test",
+ "caller_number": "+91 9848012345",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Iyer?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Ananya from the City Care Clinic in Hyderabad. I am calling about your cardiology reports."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, the reports. Are they ready? I was waiting for the call."
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, they are ready for pickup. While you are coming, can we confirm your follow-up appointment for Tuesday at ten?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Tuesday... let me check my diary. Yes, I think ten is fine."
+  },
+  {
+   "speaker": "caller",
+   "text": "Perfect, I have booked that for you. Please bring the previous files along with you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Will there be any payment for the reports today?"
+  },
+  {
+   "speaker": "caller",
+   "text": "The total for the scans and consultation is twelve thousand rupees, but you can just settle it at the billing counter when you visit."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twelve thousand? That is a bit more than I thought."
+  },
+  {
+   "speaker": "caller",
+   "text": "It includes the advanced imaging, Mrs. Iyer. You can pay by card or cash at the clinic."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, I understand. I will come on Tuesday then."
+  },
+  {
+   "speaker": "caller",
+   "text": "Thank you. We will see you then. Have a good day."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you, dear. Bye."
+  }
+ ]
+}

@@ -89,6 +89,10 @@ class RateLimiter:
                 await asyncio.sleep(wait)
 
 
+# (requests per window, reserved tokens per window), kept under this account's observed limits.
+MODEL_LIMITS = {"qwen3.5-4b-32k-fast": (26, 16000), "gemma-4-31b": (26, 150000)}
+
+
 class LLM:
     def __init__(self, settings: Settings):
         self.limiters: dict[str, RateLimiter] = {}
@@ -108,7 +112,7 @@ class LLM:
         """Returns (reply text, latency ms)."""
         body = {"model": model, "messages": messages, "max_tokens": max_tokens, "temperature": temperature}
         est_prompt = sum(len(m["content"]) for m in messages) // 3 + 50
-        limiter = self.limiters.setdefault(model, RateLimiter())
+        limiter = self.limiters.setdefault(model, RateLimiter(*MODEL_LIMITS.get(model, (26, 16000))))
         t0 = time.perf_counter()
         for attempt in range(2):
             await limiter.acquire(est_prompt + max_tokens)
@@ -132,7 +136,7 @@ class LLM:
 
     async def chat_json(self, schema: type[T], messages: list[dict], model: str | None = None,
                         fallback_model: str | None = None, max_tokens: int = 500, timeout: float | None = None,
-                        retries: int = 1) -> tuple[T, int, str]:
+                        retries: int = 1, temperature: float = 0.2) -> tuple[T, int, str]:
         """Call, extract JSON, validate. One retry on bad JSON (with the error fed back), then the fallback model.
         Returns (validated object, total latency ms, model that answered)."""
         models = [model or self.settings.detector_model]
@@ -143,7 +147,7 @@ class LLM:
             msgs = list(messages)
             for attempt in range(retries + 1):
                 try:
-                    text, ms = await self.chat(m, msgs, max_tokens=max_tokens, timeout=timeout)
+                    text, ms = await self.chat(m, msgs, max_tokens=max_tokens, temperature=temperature, timeout=timeout)
                     total += ms
                     return schema.model_validate(extract_json(text)), total, m
                 except (ValueError, ValidationError) as e:

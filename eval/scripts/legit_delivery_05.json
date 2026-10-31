@@ -1,0 +1,62 @@
+{
+ "id": "legit_delivery_05",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "delivery",
+ "split": "test",
+ "caller_number": "+91 984501234X",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Gupta?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, speaking. Who is this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, this is Naveen from the logistics hub in Bengaluru. I have a large shipment here for you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Shipment? I am not expecting anything right now."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is the industrial equipment order, the one valued at eighty thousand rupees. Did you not order this?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, the machinery for the workshop! Yes, yes, I forgot about that."
+  },
+  {
+   "speaker": "caller",
+   "text": "Okay, sir. I just want to confirm if the address in Indiranagar is still correct?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, it is correct, but the main gate is currently closed for repairs."
+  },
+  {
+   "speaker": "caller",
+   "text": "No problem, sir. Should I ask the driver to wait at the side entrance instead?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, please do that. Will he be here today?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, he is about twenty minutes away. Please keep someone ready to receive the goods."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Alright, Naveen. I will tell my son to go to the gate."
+  }
+ ]
+}

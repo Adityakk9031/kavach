@@ -1,0 +1,62 @@
+{
+ "id": "scam_bank_kyc_00",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "bank_kyc",
+ "subtype": "bank_kyc",
+ "split": "train",
+ "caller_number": "+91 98201XXXXX",
+ "decisive_turn_index": 4,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Khan from Nagpur?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Mr. Sameer from the RBI verification cell. I am calling regarding a pending KYC update for your savings account."
+  },
+  {
+   "speaker": "receiver",
+   "text": "KYC? But I gave all my papers to the branch manager last year."
+  },
+  {
+   "speaker": "caller",
+   "text": "That was for the old system, ma'am. Now we have a new digital mandate and since yours is expired, your account will be blocked by tonight."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Blocked? Oh no, I have a payment of eighty thousand rupees to make for my grandson's college today."
+  },
+  {
+   "speaker": "caller",
+   "text": "Exactly, that is why I am calling to help you. We can update it right now over the phone so your funds remain accessible."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, tell me what I need to do. How will we do it?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is very simple. Please read out your sixteen digit debit card number and the expiry date first."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Wait, is it safe to give the card number on the phone?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am an official from the Reserve Bank, Mrs. Khan. Once you give the card number, I will send a verification OTP which you must tell me to complete the process."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am a bit confused, let me call my son first and ask him."
+  }
+ ]
+}

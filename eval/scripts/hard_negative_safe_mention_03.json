@@ -1,0 +1,62 @@
+{
+ "id": "hard_negative_safe_mention_03",
+ "label": "legit",
+ "category": "hard_negative",
+ "scam_type": null,
+ "subtype": "safe_mention",
+ "split": "train",
+ "caller_number": "+91 98200XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello Mr. Sharma? This is Inspector Arjun from the Mumbai Police cyber cell community outreach program."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, hello. Why are you calling me? Is everything alright?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Everything is fine, sir. We are just calling senior citizens in your area to warn them about a new scam involving large transfers."
+  },
+  {
+   "speaker": "receiver",
+   "text": "A scam? I had a transaction of one lakh rupees recently, is there a problem with that?"
+  },
+  {
+   "speaker": "caller",
+   "text": "That is exactly why I am calling. If any stranger calls you about that one lakh rupees, please remember the police will never ask for your bank details over the phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, I see. But what if they say they are from the bank and need a code to verify it?"
+  },
+  {
+   "speaker": "caller",
+   "text": "That is the trick, Mr. Sharma. Never share your OTP or your PIN with anyone, no matter who they claim to be."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I was worried for a moment. So you do not need any information from me right now?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Not at all. I am only here to give you this a warning so you stay safe."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you, Inspector. I will be very careful from now on."
+  },
+  {
+   "speaker": "caller",
+   "text": "You are welcome, sir. Just keep your details private and have a good day."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, thank you. Goodbye."
+  }
+ ]
+}

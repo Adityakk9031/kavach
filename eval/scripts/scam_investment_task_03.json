@@ -1,0 +1,62 @@
+{
+ "id": "scam_investment_task_03",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "investment_task",
+ "subtype": "investment_task",
+ "split": "train",
+ "caller_number": "+91 9820012345",
+ "decisive_turn_index": 6,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Singh from Delhi?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is he. Who is calling?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Rohan from the Global Reach Agency, sir. I am calling because your profile was shortlisted for a home-based part-time rating project with very high daily payouts."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am retired, beta. I do not know how to do these online things."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is the best part, Mr. Singh. It is very simple, just clicking a few buttons on your phone, and we provide full training."
+  },
+  {
+   "speaker": "receiver",
+   "text": "How much can one earn from this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "You can easily make five thousand rupees a day. In fact, your account already shows a pending profit of eighty thousand rupees from the initial trial phase."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Eighty thousand? I did not do any trial. What is happening?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It was a pre-activation bonus, sir. To withdraw this amount to your bank, you just need to pay a small one-time security clearance fee of five thousand rupees."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Why should I pay money to get my own money?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is for the government tax verification, Mr. Singh. Please send it via UPI now so I can release your funds immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Let me ask my son first, I am not sure about this."
+  }
+ ]
+}

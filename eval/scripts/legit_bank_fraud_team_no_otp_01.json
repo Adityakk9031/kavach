@@ -1,0 +1,70 @@
+{
+ "id": "legit_bank_fraud_team_no_otp_01",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "bank_fraud_team_no_otp",
+ "split": "test",
+ "caller_number": "+91 98200XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Singh from Mumbai?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is he. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, my name is Ananya and I am calling from the fraud prevention team of your bank."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Fraud team? What happened? Is something wrong?"
+  },
+  {
+   "speaker": "caller",
+   "text": "We have flagged a suspicious transaction attempt of one lakh rupees on your account. Did you authorize this payment?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "One lakh! No, no, I did not do any such thing. Oh my god."
+  },
+  {
+   "speaker": "caller",
+   "text": "Please do not worry, sir. Is it correct that you are not making any large purchases today?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Correct, I am just at home. Do you need my account number to check?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No sir, I have your details here. For your safety, I have gone ahead and blocked your card immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you. Now what should I do? Do I need to give you some code to fix this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No, absolutely not. Please remember that the bank will never ask you for an OTP, your PIN, or your CVV over the phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I see. I was getting very nervous. So the money is safe?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, the transaction was stopped. You can visit your nearest branch tomorrow to apply for a replacement card."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Alright, beta. Thank you for calling and helping me."
+  }
+ ]
+}

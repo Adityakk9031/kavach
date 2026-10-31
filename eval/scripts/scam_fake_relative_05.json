@@ -1,0 +1,62 @@
+{
+ "id": "scam_fake_relative_05",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "fake_relative",
+ "subtype": "fake_relative",
+ "split": "test",
+ "caller_number": "+91 98200XXXXX",
+ "decisive_turn_index": 6,
+ "first_s5_s6_turn_index": 6,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Dada? It is me, Arjun. I am calling from a friend's phone because mine is broken."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Arjun? Is that you, beta? Why is your voice sounding so strange?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I have had a very bad accident here in Mumbai and I am in a lot of trouble. I am at the police station right now."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Police station! What happened? Are you hurt? I will call your father immediately."
+  },
+  {
+   "speaker": "caller",
+   "text": "No, please, Mr. Singh, do not call Papa. He will be very angry and I cannot face him right now."
+  },
+  {
+   "speaker": "receiver",
+   "text": "But how can I not tell him? You are in police custody, Arjun."
+  },
+  {
+   "speaker": "caller",
+   "text": "They just need a small bail deposit to let me go. If you can send twelve thousand rupees quickly, I can come home today."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twelve thousand? I do not keep that much cash at home. How do I send it?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Just use UPI or a bank transfer to the officer's account. I will text you the details, but you must keep this a secret from everyone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I feel very uneasy about this. Let me speak to the officer first."
+  },
+  {
+   "speaker": "caller",
+   "text": "There is no time to talk to him, Dada. Please just send the money now or I will be locked up for the night."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Wait, let me think. I will call your mother first to see if she knows."
+  }
+ ]
+}

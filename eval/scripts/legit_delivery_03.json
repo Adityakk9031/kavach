@@ -1,0 +1,62 @@
+{
+ "id": "legit_delivery_03",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "delivery",
+ "split": "test",
+ "caller_number": "+91 98205XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Patil?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, speaking. Who is this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Namaste sir, I am Rajesh from the electronics logistics team. I have a large parcel here for you in Nagpur."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Logistics? I am not expecting any parcel today."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is the high-end television set, sir. The invoice shows a total value of twenty five thousand rupees."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, the one my son ordered for my birthday! Yes, that is correct."
+  },
+  {
+   "speaker": "caller",
+   "text": "Great. I am currently near the Hanuman Temple area, is your house nearby?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, it is just two streets away. But I am not sure if the gate is open."
+  },
+  {
+   "speaker": "caller",
+   "text": "No problem sir, I can wait for ten minutes. Just let me know if I should call you again when I reach the gate."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, please do. I will tell my wife to keep the door open."
+  },
+  {
+   "speaker": "caller",
+   "text": "Perfect, Mr. Patil. I will see you in a few minutes then."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you, beta. Drive safely."
+  }
+ ]
+}

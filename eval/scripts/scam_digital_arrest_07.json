@@ -1,0 +1,70 @@
+{
+ "id": "scam_digital_arrest_07",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "digital_arrest",
+ "subtype": "digital_arrest",
+ "split": "test",
+ "caller_number": "+91 98200XXXXX",
+ "decisive_turn_index": 6,
+ "first_s5_s6_turn_index": 10,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, is this Mr. Patil from Pune? I am Inspector Vikram from the Cyber Crime Division office."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, I am Patil. What happened, sir? Why are you calling?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, we intercepted a courier package from Mumbai containing illegal narcotics and several fake passports."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Narcotics? But I have never sent any such parcel in my life!"
+  },
+  {
+   "speaker": "caller",
+   "text": "The problem is your Aadhaar number is listed as the primary contact for the sender. This is a very serious criminal matter."
+  },
+  {
+   "speaker": "receiver",
+   "text": "This must be a mistake. Please check again, I am a retired government employee."
+  },
+  {
+   "speaker": "caller",
+   "text": "Listen carefully, because of the sensitivity of this case, you are now under digital arrest. You must stay on this call and not tell a soul, or we will have to come and pick you up."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Digital arrest? I don't understand. Can I call my son to help me?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Absolutely not. If you leak this information, it will be treated as obstructing a government investigation."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am very scared now. Please tell me how to clear my name."
+  },
+  {
+   "speaker": "caller",
+   "text": "To verify your innocence and clear your Aadhaar from the blacklist, you must deposit fifty thousand rupees into our secure government verification account."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Fifty thousand? I don't have that much ready in my hand right now."
+  },
+  {
+   "speaker": "caller",
+   "text": "You have one hour to transfer the amount, otherwise the local Pune police will arrive at your door with handcuffs."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Please give me some time, I will try to arrange it."
+  }
+ ]
+}

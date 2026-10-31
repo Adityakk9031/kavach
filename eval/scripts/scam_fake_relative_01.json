@@ -1,0 +1,62 @@
+{
+ "id": "scam_fake_relative_01",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "fake_relative",
+ "subtype": "fake_relative",
+ "split": "test",
+ "caller_number": "+91 98221X4567",
+ "decisive_turn_index": 6,
+ "first_s5_s6_turn_index": 6,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Dadaji? It is me, Rohan. I am calling from a friend's phone because mine smashed."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Rohan? Which Rohan? My nephew is in Bangalore, not using a friend's phone."
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, I came to Pune for a project and had a small accident with a bike. I am okay but the police are here and it is very stressful."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh my god, what happened? Are you hurt? Where in Pune are you?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am just shaken up, Mr. Sharma. Please, do not tell my parents yet because they will panic and scold me."
+  },
+  {
+   "speaker": "receiver",
+   "text": "But I must call your father. We need to know which police station you are in."
+  },
+  {
+   "speaker": "caller",
+   "text": "No, please, just for today. I just need to pay twelve thousand rupees to the owner of the bike to settle it quickly or they will lock me up."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twelve thousand? That is a lot of money. Why can't you call your brother?"
+  },
+  {
+   "speaker": "caller",
+   "text": "He is not picking up. Can you please send it via UPI right now so I can leave this place?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "I don't know how to do this quickly. Let me think about it first."
+  },
+  {
+   "speaker": "caller",
+   "text": "Dadaji, please hurry. The officer is asking for the payment now or he will take me to the station."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Wait, your voice sounds a bit different today. Are you really Rohan?"
+  }
+ ]
+}

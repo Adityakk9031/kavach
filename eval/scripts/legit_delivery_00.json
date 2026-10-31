@@ -1,0 +1,62 @@
+{
+ "id": "legit_delivery_00",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "delivery",
+ "split": "train",
+ "caller_number": "+91 98201X4567",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Khan?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Namaste maam, I am Rahul from the courier service. I have a large parcel here for you in Jaipur."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, a parcel? I was not expecting anything today."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is a home appliance delivery, maam. The total bill is nine thousand five hundred rupees to be paid on delivery."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Nine thousand five hundred? That sounds like a lot, are you sure it is for me?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, the name and address match perfectly. I am just calling to check if you will be home this afternoon."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am here, but my son usually handles these things. Which area are you in?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am near the main market area right now. I can reach your house in about twenty minutes."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, but please call me again when you reach the gate because the bell is broken."
+  },
+  {
+   "speaker": "caller",
+   "text": "No problem at all, Mrs. Khan. I will call your mobile once I arrive."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Alright, thank you beta. I will keep the cash ready."
+  }
+ ]
+}

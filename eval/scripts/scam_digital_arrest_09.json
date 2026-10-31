@@ -1,0 +1,70 @@
+{
+ "id": "scam_digital_arrest_09",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "digital_arrest",
+ "subtype": "digital_arrest",
+ "split": "test",
+ "caller_number": "+91 98201XXXXX",
+ "decisive_turn_index": 6,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Patil from Pune?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Patil. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Inspector Vikram Singh from the Cyber Intelligence unit. We have intercepted a package containing illegal narcotics and several fake passports sent in your name."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What? That is impossible, I have not sent any package!"
+  },
+  {
+   "speaker": "caller",
+   "text": "That is why we are calling you. Your Aadhaar card has been used for this crime and you are now under digital arrest until this is cleared."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Digital arrest? I do not understand, please tell me what is happening."
+  },
+  {
+   "speaker": "caller",
+   "text": "Do not hang up or tell anyone, otherwise it will be seen as tampering with evidence and we will send a team to your house immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am very worried, my son is not home. What should I do?"
+  },
+  {
+   "speaker": "caller",
+   "text": "You must cooperate with the government. To prove your innocence and clear your name from the database, you need to transfer a security verification fee."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Verification fee? How much are you talking about?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is eighty thousand rupees. Once the department verifies the funds, your name will be cleared and the case closed."
+  },
+  {
+   "speaker": "receiver",
+   "text": "That is a lot of money, can I go to the police station instead?"
+  },
+  {
+   "speaker": "caller",
+   "text": "If you leave this call, you will be arrested on the spot. Transfer the money to this secure government account now to avoid jail."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Please give me a moment, I need to find my glasses."
+  }
+ ]
+}

@@ -1,0 +1,140 @@
+{
+ "hard_negative_safe_mention_01": {
+  "prompt": "6fb2af5e",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing initial identification; no scam stages have been triggered yet.",
+    "llm_ms": 1402,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1"
+    ],
+    "risk": 25,
+    "quotes": [
+     "I am Anjali from the security desk at your bank"
+    ],
+    "rationale": "The caller has impersonated a bank authority to initiate contact, but has not yet issued threats, demanded credentials, or requested payment.",
+    "llm_ms": 538,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 10,
+    "quotes": [],
+    "rationale": "The caller is impersonating a bank security desk to confirm a transfer and mention suspicious activity, which is a common social engineering tactic but does not yet involve threats, secrecy, urgency, or requests for credentials/payment.",
+    "llm_ms": 563,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1"
+    ],
+    "risk": 15,
+    "quotes": [
+     "I am Anjali from the security desk at your bank"
+    ],
+    "rationale": "The caller impersonated a bank security desk to initiate the call, but explicitly warned against sharing credentials, indicating a low-risk informational or phishing attempt rather than an active scam.",
+    "llm_ms": 604,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 10,
+    "quotes": [],
+    "rationale": "The caller is providing safety information and warning against sharing credentials, which is consistent with legitimate bank communication rather than a scam attempt.",
+    "llm_ms": 501,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is providing safety information and warning against sharing credentials, which is consistent with legitimate bank advice and not a scam stage.",
+    "llm_ms": 535,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "hard_negative_safe_mention_00": {
+  "prompt": "6fb2af5e",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing initial identification and has not yet used any scam tactics.",
+    "llm_ms": 1415,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1"
+    ],
+    "risk": 30,
+    "quotes": [
+     "I am Rohan from the State Bank security team"
+    ],
+    "rationale": "The caller impersonates a bank security team to initiate a verification process, which is a common initial tactic in financial scams.",
+    "llm_ms": 567,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1"
+    ],
+    "risk": 15,
+    "quotes": [
+     "I am Rohan from the State Bank security team."
+    ],
+    "rationale": "The caller impersonates a bank security team to verify a transaction, which is a common initial tactic in digital arrest scams.",
+    "llm_ms": 563,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1"
+    ],
+    "risk": 15,
+    "quotes": [
+     "I am Rohan from the State Bank security team"
+    ],
+    "rationale": "The caller impersonates a bank security team to initiate contact, which is a common initial tactic, but no threats, secrecy, urgency, or requests for credentials/payment have been made yet.",
+    "llm_ms": 618,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is providing safety information about OTPs rather than requesting credentials, indicating a normal or educational call.",
+    "llm_ms": 504,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is providing safety warnings about OTPs and Aadhaar, which aligns with legitimate bank communication rather than requesting credentials or money.",
+    "llm_ms": 538,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ }
+}

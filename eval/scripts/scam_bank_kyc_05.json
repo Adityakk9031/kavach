@@ -1,0 +1,62 @@
+{
+ "id": "scam_bank_kyc_05",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "bank_kyc",
+ "subtype": "bank_kyc",
+ "split": "test",
+ "caller_number": "+91 98201XXXXX",
+ "decisive_turn_index": 6,
+ "first_s5_s6_turn_index": 6,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Singh from Nagpur?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is he. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Amit Sharma from the RBI regional monitoring cell. Sir, your bank account KYC has expired and we have received a request to freeze your funds."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Freeze? But I have not done anything wrong. Why is this happening?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is just a routine update, sir. However, if we do not fix this now, your balance of one lakh rupees will be locked and you cannot withdraw it."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh no, I need that money for my medicines. What should I do?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Do not worry. I can update it right now. Just give me your Aadhaar number and the 16 digit card number for verification."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am not sure if I should give this over the phone. Can I come to the branch?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, the branch will take days and your account will be blocked by evening. Just give me the details and I will send a confirmation OTP immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, let me find my glasses. One moment."
+  },
+  {
+   "speaker": "caller",
+   "text": "Please hurry, Mr. Singh. Once you give the card number, I will trigger the OTP and you must read it back to me to complete the KYC."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, I have it here. Do you really need the OTP too?"
+  }
+ ]
+}

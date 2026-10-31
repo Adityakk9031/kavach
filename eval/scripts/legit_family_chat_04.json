@@ -1,0 +1,62 @@
+{
+ "id": "legit_family_chat_04",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "family_chat",
+ "split": "train",
+ "caller_number": "+91 98401XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Aslam-alaikum, Mrs. Khan! How is your knee pain doing today?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Wa-alaikum-assalam, Zoya. It is a bit better, but the stairs are still difficult."
+  },
+  {
+   "speaker": "caller",
+   "text": "You must take a break then. I am planning to visit Hyderabad next month for the festival."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, that is wonderful news. Will you stay with us or at a hotel?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I will definitely stay with you! I can already smell the biryani."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I will make everything you like. But tell me, how is your work going?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Everything is fine. By the way, I sent twelve thousand rupees to your account for the house repairs."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What? Why did you do that, beta? You should keep your money."
+  },
+  {
+   "speaker": "caller",
+   "text": "Do not worry about it, it is just a small gift for the home."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I will check the passbook tomorrow. You are too kind to me."
+  },
+  {
+   "speaker": "caller",
+   "text": "Just keep it safe for the painter. I will call you again on Sunday."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Alright, dear. Give my love to everyone there."
+  }
+ ]
+}

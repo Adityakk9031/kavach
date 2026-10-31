@@ -1,0 +1,62 @@
+{
+ "id": "scam_bank_kyc_04",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "bank_kyc",
+ "subtype": "bank_kyc",
+ "split": "train",
+ "caller_number": "+91 9845012345",
+ "decisive_turn_index": 6,
+ "first_s5_s6_turn_index": 6,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Good afternoon, am I speaking with Mrs. Banerjee from Bengaluru?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Rohan from the RBI compliance wing. We are calling because your bank KYC has expired and your account will be frozen by tonight."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What? I did not get any letter. My account is working fine today."
+  },
+  {
+   "speaker": "caller",
+   "text": "The system is flagging it now, ma'am. If you have more than one lakh rupees in there, you might lose access to the funds temporarily."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh my goodness, I cannot have that. What do I need to do to fix this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I can help you update it right now over the phone so you do not have to visit the branch. May I have your Aadhaar number first?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Is this safe? Should I call my manager at the bank instead?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Ma'am, the bank manager is busy. Just give me the Aadhaar and the OTP that is coming to your phone now to verify your identity."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am not sure about the OTP. Let me talk to my son first."
+  },
+  {
+   "speaker": "caller",
+   "text": "If you wait for your son, the window will close and the account will be blocked. Just read me the six digits quickly."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Wait, please hold on a minute. I am getting very confused."
+  }
+ ]
+}

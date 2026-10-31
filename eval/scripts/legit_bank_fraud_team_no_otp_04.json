@@ -1,0 +1,66 @@
+{
+ "id": "legit_bank_fraud_team_no_otp_04",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "bank_fraud_team_no_otp",
+ "split": "train",
+ "caller_number": "+91 98200XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Reddy from Nagpur?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Reddy. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "My name is Ananya from the bank fraud prevention team. We have noticed a suspicious attempt for fifty thousand rupees on your account."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What? Fifty thousand? I have not done any such transaction!"
+  },
+  {
+   "speaker": "caller",
+   "text": "I understand, sir. Was this payment made by you or anyone in your family?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "No, no, not at all. Please tell me what is happening."
+  },
+  {
+   "speaker": "caller",
+   "text": "Do not worry, sir. I am blocking your card right now to prevent any money from leaving your account."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, please block it quickly. Do you need my account number for this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No, I have your details on my screen. I just need you to confirm if you have your physical card with you?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, it is right here in my wallet."
+  },
+  {
+   "speaker": "caller",
+   "text": "Perfect. The card is now blocked. Please remember that the bank will never ask you for your OTP, PIN, or CVV over the phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you, beta. I was very scared for a moment."
+  },
+  {
+   "speaker": "caller",
+   "text": "You are welcome, Mr. Reddy. Please visit your home branch tomorrow to apply for a replacement card."
+  }
+ ]
+}

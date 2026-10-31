@@ -1,0 +1,62 @@
+{
+ "id": "scam_investment_task_04",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "investment_task",
+ "subtype": "investment_task",
+ "split": "test",
+ "caller_number": "+91 98450X1234",
+ "decisive_turn_index": 4,
+ "first_s5_s6_turn_index": 4,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello Mr. Sharma, I am Rohan from the Global Task Center in Bengaluru. I am calling regarding the part-time data optimization project you expressed interest in."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Hello? I do not remember applying for any project. Which website was this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It was through the social media advertisement sir. You can earn five thousand rupees daily just by liking videos on your phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Five thousand? That sounds very high for just liking videos. Is it really possible?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes sir, it is a very simple system. Just to start your account and activate the first batch, you need to deposit a small security fee of twelve thousand rupees."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twelve thousand is a lot of money for me to just give like that. Why do I have to pay first?"
+  },
+  {
+   "speaker": "caller",
+   "text": "This is only for verification of your bank account so we can send your daily commissions. Once you pay, you get the amount back with a twenty percent bonus immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am still not sure. Can you send me an email or some official letter first?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, the offer is only for today. If you transfer the twelve thousand rupees now via UPI, I will personally ensure your first profit is credited within ten minutes."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I will have to ask my son. Let me call him and then I will tell you."
+  },
+  {
+   "speaker": "caller",
+   "text": "Please do not waste time Mr. Sharma. Just send the money now and I will give you the link to start earning immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I don't know, I feel something is wrong here. I will call you back later."
+  }
+ ]
+}

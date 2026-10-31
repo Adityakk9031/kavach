@@ -1,0 +1,62 @@
+{
+ "id": "legit_telemarketing_02",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "telemarketing",
+ "split": "test",
+ "caller_number": "+91 98300XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Good afternoon, am I speaking with Mrs. Iyer from Kolkata?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Hello Maam, my name is Rohan from Zenith Finance. I am calling to offer you a premium credit card with a limit of one lakh rupees."
+  },
+  {
+   "speaker": "receiver",
+   "text": "One lakh? Why do you need to tell me this now, I do not use such cards."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is just a special offer for senior citizens with zero annual fees for the first year. It helps with medical expenses and travel."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I have my pension and that is enough for me. I don't like these new things."
+  },
+  {
+   "speaker": "caller",
+   "text": "I completely understand your hesitation, Mrs. Iyer. Would you prefer if I sent the brochure and details to your email instead?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Email? My son handles that for me. Can you send it to him?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Of course, if you can provide the email address, I will send all the documents for you to review at your own pace."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Let me check the diary first. Give me a minute, I am not sure if I remember it correctly."
+  },
+  {
+   "speaker": "caller",
+   "text": "No problem at all, please take your time. I can also call you back tomorrow morning if that is easier."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, call tomorrow morning. I will ask my son and then we will see."
+  }
+ ]
+}

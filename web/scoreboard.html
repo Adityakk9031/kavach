@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kavach · Scoreboard</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    main { max-width: 1100px; }
+    .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+    .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+    .tile .v { font-size: 26px; font-weight: 650; }
+    .tile .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+    .tile .n { font-size: 12px; color: var(--muted); }
+    table { border-collapse: collapse; width: 100%; font-size: 14px; }
+    th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+    th { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; cursor: pointer; }
+    tr.call { cursor: pointer; } tr.call:hover { background: var(--bg); }
+    .badge { padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+    .TP, .TN { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--accent); }
+    .FN, .FP { background: color-mix(in srgb, var(--danger) 22%, transparent); color: var(--danger); }
+    .cm { display: grid; grid-template-columns: auto 1fr 1fr; gap: 4px; max-width: 360px; text-align: center; }
+    .cm div { padding: 10px; border-radius: 8px; background: var(--bg); } .cm .h { background: none; color: var(--muted); font-size: 12px; }
+    .cm .good { background: color-mix(in srgb, var(--accent) 20%, transparent); }
+    .cm .bad { background: color-mix(in srgb, var(--danger) 20%, transparent); }
+    .cm b { font-size: 22px; display: block; }
+    .detail { display: grid; gap: 10px; padding: 10px 4px 16px; }
+    .line { padding: 4px 8px; border-left: 3px solid var(--line); font-size: 14px; }
+    .line.caller { border-left-color: var(--caller); } .line.receiver { border-left-color: var(--receiver); }
+    .mark { font-size: 11px; font-weight: 700; color: #fff; padding: 0 6px; border-radius: 4px; margin-left: 6px; }
+    .mark.dec { background: var(--warn); } .mark.ask { background: var(--danger); } .mark.trig { background: var(--accent); }
+    .caveat { font-size: 13px; color: var(--muted); }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filters button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+    @media (max-width: 640px) { th:nth-child(n+5), td:nth-child(n+5) { display: none; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Kavach scoreboard</h1>
+    <span class="muted" id="runInfo">loading…</span>
+    <a href="index.html" style="margin-left:auto">Call simulator</a>
+  </header>
+  <main>
+    <section class="panel" id="warn" hidden></section>
+    <section id="tiles" class="tiles"></section>
+    <section class="panel">
+      <div class="row" style="align-items:flex-start; gap:32px">
+        <div><h3 style="margin:0 0 8px">Confusion matrix</h3><div class="cm" id="cm"></div></div>
+        <div style="flex:1; min-width:280px"><h3 style="margin:0 0 8px">By scam type</h3><table id="types"></table></div>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="row" style="justify-content:space-between">
+        <h3 style="margin:0">Calls</h3>
+        <div class="filters" id="filters"></div>
+      </div>
+      <table id="calls"></table>
+      <p class="caveat">Click a call for its audio, transcript, and the moments that mattered. Test split only; train calls were used for tuning.
+        The audio is synthetic TTS, which is cleaner than a real phone line, so real-world numbers may be lower.</p>
+    </section>
+  </main>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const pct = (x) => x == null ? 'n/a' : `${(x * 100).toFixed(x * 100 % 1 ? 1 : 0)}%`;
+    const sec = (x) => x == null ? 'n/a' : `${x.toFixed(1)} s`;
+    const ms = (x) => x == null ? 'n/a' : `${Math.round(x)} ms`;
+    let data, filter = 'all', sortKey = 'id', sortDir = 1;
+
+    const outcome = (r) => r.label === 'scam' ? (r.triggered ? 'TP' : 'FN') : (r.triggered ? 'FP' : 'TN');
+    const fmt = (v) => v == null ? '–' : v;
+
+    function tiles(m) {
+      const t = [
+        ['Scam recall', pct(m.recall), `${m.confusion.tp} of ${m.n_scam} scams warned`],
+        ['False alarms, normal calls', pct(m.fpr_legit), `${m.n_legit} legit calls`],
+        ['False alarms, hard negatives', pct(m.fpr_hard_negative), `${m.n_hard_negative} calls that mention OTP or police safely`],
+        ['Decisive turn → warning, median', sec(m.decisive_to_warning_s.median), `p90 ${sec(m.decisive_to_warning_s.p90)} · n=${m.decisive_to_warning_s.n}`],
+        ['Warning audio after caller stops, median', ms(m.turn_end_to_warning_audio_ms.median), `p90 ${ms(m.turn_end_to_warning_audio_ms.p90)}`],
+        ['Voice first audio, median', ms(m.warning_tts_first_audio_ms_median), 'TTS-1 time to first audio'],
+        ['Caught before the ask', pct(m.pct_caught_before_s5_s6), `of ${m.n_scams_with_s5_s6} scams that ask for OTP or money`],
+      ];
+      $('tiles').innerHTML = t.map(([k, v, n]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join('');
+    }
+
+    function matrix(c) {
+      $('cm').innerHTML = `
+        <div class="h"></div><div class="h">Warned</div><div class="h">Quiet</div>
+        <div class="h">Scam</div><div class="good"><b>${c.tp}</b>caught</div><div class="bad"><b>${c.fn}</b>missed</div>
+        <div class="h">Not a scam</div><div class="bad"><b>${c.fp}</b>false alarm</div><div class="good"><b>${c.tn}</b>correctly quiet</div>`;
+    }
+
+    function types(m) {
+      $('types').innerHTML = '<tr><th>Type</th><th>Caught</th></tr>' + Object.entries(m.by_scam_type)
+        .map(([t, v]) => `<tr><td>${t.replaceAll('_', ' ')}</td><td>${v.caught} / ${v.n}</td></tr>`).join('');
+    }
+
+    function filters() {
+      const opts = [['all', 'All'], ['scam', 'Scams'], ['legit', 'Legit'], ['hard_negative', 'Hard negatives'], ['wrong', 'Wrong only']];
+      $('filters').innerHTML = opts.map(([k, l]) => `<button data-k="${k}" class="${filter === k ? 'on' : ''}">${l}</button>`).join('');
+      $('filters').onclick = (e) => { if (e.target.dataset.k) { filter = e.target.dataset.k; filters(); calls(); } };
+    }
+
+    function calls() {
+      let rows = data.results.filter((r) => filter === 'all' || (filter === 'wrong' ? ['FN', 'FP'].includes(outcome(r)) : r.category === filter));
+      rows = [...rows].sort((a, b) => ((a[sortKey] ?? 1e9) > (b[sortKey] ?? 1e9) ? 1 : -1) * sortDir);
+      const head = [['id', 'Call'], ['category', 'Kind'], ['outcome', 'Result'], ['trigger_script_turn', 'Warned at turn'],
+                    ['decisive_to_warning_s', 'Decisive → warning'], ['max_risk', 'Peak risk'], ['caught_before_s5s6', 'Before the ask']];
+      $('calls').innerHTML = '<tr>' + head.map(([k, l]) => `<th data-k="${k}">${l}</th>`).join('') + '</tr>' + rows.map((r) => {
+        const o = outcome(r);
+        return `<tr class="call" data-id="${r.id}"><td>${r.id.replace(/^(scam|legit|hard_negative)_/, '')}</td><td>${r.category.replace('_', ' ')}</td>
+          <td><span class="badge ${o}">${o}</span></td><td>${fmt(r.trigger_script_turn)}</td>
+          <td>${r.decisive_to_warning_s == null ? '–' : r.decisive_to_warning_s.toFixed(1) + ' s'}</td><td>${Math.round(r.max_risk)}</td>
+          <td>${r.caught_before_s5s6 == null ? '–' : (r.caught_before_s5s6 ? 'yes' : 'no')}</td></tr>`;
+      }).join('');
+      $('calls').onclick = (e) => {
+        const th = e.target.closest('th'); if (th) { sortDir = sortKey === th.dataset.k ? -sortDir : 1; sortKey = th.dataset.k; calls(); return; }
+        const tr = e.target.closest('tr.call'); if (tr) toggle(tr);
+      };
+    }
+
+    async function toggle(tr) {
+      const next = tr.nextElementSibling;
+      if (next && next.classList.contains('open')) { next.remove(); return; }
+      const r = data.results.find((x) => x.id === tr.dataset.id);
+      const script = await (await fetch(`/api/eval/script/${r.id}`)).json();
+      const lines = script.turns.map((t, i) => {
+        const marks = (i === r.decisive_turn_index ? '<span class="mark dec">decisive</span>' : '') +
+          (i === r.first_s5_s6_turn_index ? '<span class="mark ask">asks OTP/money</span>' : '') +
+          (i === r.trigger_script_turn ? '<span class="mark trig">warned here</span>' : '');
+        return `<div class="line ${t.speaker}"><b>${t.speaker}</b> ${t.text.replace(/</g, '&lt;')}${marks}</div>`;
+      }).join('');
+      const det = r.detections.map((d) => `<tr><td>${d.turn_idx}</td><td>${d.stages.join(', ') || '–'}</td><td>${d.risk_llm}</td><td>${d.risk_cum}</td><td>${d.llm_ms} ms</td><td>${d.trigger ? 'WARN' : ''}</td></tr>`).join('');
+      const el = document.createElement('tr');
+      el.className = 'open';
+      el.innerHTML = `<td colspan="7"><div class="detail">
+        <audio controls preload="none" src="/eval-audio/${r.id}.wav"></audio>
+        <div class="muted">${script.subtype.replaceAll('_', ' ')} · generated by ${script.generator} · detector warned ${r.triggered ? `(${r.trigger_reason})` : 'never'}${r.stt_incidents ? ` · ${r.stt_incidents} transcription incident(s)` : ''}</div>
+        <div>${lines}</div>
+        <table><tr><th>Turn</th><th>Stages so far</th><th>LLM risk</th><th>Cumulative</th><th>LLM time</th><th></th></tr>${det || '<tr><td colspan=6>no detections</td></tr>'}</table>
+      </div></td>`;
+      tr.after(el);
+    }
+
+    fetch('/api/eval/latest?split=test').then((r) => r.json()).then((d) => {
+      if (d.error) { $('runInfo').textContent = d.error; return; }
+      data = d;
+      const c = d.config || {};
+      $('runInfo').textContent = `run ${d.run_id} · ${d.split} split · ${d.metrics.n_calls} calls · detector ${c.detector_model} · threshold ${c.risk_threshold} · STT ${c.stt_model}${d.finished ? '' : ' · RUN NOT FINISHED'}`;
+      if (!d.finished) { $('warn').hidden = false; $('warn').textContent = 'This run has not finished: numbers are partial.'; }
+      tiles(d.metrics); matrix(d.metrics.confusion); types(d.metrics); filters(); calls();
+    });
+  </script>
+</body>
+</html>

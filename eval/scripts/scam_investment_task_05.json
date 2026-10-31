@@ -1,0 +1,62 @@
+{
+ "id": "scam_investment_task_05",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "investment_task",
+ "subtype": "investment_task",
+ "split": "train",
+ "caller_number": "+91 98402XXXXX",
+ "decisive_turn_index": 6,
+ "first_s5_s6_turn_index": 6,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Singh from Chennai?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is he. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Ananya from Global Task Solutions. I am calling regarding your application for the part-time home assistant role online."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Application? I do not remember applying for any such job, beta."
+  },
+  {
+   "speaker": "caller",
+   "text": "It was likely through the WhatsApp portal you visited. You just need to like a few videos to earn daily commissions, very simple work for seniors."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I see. But how can I be sure this is genuine?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, your first bonus of five thousand is already waiting in your portal account. You just need to pay a security activation fee of nine thousand five hundred rupees to unlock it."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Nine thousand? That is a lot of money just to start a job."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is a refundable deposit, Mr. Singh. Once you complete the first five tasks today, you will get everything back with a huge profit."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am not sure. Can I talk to my son first?"
+  },
+  {
+   "speaker": "caller",
+   "text": "The offer expires in ten minutes, sir. If you send the payment now via UPI, I will double your first commission immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Wait, why is there such a hurry?"
+  }
+ ]
+}

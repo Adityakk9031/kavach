@@ -1,0 +1,66 @@
+{
+ "id": "scam_digital_arrest_00",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "digital_arrest",
+ "subtype": "digital_arrest",
+ "split": "train",
+ "caller_number": "+91 98421XXXXX",
+ "decisive_turn_index": 4,
+ "first_s5_s6_turn_index": 10,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Khan from Hyderabad?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Inspector Vikram from the Cyber Crime Unit. We have intercepted a courier package containing illegal narcotics and several fake passports linked to your Aadhaar number."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What? That is impossible, I have not sent any parcel!"
+  },
+  {
+   "speaker": "caller",
+   "text": "That is why we are calling, but your identity is being used for money laundering. This is now a matter of digital arrest, so you must stay on this line and not tell anyone, or you will be picked up by local police immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Please, I am an old woman, I do not know anything about these things. What should I do?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Do not panic, but you must cooperate to clear your name. I am transferring your case to our verification officer to see if you are a victim or a suspect."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Can I call my son to help me with this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Absolutely not, this is a confidential government operation and any leak will be seen as tampering with evidence. You will be arrested if you hang up."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am very scared now. Please tell me how to fix this."
+  },
+  {
+   "speaker": "caller",
+   "text": "To prove your innocence, you need to transfer eighty thousand rupees into a secure government verification account for a temporary security deposit."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Eighty thousand? I do not have that much money readily available."
+  },
+  {
+   "speaker": "caller",
+   "text": "You must arrange it through a friend or bank transfer right now, or I will have no choice but to issue the warrant for your arrest."
+  }
+ ]
+}

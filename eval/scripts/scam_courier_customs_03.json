@@ -1,0 +1,62 @@
+{
+ "id": "scam_courier_customs_03",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "courier_customs",
+ "subtype": "courier_customs",
+ "split": "train",
+ "caller_number": "+91 9821X XXXXX",
+ "decisive_turn_index": 8,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Iyer from Lucknow?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Maam, I am Rohan from the Global Logistics clearance cell. We have a heavy parcel for you that has been detained by customs."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Parcel? I am not expecting any package, maybe it is a mistake."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is marked as a high-value gift from overseas, but there is a legal discrepancy with the declarations."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh dear, what kind of discrepancy? Is it something serious?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is a customs violation, and if not cleared in two hours, the police will be notified for an investigation."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Police? Please, I am a law abiding citizen, I do not know anything about this."
+  },
+  {
+   "speaker": "caller",
+   "text": "Do not worry, you can settle the penalty of twenty five thousand rupees now to avoid any legal trouble."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twenty five thousand is a lot of money. Can I come to the office and pay?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No maam, the office is closed for audit. Just send the amount via UPI or buy Google gift cards and send the codes immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Gift cards for a government fine? I must ask my son first."
+  }
+ ]
+}

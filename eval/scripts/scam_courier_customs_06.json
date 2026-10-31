@@ -1,0 +1,62 @@
+{
+ "id": "scam_courier_customs_06",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "courier_customs",
+ "subtype": "courier_customs",
+ "split": "train",
+ "caller_number": "+91 9820X XXXXX1",
+ "decisive_turn_index": 6,
+ "first_s5_s6_turn_index": 6,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, is this Mr. Singh from Nagpur?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is he. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Rohan from the Customs Clearance division. We have a high-value international shipment for you that has been flagged at the airport."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Shipment? I am not expecting any package from abroad."
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, the documents say it contains electronics and gold coins. If you do not claim it and pay the duty now, it will be marked as illegal and reported to the police."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Police? But there must be some mistake, I have not ordered anything."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is why we must clear this immediately to avoid a legal case. You need to pay a clearance fine of eighty thousand rupees right now."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Eighty thousand is a lot of money. How do I pay this officially?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Since it is urgent, you can just send the amount via UPI or buy Amazon gift cards and share the codes with me."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Gift cards for customs? I don't understand why I would do that."
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, the government portal is down for maintenance, so this is the only way to stop the police case. Please hurry or the parcel will be seized."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Wait, let me talk to my son first."
+  }
+ ]
+}

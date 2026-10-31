@@ -1,0 +1,62 @@
+{
+ "id": "scam_courier_customs_07",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "courier_customs",
+ "subtype": "courier_customs",
+ "split": "test",
+ "caller_number": "+91 9823X XXXXX",
+ "decisive_turn_index": 6,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Sharma of Jaipur city?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Sharma. Who is calling?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Rohan from the International Shipping Hub. Your overseas parcel is currently stuck at the customs office."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Overseas parcel? I am not expecting any package from outside."
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, it is a registered shipment containing documents. The customs officer has flagged it for a missing clearance fee."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I don't understand. Why would I have documents from outside?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It could be from a relative, but if you don't settle the nine thousand five hundred rupees fine now, the police will be notified for illegal import."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Police? This is very stressful, I cannot pay such a big amount suddenly."
+  },
+  {
+   "speaker": "caller",
+   "text": "Listen, to avoid legal trouble, just send the money via UPI or buy an Amazon gift card and tell me the code."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Gift card for customs? Does the government take gift cards?"
+  },
+  {
+   "speaker": "caller",
+   "text": "This is the fast-track process for senior citizens. Please hurry or I cannot stop the case filing."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Let me call my son first and ask him."
+  }
+ ]
+}

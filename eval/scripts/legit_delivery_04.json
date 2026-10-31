@@ -1,0 +1,62 @@
+{
+ "id": "legit_delivery_04",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "delivery",
+ "split": "train",
+ "caller_number": "+91 98220XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Singh?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Singh. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, I am Anjali from the logistics office. I am calling about your furniture shipment arriving in Pune today."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, the sofa set. Is it coming today? I was told next week."
+  },
+  {
+   "speaker": "caller",
+   "text": "It arrived at our warehouse earlier than expected, sir. Our driver is currently near Kothrud."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Kothrud is quite far from my house, will he reach by evening?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, he should be there by 5 PM. I just wanted to confirm if your address on the invoice is still correct."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Wait, let me check my glasses. Yes, the address is the same as always."
+  },
+  {
+   "speaker": "caller",
+   "text": "Perfect. Just a reminder that the balance amount is twenty five thousand rupees to be paid to the driver."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twenty five thousand, yes. I have the cheque ready for him."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is fine, sir. Please just keep your phone reachable so the driver can call you when he reaches your gate."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay beta, I will be waiting. Thank you for informing me."
+  }
+ ]
+}

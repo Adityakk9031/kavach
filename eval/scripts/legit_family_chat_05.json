@@ -1,0 +1,62 @@
+{
+ "id": "legit_family_chat_05",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "family_chat",
+ "split": "test",
+ "caller_number": "+91 98201XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Assalamu Alaikum, Mrs. Khan! This is Sameer calling from Delhi."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Wa Alaikum Assalam, Sameer beta. How are you? It has been so long."
+  },
+  {
+   "speaker": "caller",
+   "text": "I am doing well. I was just thinking about you and wondering how your knee pain is these days."
+  },
+  {
+   "speaker": "receiver",
+   "text": "It is better now, but I still struggle with the stairs. Why are you calling so suddenly?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No reason, just calling to chat. By the way, are you planning to come to Lucknow for the Diwali holidays?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am thinking about it, but the tickets are getting very expensive now."
+  },
+  {
+   "speaker": "caller",
+   "text": "Don't worry about that. I have already checked the train fare for your dates."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, really? How much is it showing?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is exactly nine thousand five hundred rupees for the AC tier. I can book it for you if you like."
+  },
+  {
+   "speaker": "receiver",
+   "text": "That is a bit high, isn't it? Let me check with my daughter first."
+  },
+  {
+   "speaker": "caller",
+   "text": "Take your time. Just let me know by tomorrow so I can grab the seat."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, I will call you back in the evening. Give my love to everyone there."
+  }
+ ]
+}

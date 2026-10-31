@@ -1,0 +1,66 @@
+{
+ "id": "scam_digital_arrest_04",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "digital_arrest",
+ "subtype": "digital_arrest",
+ "split": "test",
+ "caller_number": "+91 98401XXXXX",
+ "decisive_turn_index": 4,
+ "first_s5_s6_turn_index": 10,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Reddy of Chennai? This is Inspector Vikram from the Cyber Cell."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Reddy. Is something wrong? Why are you calling?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, we have intercepted a courier from Mumbai containing illegal narcotics and your Aadhaar number is linked to the sender's address."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What? I have never sent any courier to Mumbai. This must be a huge mistake."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is why we are calling, but until the verification is done, you are under digital arrest and cannot leave your house or tell anyone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Digital arrest? I don't understand this. Please, I am a retired man, let me call my son."
+  },
+  {
+   "speaker": "caller",
+   "text": "If you disconnect or inform anyone, it will be seen as tampering with evidence and we will send a team to arrest you immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am very scared now. Please tell me how to prove that I have nothing to do with these drugs."
+  },
+  {
+   "speaker": "caller",
+   "text": "The court has a provision for a security clearance deposit to verify your identity and clear your name."
+  },
+  {
+   "speaker": "receiver",
+   "text": "A deposit? How much are you talking about?"
+  },
+  {
+   "speaker": "caller",
+   "text": "You need to transfer one lakh rupees to the government verification account immediately to avoid the arrest warrant."
+  },
+  {
+   "speaker": "receiver",
+   "text": "One lakh is a lot of money. Can I come to the police station instead?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No, you are under digital arrest. Just send the money now and I will send you the release certificate on WhatsApp."
+  }
+ ]
+}

@@ -1,0 +1,62 @@
+{
+ "id": "scam_fake_relative_03",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "fake_relative",
+ "subtype": "fake_relative",
+ "split": "test",
+ "caller_number": "+91 982001XXXX",
+ "decisive_turn_index": 8,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, Nani? It is me, Rahul. Please tell me you can hear me clearly."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Rahul? Beta, why are you calling from this new number? Is everything okay?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Nani, I am in a big mess. I had a small accident with a car in Pune and the police are very angry."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh my god, are you hurt? Do I need to call your father right now?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No, no! Please do not tell Papa, he will kill me. I just need to settle this with the police quickly and go home."
+  },
+  {
+   "speaker": "receiver",
+   "text": "But how can you settle it alone? What exactly happened there?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It was a misunderstanding, but they are asking for a security deposit to release me. I am so scared, Nani."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I do not understand. Why can't you call your friends or use your own account?"
+  },
+  {
+   "speaker": "caller",
+   "text": "My phone is broken and I have no access to my bank. I need one lakh rupees immediately to pay the officer."
+  },
+  {
+   "speaker": "receiver",
+   "text": "One lakh is a lot of money, Rahul. Let me think how to arrange this."
+  },
+  {
+   "speaker": "caller",
+   "text": "Please hurry, Nani, they are giving me only one hour. I will send you the UPI details on WhatsApp right now."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Wait, let me just call your mother first to check if she knows about this."
+  }
+ ]
+}

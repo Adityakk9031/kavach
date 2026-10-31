@@ -1,0 +1,70 @@
+{
+ "id": "scam_investment_task_06",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "investment_task",
+ "subtype": "investment_task",
+ "split": "test",
+ "caller_number": "+91 98200XXXXX",
+ "decisive_turn_index": 6,
+ "first_s5_s6_turn_index": 6,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Patil from Delhi?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is he. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Sarah from Global Task Solutions. I saw your profile and wanted to offer you a simple part-time job where you just rate products online for easy money."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Rating products? I am retired, I do not know how to do such things."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is very simple, Mr. Patil. Just click a few buttons on your phone and you can earn three thousand rupees every day."
+  },
+  {
+   "speaker": "receiver",
+   "text": "That sounds too much for such a small thing. How do I start?"
+  },
+  {
+   "speaker": "caller",
+   "text": "You just need to activate your worker account first. Please transfer twelve thousand rupees as a refundable security deposit to this link I am sending."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twelve thousand is a lot of money. Why should I pay to get a job?"
+  },
+  {
+   "speaker": "caller",
+   "text": "This is just for verification to show you are a serious worker. You will get it back with your first payment in two hours."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am very worried about this. Can you send me an official email first?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, the offer is only for today and the slots are filling fast. Just pay the fee now or you will lose this opportunity."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I do not think I can do this right now, let me ask my son."
+  },
+  {
+   "speaker": "caller",
+   "text": "Do not waste time talking to others. Just make the payment and I will double your balance immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I will call you back later then."
+  }
+ ]
+}

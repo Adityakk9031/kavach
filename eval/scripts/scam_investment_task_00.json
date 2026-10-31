@@ -1,0 +1,70 @@
+{
+ "id": "scam_investment_task_00",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "investment_task",
+ "subtype": "investment_task",
+ "split": "train",
+ "caller_number": "+91 9821X XXXXX",
+ "decisive_turn_index": 8,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Reddy from Lucknow?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Reddy. Who is this calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Sameer from Global Task Solutions, calling about your registration for the part-time data optimization project."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Registration? I do not remember signing up for any such thing, beta."
+  },
+  {
+   "speaker": "caller",
+   "text": "It might have been through a social media ad, sir, but you were shortlisted for easy daily earnings just by clicking a few links."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am retired, I do not know much about these links. How much money are you talking about?"
+  },
+  {
+   "speaker": "caller",
+   "text": "You can earn thousands daily, and since you completed the trial, your wallet currently shows a profit of fifty thousand rupees."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Fifty thousand! Truly? How do I get this money in my bank account?"
+  },
+  {
+   "speaker": "caller",
+   "text": "To activate the withdrawal, the system requires a one-time security verification deposit of five thousand rupees."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Why should I pay money to get my own profit? This sounds very strange."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is just a refundable tax fee, Mr. Reddy, and once you pay, the full fifty thousand will be credited instantly."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I have to ask my son first, I am not comfortable with this."
+  },
+  {
+   "speaker": "caller",
+   "text": "The offer expires in one hour, sir, so please just send the amount via UPI now to avoid losing your profit."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Wait, please, let me check with my family first."
+  }
+ ]
+}

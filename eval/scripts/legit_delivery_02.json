@@ -1,0 +1,62 @@
+{
+ "id": "legit_delivery_02",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "delivery",
+ "split": "train",
+ "caller_number": "+91 98201X44X2",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Sharma in Jaipur?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Sharma. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, I am Rajesh from the logistics hub. I have a large shipment here for you valued at fifty thousand rupees."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Fifty thousand? I am not expecting anything so expensive. What is this for?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is the electronic equipment you ordered last week. My manager told me to coordinate the timing with you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, the air purifier for my daughter. I forgot it was that much."
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes sir, the premium model. Will you be home tomorrow between 11 AM and 2 PM?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "I might be at the temple. Can you come in the evening instead?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I can do that. Will 6 PM work for you?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, 6 PM is fine. But is the address correct in your system?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I have it as House 42, Mansarovar. Is that still correct?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, that is correct. Thank you for calling."
+  }
+ ]
+}

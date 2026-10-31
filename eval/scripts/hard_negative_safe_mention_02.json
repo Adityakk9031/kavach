@@ -1,0 +1,62 @@
+{
+ "id": "hard_negative_safe_mention_02",
+ "label": "legit",
+ "category": "hard_negative",
+ "scam_type": null,
+ "subtype": "safe_mention",
+ "split": "test",
+ "caller_number": "+91 98402XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Patil from the T Nagar area in Chennai?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Patil. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Namaste sir, I am Anirudh from the Community Policing wing. I am calling to inform you about a recent spike in fraudulent calls targeting senior citizens in your neighborhood."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, I have been getting many strange calls lately. Is there something I should worry about?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Please do not worry, sir, but be cautious. We noticed some suspicious activity involving transfers of eighty thousand rupees from several accounts in your locality."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Eighty thousand! That is a lot of money. How do they take it?"
+  },
+  {
+   "speaker": "caller",
+   "text": "They usually trick people into sharing a one time password or a PIN. I want to warn you that the police or any bank official will never ask you for these details over the phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I see. But what if they say it is for a government verification?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Even then, please do not share your Aadhaar number or bank passwords. If anyone asks for such things, just hang up immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you for telling me, Anirudh. I was getting very confused about these calls."
+  },
+  {
+   "speaker": "caller",
+   "text": "You are welcome, Mr. Patil. Just remember that we will never ask for money or codes over a call."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I will keep that in mind. Thank you for the warning."
+  }
+ ]
+}

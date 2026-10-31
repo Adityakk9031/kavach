@@ -1,0 +1,62 @@
+{
+ "id": "hard_negative_safe_mention_13",
+ "label": "legit",
+ "category": "hard_negative",
+ "scam_type": null,
+ "subtype": "safe_mention",
+ "split": "train",
+ "caller_number": "+91 98220XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Good afternoon, am I speaking with Mrs. Iyer from Nagpur?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Ananya from the City Police Community Outreach cell, and I am calling to provide a security awareness update for senior citizens."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Police? Oh my goodness, has something happened to my family?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No no, please do not worry, everything is fine. I am just calling to warn you about a fake lottery scam going around your neighborhood."
+  },
+  {
+   "speaker": "receiver",
+   "text": "A lottery? I have not entered any lottery, why are they targeting me?"
+  },
+  {
+   "speaker": "caller",
+   "text": "They target many people, often claiming you won twenty five thousand rupees to lure you into giving your bank details."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twenty five thousand is a lot of money. What do I do if they call me?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Just remember that the police and banks will never ask for your OTP, PIN, or Aadhaar number over the phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I see. But what if they say they are from my own bank?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Even then, never share your password or OTP with anyone, because no official officer will ever demand those details."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you for telling me, beta. I will be very careful now."
+  }
+ ]
+}

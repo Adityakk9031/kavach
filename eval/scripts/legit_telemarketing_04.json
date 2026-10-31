@@ -1,0 +1,70 @@
+{
+ "id": "legit_telemarketing_04",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "telemarketing",
+ "split": "train",
+ "caller_number": "+91 98220XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, good afternoon. Am I speaking with Mr. Singh from Chennai?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Singh. Who is this calling?"
+  },
+  {
+   "speaker": "caller",
+   "text": "My name is Ananya from Global Connect. I am calling regarding a special upgrade for your home broadband plan."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Broadband? I already have a connection, I do not need a new one."
+  },
+  {
+   "speaker": "caller",
+   "text": "I understand, sir. This is just an offer to increase your speed to one gigabit for the same monthly price."
+  },
+  {
+   "speaker": "receiver",
+   "text": "One gigabit? I only use it for the news and calling my children, I don't know what this means."
+  },
+  {
+   "speaker": "caller",
+   "text": "It simply means your videos will load faster, Mr. Singh. We are offering this to a few select customers in your area."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am not sure. Is there any extra charge for this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No extra monthly charge, sir. We only provide a one-time installation credit of eighty thousand rupees for corporate accounts, but for you, it is completely free."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Eighty thousand? That sounds like a lot of money. I am getting confused now."
+  },
+  {
+   "speaker": "caller",
+   "text": "Please do not worry, sir. There is no payment required from your side at all."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Can you just send the details to my email? I will talk to my son first."
+  },
+  {
+   "speaker": "caller",
+   "text": "Of course, sir. I will send the brochure to your registered email address right away."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you. That is better."
+  }
+ ]
+}

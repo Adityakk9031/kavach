@@ -1,0 +1,62 @@
+{
+ "id": "hard_negative_safe_mention_09",
+ "label": "legit",
+ "category": "hard_negative",
+ "scam_type": null,
+ "subtype": "safe_mention",
+ "split": "test",
+ "caller_number": "+91 9848012345",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Gupta from Hyderabad?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Gupta speaking. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Ananya from the State Bank fraud prevention cell, calling to confirm a transaction of fifty thousand rupees made this morning."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Fifty thousand? I did not make any such payment today."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is exactly why I am calling. We noticed a suspicious attempt and have temporarily blocked the transfer for your safety."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh my goodness, thank you. What do I need to do now to fix this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "You do not need to do anything on this call. Please just visit your home branch in person tomorrow with your ID to resolve it."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Can you not just take my details over the phone to verify it now?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No, Mr. Gupta, we will never ask for your OTP, PIN, or account details over the phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I see. I was worried someone would ask me for a code or something."
+  },
+  {
+   "speaker": "caller",
+   "text": "Exactly, please remember that bank officials never ask for such private information. Just go to the branch and they will help you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Alright, I will go there tomorrow morning. Thank you for the warning."
+  }
+ ]
+}

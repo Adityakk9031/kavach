@@ -1,0 +1,62 @@
+{
+ "id": "legit_delivery_01",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "delivery",
+ "split": "test",
+ "caller_number": "+91 98220XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Khan?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Namaste, I am Sameer from the logistics team in Pune. I have a large parcel here for you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "A parcel? I am not expecting anything today."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is the home appliance you ordered last week, the one for twelve thousand rupees."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, the air purifier! My son told me he bought it, but I forgot."
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, that is the one. I am currently near the main market, so I wanted to check if you are home."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am here, but my gate is locked. Will you be able to find the side entrance?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I can do that. Just please keep the gate open so my helper can carry the box inside."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Alright, let me go and open it now. How long will you take?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I will be there in about ten minutes, Mrs. Khan."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay beta, I am waiting. See you soon."
+  }
+ ]
+}

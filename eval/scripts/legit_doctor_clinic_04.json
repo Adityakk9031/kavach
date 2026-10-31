@@ -1,0 +1,66 @@
+{
+ "id": "legit_doctor_clinic_04",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "doctor_clinic",
+ "split": "train",
+ "caller_number": "+91 98450XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Gupta?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Gupta. Who is calling?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Ananya from the City Care Hospital in Bengaluru, calling regarding your cardiology reports."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, the reports. Are they ready? I was waiting for the call."
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, they are ready for pickup at the front desk, and the doctor has scheduled a review for Tuesday at 10 AM."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Tuesday... let me check my diary. Is that 10 in the morning?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, 10 AM sharp. Please bring the physical copies of your previous tests as well."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I will bring them. But will there be a charge for this consultation?"
+  },
+  {
+   "speaker": "caller",
+   "text": "The total for the tests and the visit comes to twelve thousand rupees, but you can just settle that at the billing counter when you arrive."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twelve thousand? It seems a bit more than last time, but okay."
+  },
+  {
+   "speaker": "caller",
+   "text": "It includes the advanced screening you requested. We will see you on Tuesday then."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Fine, thank you Ananya. I will be there."
+  },
+  {
+   "speaker": "caller",
+   "text": "You are welcome, Mr. Gupta. Have a good day."
+  }
+ ]
+}

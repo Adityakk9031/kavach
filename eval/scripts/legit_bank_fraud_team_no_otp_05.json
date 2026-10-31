@@ -1,0 +1,62 @@
+{
+ "id": "legit_bank_fraud_team_no_otp_05",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "bank_fraud_team_no_otp",
+ "split": "test",
+ "caller_number": "+91 98450XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Sharma from Hyderabad?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Sharma. Who is this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, I am Anjali from the bank fraud monitoring team. I am calling because we see a suspicious transaction of one lakh rupees on your account."
+  },
+  {
+   "speaker": "receiver",
+   "text": "One lakh? What is this? I have not done any such thing!"
+  },
+  {
+   "speaker": "caller",
+   "text": "Please do not worry, sir. Did you authorize any payment of one lakh rupees to an electronics store in the last hour?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "No, no, absolutely not. This is very worrying."
+  },
+  {
+   "speaker": "caller",
+   "text": "I understand. I have gone ahead and blocked your card immediately to prevent any more money from leaving your account."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you. But how will I get my money back now?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Our team will investigate and revert to you. For your safety, please remember that the bank will never ask you for your OTP, PIN, or CVV over the phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, you don't need any of those things from me now?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No, sir, we do not need any credentials or payments from you. Just visit your home branch tomorrow to apply for a new card."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Alright, I will do that. Thank you for letting me know, Anjali."
+  }
+ ]
+}

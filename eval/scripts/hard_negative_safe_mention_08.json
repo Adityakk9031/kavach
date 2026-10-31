@@ -1,0 +1,62 @@
+{
+ "id": "hard_negative_safe_mention_08",
+ "label": "legit",
+ "category": "hard_negative",
+ "scam_type": null,
+ "subtype": "safe_mention",
+ "split": "train",
+ "caller_number": "+91 98301XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Khan from Kolkata?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Mrs. Khan, I am Anirban from the State Bank security department. I am calling to confirm a transaction of eighty thousand rupees made on your account today."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Eighty thousand? I did not do any such thing, oh my god!"
+  },
+  {
+   "speaker": "caller",
+   "text": "Please do not worry, the transaction is currently on hold and has not been processed. I am just calling to verify if you initiated this."
+  },
+  {
+   "speaker": "receiver",
+   "text": "No, no, I have not sent any money. How did this happen?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It looks like a suspicious attempt. Since this is a security alert, I want to remind you that the bank will never ask you for your OTP or PIN over the phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Is that so? Because someone called me yesterday asking for a code."
+  },
+  {
+   "speaker": "caller",
+   "text": "That was likely a scammer. Please never share your passwords or Aadhaar details with anyone calling from a mobile number."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you for telling me. So what should I do now to stop this money from leaving?"
+  },
+  {
+   "speaker": "caller",
+   "text": "You do not need to do anything on this call. Just visit your home branch in Kolkata tomorrow with your ID to formally block the request."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Alright, I will go there tomorrow morning. Thank you for the warning, beta."
+  }
+ ]
+}

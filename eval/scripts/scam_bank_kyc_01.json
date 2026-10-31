@@ -1,0 +1,70 @@
+{
+ "id": "scam_bank_kyc_01",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "bank_kyc",
+ "subtype": "bank_kyc",
+ "split": "train",
+ "caller_number": "+91 98450XXXXX",
+ "decisive_turn_index": 8,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Khan from Hyderabad?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Deepak Sharma from the RBI digital compliance cell. I am calling regarding your savings account KYC which has expired today."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Expired? But I gave my papers to the branch last year."
+  },
+  {
+   "speaker": "caller",
+   "text": "Madam, there is a new government mandate and your file is incomplete. If we do not update it now, your account will be blocked by evening."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh my god, please tell me what to do. I have some payments pending."
+  },
+  {
+   "speaker": "caller",
+   "text": "Do not worry, I can fix this for you right now. I just need to verify your identity first."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, what do you need from me?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Please tell me your sixteen digit debit card number and the Aadhaar number linked to the account."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Is this safe? My son told me not to give these things over the phone."
+  },
+  {
+   "speaker": "caller",
+   "text": "I am an officer from the RBI, madam. To prove it, I will send a verification link for twelve thousand rupees which will be refunded instantly after the KYC is done."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twelve thousand? That is a lot of money, why is it needed for KYC?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is just a security deposit for the activation. Now please give me the OTP you just received on your phone to complete the process."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Wait, let me check the message first."
+  }
+ ]
+}

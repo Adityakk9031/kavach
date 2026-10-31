@@ -1,0 +1,62 @@
+{
+ "id": "scam_remote_access_03",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "remote_access",
+ "subtype": "remote_access",
+ "split": "train",
+ "caller_number": "+91 98200X1234",
+ "decisive_turn_index": 4,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Gupta from Mumbai? I am Rohan from the digital security department regarding your bank app."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Gupta. What is the matter? Is there some problem?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, we detected a synchronization error in your account which might block your UPI transactions today."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Block? But I have not done anything wrong. How can this happen?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is just a technical glitch, sir. I can fix it easily, but I need you to download the AnyDesk app from the Play Store so I can guide you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I do not know these apps, beta. Can you not just tell me on the phone what to do?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is safer if I see the screen to ensure your data is secure. Please just share the nine digit code with me once it opens."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, wait a minute. I am trying to find it. Now it is showing some numbers."
+  },
+  {
+   "speaker": "caller",
+   "text": "Perfect, I have access now. To verify the account link, you must pay a nominal security deposit of nine thousand five hundred rupees."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Nine thousand five hundred? Why do I have to pay this to fix a glitch?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is a refundable verification fee, Mr. Gupta. Just open your banking app and tell me the OTP you receive now."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am feeling very confused. I will call my son first and ask him."
+  }
+ ]
+}

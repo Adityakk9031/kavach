@@ -1,0 +1,62 @@
+{
+ "id": "hard_negative_safe_mention_12",
+ "label": "legit",
+ "category": "hard_negative",
+ "scam_type": null,
+ "subtype": "safe_mention",
+ "split": "test",
+ "caller_number": "+91 98112XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Reddy from your residence in Delhi?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Reddy. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Ananya from the State Bank security team. I am calling to confirm if you made a payment of nine thousand five hundred rupees this morning?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, yes, I did. I sent it to my grandson for his books. Is there a problem?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No, the transaction went through perfectly. We are just doing a routine check for high-value transfers to ensure your account is safe."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I see. I was worried something happened to the money."
+  },
+  {
+   "speaker": "caller",
+   "text": "Everything is fine, Mr. Reddy. However, please remember that our bank will never call you to ask for your OTP or your secret PIN."
+  },
+  {
+   "speaker": "receiver",
+   "text": "But why would they ask for that if they are from the bank?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Because scammers pretend to be us to steal your money. If anyone asks for your card number or Aadhaar details over the phone, just hang up immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I will be careful. Thank you for telling me this, beta."
+  },
+  {
+   "speaker": "caller",
+   "text": "You are welcome. Just stay alert and never share your passwords with anyone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, I understand. Have a good day."
+  }
+ ]
+}

@@ -1,0 +1,66 @@
+{
+ "id": "scam_digital_arrest_02",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "digital_arrest",
+ "subtype": "digital_arrest",
+ "split": "test",
+ "caller_number": "+91 98450XXXXX",
+ "decisive_turn_index": 4,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Gupta from Chennai?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is he. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Inspector Vikram from the Cyber Crime Cell. Your Aadhaar card has been flagged in connection with a narcotics smuggling case across state borders."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What? Narcotics? There must be some mistake, I am a retired teacher!"
+  },
+  {
+   "speaker": "caller",
+   "text": "That is why we are calling you, but the digital trail leads to your ID. Because this is a sensitive national security matter, you are now under digital arrest and must not hang up or tell anyone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Digital arrest? I have never heard of this. Can I call my son?"
+  },
+  {
+   "speaker": "caller",
+   "text": "If you disclose this to anyone, it will be treated as tampering with evidence and we will send a team for a physical arrest immediately. Do you understand the seriousness?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, yes, I understand. Please tell me how to clear my name."
+  },
+  {
+   "speaker": "caller",
+   "text": "The court allows a verification process to prove your innocence. You need to transfer a security deposit to the government's safe account for clearance."
+  },
+  {
+   "speaker": "receiver",
+   "text": "How much money are you asking for?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is a small verification fee of nine thousand five hundred rupees. Once the payment is reflected, your name will be cleared from the FIR."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I can do it, but can you send me a letter or something official first?"
+  },
+  {
+   "speaker": "caller",
+   "text": "There is no time for letters in a digital arrest. Transfer the nine thousand five hundred rupees now or the police van will reach your house in ten minutes."
+  }
+ ]
+}

@@ -1,0 +1,66 @@
+{
+ "id": "scam_investment_task_01",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "investment_task",
+ "subtype": "investment_task",
+ "split": "train",
+ "caller_number": "+91 98200XXXXX",
+ "decisive_turn_index": 8,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Singh from Pune?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is he. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Anjali from the Global Task Management team. I am calling regarding your application for the online rating part-time job."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Application? I do not remember applying for any job, beta."
+  },
+  {
+   "speaker": "caller",
+   "text": "It might have been through a social media ad you clicked, sir. It is very simple work where you just like products and earn daily commissions."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am retired, I do not know these things. How much can a person earn?"
+  },
+  {
+   "speaker": "caller",
+   "text": "You can earn five thousand rupees a day. In fact, I have already credited a small bonus to your trial account to show you it is real."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Really? But how do I take this money out of the account?"
+  },
+  {
+   "speaker": "caller",
+   "text": "That is the thing, sir. To unlock the withdrawal gateway, you just need to pay a one-time security activation fee of twenty five thousand rupees."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twenty five thousand? That is a lot of money for a simple job."
+  },
+  {
+   "speaker": "caller",
+   "text": "Do not worry, sir. Once you pay this, you will get your bonus and the fee back immediately along with your first week's salary."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I will have to ask my son first. Can you call me tomorrow?"
+  },
+  {
+   "speaker": "caller",
+   "text": "The offer expires in two hours, Mr. Singh. Just send the amount via UPI now and I will process the full payment to your bank instantly."
+  }
+ ]
+}

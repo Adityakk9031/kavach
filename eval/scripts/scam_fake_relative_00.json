@@ -1,0 +1,62 @@
+{
+ "id": "scam_fake_relative_00",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "fake_relative",
+ "subtype": "fake_relative",
+ "split": "train",
+ "caller_number": "+91 98450XXXXX",
+ "decisive_turn_index": 6,
+ "first_s5_s6_turn_index": 6,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, Dadaji? It is me, Rohan. Please do not be shocked, but I am in a very bad situation."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Rohan? Beta, is that you? Your voice sounds different, what happened?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I had a small accident here in Chennai and the police are holding me because of some paperwork issues. I am very scared, Mr. Gupta, please help me."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Accident? My goodness! Why are you calling me and not your father?"
+  },
+  {
+   "speaker": "caller",
+   "text": "That is the problem, I do not want to worry Papa or he will be furious with me. Please, you must keep this a secret between us for now."
+  },
+  {
+   "speaker": "receiver",
+   "text": "But how can I keep such a big thing secret? Are you hurt?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am fine, but the lawyer says I need to pay a bail bond immediately or I will stay in lockup all weekend. I need eighty thousand rupees urgently."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Eighty thousand? That is a lot of money, I have to check my savings account first."
+  },
+  {
+   "speaker": "caller",
+   "text": "Please hurry, Dadaji, the officer is asking for the payment right now. Can you send it via UPI or bank transfer immediately?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "I do not know how to do this fast, let me call your uncle first to ask for help."
+  },
+  {
+   "speaker": "caller",
+   "text": "No, no! Do not call anyone or they will tell Papa and I will be in more trouble. Just send the money to this number I will message you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am getting very confused, let me just hang up and call your father's phone."
+  }
+ ]
+}

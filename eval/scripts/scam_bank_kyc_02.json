@@ -1,0 +1,66 @@
+{
+ "id": "scam_bank_kyc_02",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "bank_kyc",
+ "subtype": "bank_kyc",
+ "split": "test",
+ "caller_number": "+91 98200XXXXX",
+ "decisive_turn_index": 4,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Sharma from Nagpur?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Sharma speaking. Who is this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, I am Rohan from the Reserve Bank auditing wing. I am calling regarding a pending KYC update for your savings account."
+  },
+  {
+   "speaker": "receiver",
+   "text": "KYC? But I gave all my documents to the branch last year."
+  },
+  {
+   "speaker": "caller",
+   "text": "That was for the old portal sir, but the new RBI guidelines require a digital refresh or your account will be blocked by tonight."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Blocked tonight? That is very sudden, I have some payments to make."
+  },
+  {
+   "speaker": "caller",
+   "text": "I understand your worry sir, that is why I am helping you. We just need to verify your identity to keep the account active."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, tell me what I need to do then."
+  },
+  {
+   "speaker": "caller",
+   "text": "First, please tell me your sixteen digit debit card number and the expiry date for the system check."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I have the card here, but is it safe to tell this over the phone?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, I can see your account balance is twenty five thousand rupees, if it gets blocked you will have to visit the branch and pay a fine."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, I don't want any fine. It is 4521..."
+  },
+  {
+   "speaker": "caller",
+   "text": "Thank you, now I am sending a verification code to your mobile, please read that OTP to me immediately."
+  }
+ ]
+}

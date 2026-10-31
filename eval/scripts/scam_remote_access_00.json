@@ -1,0 +1,62 @@
+{
+ "id": "scam_remote_access_00",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "remote_access",
+ "subtype": "remote_access",
+ "split": "train",
+ "caller_number": "+91 98221X4577",
+ "decisive_turn_index": 4,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Reddy from Lucknow?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Reddy. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, my name is Rohan from the Digital Security Wing. We noticed some suspicious login attempts on your banking app from a different city."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What? But I am at home only. Is my money safe?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is safe for now, but we must secure your account immediately. Please download the AnyDesk app from the play store so I can guide you through the security settings."
+  },
+  {
+   "speaker": "receiver",
+   "text": "AnyDesk? I do not know how to do this. Can you not just fix it from your office?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I need to see your screen to block the hackers, sir. Just open the app and tell me the nine digit code showing on your screen."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, wait one minute. The code is 421 883 901."
+  },
+  {
+   "speaker": "caller",
+   "text": "Thank you, I have accessed the system. Now, to verify the account ownership and reverse the pending fraudulent charge, you must transfer fifty thousand rupees to our secure government verification vault."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Fifty thousand? That is too much, why should I send money to fix a problem?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, this is a refundable security deposit. If you do not do this now, your account will be frozen by the RBI within ten minutes."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am getting very worried. Let me call my son first."
+  }
+ ]
+}

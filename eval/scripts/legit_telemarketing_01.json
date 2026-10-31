@@ -1,0 +1,62 @@
+{
+ "id": "legit_telemarketing_01",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "telemarketing",
+ "split": "train",
+ "caller_number": "+91 98300XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Sharma of Kolkata?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Sharma. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "My name is Anjali from Global Connect. I am calling to share a special offer on our high-speed broadband plans for your area."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Broadband? I already have a connection, beta. I do not need another one."
+  },
+  {
+   "speaker": "caller",
+   "text": "I understand, sir. This plan is much faster and includes a free security upgrade for your devices."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am not very good with computers. How much does this cost?"
+  },
+  {
+   "speaker": "caller",
+   "text": "The annual subscription for this premium package comes to nine thousand five hundred rupees, including tax."
+  },
+  {
+   "speaker": "receiver",
+   "text": "That is quite a lot of money for me. I must ask my son first."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is perfectly fine, sir. I can send the complete brochure and plan details to your email or WhatsApp."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, please do that. I will check it and let you know later."
+  },
+  {
+   "speaker": "caller",
+   "text": "I will send it right away. Thank you for your time, Mr. Sharma."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you. Goodbye."
+  }
+ ]
+}

@@ -1,0 +1,62 @@
+{
+ "id": "hard_negative_safe_mention_04",
+ "label": "legit",
+ "category": "hard_negative",
+ "scam_type": null,
+ "subtype": "safe_mention",
+ "split": "test",
+ "caller_number": "+91 9821X XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Iyer from Lucknow?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Namaste, I am Anjali from the State Bank security team. I am calling to confirm if you just made a payment of nine thousand five hundred rupees?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh my goodness, yes, I did. Is there some problem with the transaction?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No, no, everything is perfect. We just noticed a large amount and wanted to ensure it was actually you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I was a bit worried. Do I need to do anything to verify it?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Nothing at all, Mrs. Iyer. This is just a courtesy confirmation call for your safety."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I see. Some people told me that banks call to steal money these days."
+  },
+  {
+   "speaker": "caller",
+   "text": "They are right to be careful. Please remember that the bank will never ask you for your OTP, PIN, or password over the phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "That is a relief. I almost asked if I should tell you my details for the record."
+  },
+  {
+   "speaker": "caller",
+   "text": "Please never share those details with anyone, even if they claim to be from the bank. We already have your records here."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you, beta. I will keep that in mind."
+  }
+ ]
+}

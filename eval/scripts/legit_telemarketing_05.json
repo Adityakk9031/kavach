@@ -1,0 +1,62 @@
+{
+ "id": "legit_telemarketing_05",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "telemarketing",
+ "split": "test",
+ "caller_number": "+91 98200XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Reddy in Mumbai?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Reddy. Who is this calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, my name is Sameer and I am calling from Vista Broadband regarding a special family plan for your area."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Broadband? I already have a connection in my house, beta."
+  },
+  {
+   "speaker": "caller",
+   "text": "I understand sir, but our new high-speed plan is only nine thousand five hundred rupees for the entire year."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Nine thousand five hundred? That sounds a bit expensive for me."
+  },
+  {
+   "speaker": "caller",
+   "text": "It includes a free router upgrade and unlimited data for all your devices, sir."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I don't know, I have to ask my son first about these things."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is perfectly fine. Would it be okay if I send the plan details to your WhatsApp?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, you can send a message. I will check it later."
+  },
+  {
+   "speaker": "caller",
+   "text": "I will send it right away, Mr. Reddy. Have a very nice day."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, thank you. Bye."
+  }
+ ]
+}

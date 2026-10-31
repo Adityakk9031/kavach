@@ -1,0 +1,62 @@
+{
+ "id": "hard_negative_safe_mention_06",
+ "label": "legit",
+ "category": "hard_negative",
+ "scam_type": null,
+ "subtype": "safe_mention",
+ "split": "train",
+ "caller_number": "+91 98220XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Khan from Pune?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Advait from the State Bank security team, calling to confirm a transaction of one lakh rupees made today."
+  },
+  {
+   "speaker": "receiver",
+   "text": "One lakh? I did not do any such thing, oh my god, what happened?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Please do not worry, Mrs. Khan. The transaction was flagged and blocked by our system as suspicious, so your money is safe."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank goodness. Do I need to give you any details to fix this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No, not at all. I am only calling to alert you and tell you that the bank will never ask for your OTP or PIN over the phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "It is so confusing these days. Some people called me last week asking for my Aadhaar number."
+  },
+  {
+   "speaker": "caller",
+   "text": "That was likely a scam. Please remember to never share your passwords or card details with anyone, even if they claim to be from the bank."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I understand. I will be very careful from now on."
+  },
+  {
+   "speaker": "caller",
+   "text": "Precisely. Just keep your credentials private and you will be fine. Have a nice day, Mrs. Khan."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you for calling and informing me, beta."
+  }
+ ]
+}

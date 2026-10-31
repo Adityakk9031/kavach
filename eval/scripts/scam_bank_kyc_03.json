@@ -1,0 +1,62 @@
+{
+ "id": "scam_bank_kyc_03",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "bank_kyc",
+ "subtype": "bank_kyc",
+ "split": "train",
+ "caller_number": "+91 98200X1234",
+ "decisive_turn_index": 8,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Patil from Mumbai?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Patil. Who is calling?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Rohan from the RBI regional compliance wing. Sir, we noticed your bank KYC has been pending since last month."
+  },
+  {
+   "speaker": "receiver",
+   "text": "KYC? I thought I did that at the branch last year."
+  },
+  {
+   "speaker": "caller",
+   "text": "There is a new digital mandate, Mr. Patil. If we don't update it now, your account will be frozen by tonight."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Frozen? But I have a payment of twenty five thousand rupees to make for my medicines tomorrow."
+  },
+  {
+   "speaker": "caller",
+   "text": "Exactly, that is why I am calling to help you avoid that trouble. I just need to verify your identity quickly."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, what do I need to do?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Please tell me your full Aadhaar number first, and then I will send a verification code to your phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Aadhaar number over the phone? Is that safe?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, I am an official from the Reserve Bank. Just give me the number and the OTP I send you, otherwise the account will block."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am not sure, let me ask my son first."
+  }
+ ]
+}

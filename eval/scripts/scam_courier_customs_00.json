@@ -1,0 +1,62 @@
+{
+ "id": "scam_courier_customs_00",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "courier_customs",
+ "subtype": "courier_customs",
+ "split": "train",
+ "caller_number": "+91 9820X X4122",
+ "decisive_turn_index": 6,
+ "first_s5_s6_turn_index": 6,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Gupta from Nagpur?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Gupta. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, this is Rohan from the Air Customs clearance wing. We have a luxury watch parcel arriving for you from Dubai, but it is currently held at the hub."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Dubai? I have not ordered any watch, maybe there is some mistake."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is the problem sir, the package contains banned items and your ID is attached, so now it is a legal matter."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Banned items? Oh my god, what will happen now?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Don't worry, I can settle this internally so no police case is filed, but you must pay a clearance fine of twelve thousand rupees immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twelve thousand is a lot of money, can I come to the office and pay?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No sir, the office is closed for audit, you must send it via UPI or a Google Play gift card right now to avoid arrest."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I don't know how to do these gift cards, please give me some time."
+  },
+  {
+   "speaker": "caller",
+   "text": "I only have ten minutes before the file goes to the police, just send the UPI payment to the number I am messaging you now."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Let me ask my son first, he handles these things."
+  }
+ ]
+}

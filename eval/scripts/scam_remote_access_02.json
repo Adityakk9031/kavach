@@ -1,0 +1,62 @@
+{
+ "id": "scam_remote_access_02",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "remote_access",
+ "subtype": "remote_access",
+ "split": "test",
+ "caller_number": "+91 98200XXXXX",
+ "decisive_turn_index": 4,
+ "first_s5_s6_turn_index": 6,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello Mr. Patil, I am Rohan from the secure banking department. I am calling regarding a synchronization error with your mobile app account based in Nagpur."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Hello? What error? Everything was working fine yesterday."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is a backend server issue, sir, but if not fixed, your account will be frozen. I just need you to download a small tool called AnyDesk so I can guide you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "AnyDesk? I do not know this. Is this safe to put on my phone?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, it is completely official for remote assistance. Just open the app and tell me the nine digit code appearing on your screen."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, wait one minute. The number is 452 109 832."
+  },
+  {
+   "speaker": "caller",
+   "text": "Thank you, I have access now. I can see the glitch, and to reactivate the link, you need to make a verification transfer of eighty thousand rupees to our secure node."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Eighty thousand? Why do I need to send money to fix a server error?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is not a charge, sir, it is a security deposit that will be refunded immediately. Please open your UPI app and enter the amount now."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am not sure about this. Let me call my son first."
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, if you hang up now, the account will be permanently blocked. Just give me your login PIN and I will handle the transfer for you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "But my bank says never to share the PIN with anyone."
+  }
+ ]
+}

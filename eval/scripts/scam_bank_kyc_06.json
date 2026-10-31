@@ -1,0 +1,70 @@
+{
+ "id": "scam_bank_kyc_06",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "bank_kyc",
+ "subtype": "bank_kyc",
+ "split": "train",
+ "caller_number": "+91 98201XXXXX",
+ "decisive_turn_index": 8,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Iyer from Delhi?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Sameer from the RBI regional compliance office. Your bank account KYC has expired and we have received a notice to freeze it by tonight."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Freeze it? But I did everything last year, I think."
+  },
+  {
+   "speaker": "caller",
+   "text": "There is a new government mandate for senior citizens, and your file is still pending. If it is not updated, you will not be able to withdraw any money."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh dear, I have some payments to make. What do I need to do?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Do not worry, I can do it for you right now over the phone. I just need to verify your identity first."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Is this safe? Should I come to the branch instead?"
+  },
+  {
+   "speaker": "caller",
+   "text": "The branch will take three days, and your account will be blocked. Just tell me your Aadhaar number and the sixteen digit card number to start."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Wait, I have my card here. It is 4532... no, let me find my glasses."
+  },
+  {
+   "speaker": "caller",
+   "text": "Please hurry, Mrs. Iyer. Once I enter the card details, a verification code of twenty five thousand rupees will be triggered to confirm your limit, and you will get it back immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twenty five thousand? Why is such a large amount involved?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is just a technical check for the KYC portal. Now please read out the OTP you just received on your mobile."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am not sure about this, it sounds very strange."
+  }
+ ]
+}

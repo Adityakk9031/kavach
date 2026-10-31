@@ -1,0 +1,62 @@
+{
+ "id": "scam_digital_arrest_01",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "digital_arrest",
+ "subtype": "digital_arrest",
+ "split": "train",
+ "caller_number": "+91 98204XXXXX",
+ "decisive_turn_index": 4,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Patil? This is Inspector Vikram Rathore from the Narcotics Control Bureau office in Bengaluru."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Patil. What is this about? Why are you calling me?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, we have intercepted a courier package containing banned substances and your Aadhaar number was found linked to the sender's profile."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What? That is impossible. I have never sent any such package in my life."
+  },
+  {
+   "speaker": "caller",
+   "text": "Listen carefully, this is a serious criminal matter. If you hang up or tell anyone, we will have to initiate a digital arrest and send a team to your house immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Digital arrest? I do not understand. Please, I am a retired man, let me explain everything."
+  },
+  {
+   "speaker": "caller",
+   "text": "I can help you clear your name, but you must stay on this line for the entire verification process. Do not talk to your family or they will be implicated too."
+  },
+  {
+   "speaker": "receiver",
+   "text": "My family? Why would they be involved? This is very stressful, please tell me what to do."
+  },
+  {
+   "speaker": "caller",
+   "text": "The legal department has agreed to a provisional clearance. You just need to deposit twenty five thousand rupees into our secure verification account to prove your identity."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I have to pay money? I thought this was a police matter, why do I need to pay?"
+  },
+  {
+   "speaker": "caller",
+   "text": "This is a refundable security deposit, Mr. Patil. If you don't transfer it in ten minutes, I will be forced to issue the arrest warrant."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Ten minutes is not enough time, I have to find my glasses and the banking app."
+  }
+ ]
+}

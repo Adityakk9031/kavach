@@ -1,0 +1,62 @@
+{
+ "id": "legit_family_chat_02",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "family_chat",
+ "split": "test",
+ "caller_number": "+91 98201XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello Mr. Patil, it is Rohan here. How are you doing today?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, Rohan beta. I am fine, just resting. You are calling after a long time."
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, sorry about that. I was actually thinking about the Diwali holidays and if you are coming to visit us."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I want to come, but my knee is bothering me again. The doctor said I should avoid long travel."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is a shame. Maybe we can just come to Nagpur and spend the festival with you instead."
+  },
+  {
+   "speaker": "receiver",
+   "text": "That would be very nice. But will you be able to manage the travel with the kids?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Of course we will. By the way, I remember you mentioned the house renovation last month."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, the painting is almost done. It took a bit more time than I thought."
+  },
+  {
+   "speaker": "caller",
+   "text": "I saw the photos you sent. The new color looks very elegant."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you. It cost me about fifty thousand rupees more than the budget, but it was worth it."
+  },
+  {
+   "speaker": "caller",
+   "text": "It definitely looks premium. We will see it in person when we visit next month."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I will wait for you all. Take care of yourself and give my love to everyone."
+  }
+ ]
+}

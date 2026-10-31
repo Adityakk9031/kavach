@@ -1,0 +1,66 @@
+{
+ "id": "legit_doctor_clinic_05",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "doctor_clinic",
+ "split": "test",
+ "caller_number": "+91 98240XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Gupta?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Gupta speaking. Who is this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Anjali from the City Clinic in Jaipur. I am calling to confirm your cardiology report is ready for pickup."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, the heart test. Is everything alright with the results?"
+  },
+  {
+   "speaker": "caller",
+   "text": "The doctor has reviewed them and wants to discuss them with you in person. Do you have time for an appointment tomorrow at 11 AM?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Tomorrow? I think I can come, but will it take long?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It should be a quick fifteen minute consultation. Please just bring your previous file along with you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I see. And about the billing, how much was the total for the tests?"
+  },
+  {
+   "speaker": "caller",
+   "text": "The total bill is one lakh rupees, including the specialized scan."
+  },
+  {
+   "speaker": "receiver",
+   "text": "One lakh! That is quite high. Do I need to pay it now over the phone?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No, no, not at all. You can settle everything at the reception desk when you visit tomorrow."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, that is a relief. I will see you tomorrow at 11 then."
+  },
+  {
+   "speaker": "caller",
+   "text": "Perfect. We will see you then, Mr. Gupta. Have a good day."
+  }
+ ]
+}

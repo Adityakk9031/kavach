@@ -1,0 +1,62 @@
+{
+ "id": "scam_remote_access_05",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "remote_access",
+ "subtype": "remote_access",
+ "split": "test",
+ "caller_number": "+91 98200XXXXX",
+ "decisive_turn_index": 4,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, is this Mrs. Iyer from Delhi? This is Sameer from the Digital Security Wing regarding your banking app."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, I am Mrs. Iyer. What is the problem? Everything is working fine."
+  },
+  {
+   "speaker": "caller",
+   "text": "Actually, we have detected a security loophole in your version of the app that could lead to unauthorized access. I need to push a quick security patch to your phone right now."
+  },
+  {
+   "speaker": "receiver",
+   "text": "A patch? I do not understand. Can I not just go to the bank branch tomorrow?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is very urgent, Ma'am, otherwise the account might be frozen for twenty four hours. Please just download an app called AnyDesk from the Play Store so I can secure it for you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "AnyDesk? I have never heard of this. Is it safe to let you see my screen?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is completely safe and official. Just give me the nine digit code showing on your screen and I will handle the rest."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, it says 492 105 837. Please do it quickly, I am getting worried."
+  },
+  {
+   "speaker": "caller",
+   "text": "I am in your system now. To activate the security shield, you must make a verification payment of nine thousand five hundred rupees to the server."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Payment? You said it was a patch. Why should I pay for a security update?"
+  },
+  {
+   "speaker": "caller",
+   "text": "This is just a refundable deposit to verify your account ownership. Please tell me your UPI PIN so I can process this refund immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am not sure about this. Let me call my son first."
+  }
+ ]
+}

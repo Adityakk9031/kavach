@@ -1,0 +1,62 @@
+{
+ "id": "hard_negative_safe_mention_11",
+ "label": "legit",
+ "category": "hard_negative",
+ "scam_type": null,
+ "subtype": "safe_mention",
+ "split": "train",
+ "caller_number": "+91 98200XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Reddy from Mumbai?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Reddy. Who is calling?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Anjali from the State Bank security team. I am calling to confirm a transaction of twenty five thousand rupees made today."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twenty five thousand? I did not do any such transaction, oh my god."
+  },
+  {
+   "speaker": "caller",
+   "text": "Please do not worry, sir. This is just a verification call to make sure you are aware of the activity."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What should I do? Do I need to give you my details to stop it?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No, please do not share any details. I will never ask you for your OTP, PIN, or Aadhaar number over the phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "But how will you help me if I don't give the information?"
+  },
+  {
+   "speaker": "caller",
+   "text": "We only need your verbal confirmation. Just remember that the bank will never ask for your passwords or secret codes."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, I understand. I was getting very scared."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is a common trick by scammers, so please be careful. You can visit your home branch in Mumbai if you still have doubts."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you, Anjali. I will be more careful from now on."
+  }
+ ]
+}

@@ -1,0 +1,62 @@
+{
+ "id": "legit_family_chat_00",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "family_chat",
+ "split": "train",
+ "caller_number": "+91 98450XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello Mr. Reddy, how are you doing? This is your nephew Arjun calling from Bengaluru."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, Arjun! I was wondering when you would call. I am doing fine, but my knees are bothering me again."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is just the weather changing. Are you still taking the medicine the doctor gave you last month?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, but sometimes I forget if I took it in the morning. It is very confusing now."
+  },
+  {
+   "speaker": "caller",
+   "text": "Dont worry, I will bring a pill organizer for you when I visit during the next festival."
+  },
+  {
+   "speaker": "receiver",
+   "text": "That would be very helpful. When are you planning to come home?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am looking at flights for next week. I want to spend a few days with you and the cousins."
+  },
+  {
+   "speaker": "receiver",
+   "text": "The children will be so happy. Will you bring those sweets from the city?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Of course, I will bring plenty. By the way, I sent twelve thousand rupees to your account for the house repairs we discussed."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twelve thousand? You should have kept that money for your own expenses, beta."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is okay, uncle. Just use it to get the leak in the roof fixed before the heavy rains start."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Alright then, I will talk to the contractor tomorrow. I am glad you called today."
+  }
+ ]
+}

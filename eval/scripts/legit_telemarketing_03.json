@@ -1,0 +1,62 @@
+{
+ "id": "legit_telemarketing_03",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "telemarketing",
+ "split": "train",
+ "caller_number": "+91 98405XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, good afternoon. Am I speaking with Mr. Reddy from Chennai?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Reddy. Who is this calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Ananya from Horizon Finance. I am calling to offer you a premium credit card with a limit of twenty five thousand rupees to start with."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Credit card? I do not need any more cards, I already have one from my bank."
+  },
+  {
+   "speaker": "caller",
+   "text": "I understand, sir. But this particular card has zero annual fees and very good rewards for grocery shopping."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I don't know... these things are very confusing for me. What are the charges?"
+  },
+  {
+   "speaker": "caller",
+   "text": "There are no joining charges at all, Mr. Reddy. It is a completely free offer for selected customers."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Can you just send me the details on WhatsApp or email? I need to show it to my son first."
+  },
+  {
+   "speaker": "caller",
+   "text": "Of course, sir. I can send the brochure and the terms and conditions to your registered email right away."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, please do that. I will check it and tell you later."
+  },
+  {
+   "speaker": "caller",
+   "text": "That sounds perfect. I will send it now and you can take your time to decide."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, thank you. Goodbye."
+  }
+ ]
+}

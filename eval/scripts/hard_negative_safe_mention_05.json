@@ -1,0 +1,62 @@
+{
+ "id": "hard_negative_safe_mention_05",
+ "label": "legit",
+ "category": "hard_negative",
+ "scam_type": null,
+ "subtype": "safe_mention",
+ "split": "train",
+ "caller_number": "+91 98401XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, is this Mr. Reddy? I am Ananya from the Chennai City Police community outreach team."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Reddy speaking. Is everything alright? Why are you calling?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Everything is fine, sir. We are just making awareness calls to senior citizens about the rise in digital fraud in our city."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, I see. My son told me about these things, but I get very confused with the phone apps."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is exactly why we are calling. Please remember that no police officer or bank official will ever ask for your OTP or PIN over the phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "But what if there is a problem with my account? Like last month I had a transfer of twenty five thousand rupees that was delayed."
+  },
+  {
+   "speaker": "caller",
+   "text": "Even then, sir, the bank will never ask you to share your password or Aadhaar number to fix a transaction."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I see. Some people call me saying they are from the head office and ask for these things."
+  },
+  {
+   "speaker": "caller",
+   "text": "Those are scammers, Mr. Reddy. If anyone asks for a code or money to solve a problem, please hang up immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I will keep that in mind. Thank you for warning me, beta."
+  },
+  {
+   "speaker": "caller",
+   "text": "You are welcome, sir. Just stay alert and do not share any private details with strangers."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, I understand now. Thank you for the call."
+  }
+ ]
+}

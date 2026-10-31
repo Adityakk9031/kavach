@@ -1,0 +1,62 @@
+{
+ "id": "legit_family_chat_01",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "family_chat",
+ "split": "train",
+ "caller_number": "+91 98205X4123",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, Tauji! I was just thinking about you, how are you feeling today?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Hello Naveen, I am fine. Just this knee pain is bothering me a bit since morning."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is why you should come to Delhi for a few days, the weather is very pleasant right now."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Delhi is too crowded for me, beta. I do not know if I can manage the travel."
+  },
+  {
+   "speaker": "caller",
+   "text": "Do not worry about that, I will pick you up from the station. We can celebrate Diwali together this year."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Diwali is still some time away. Will your mother be okay with it?"
+  },
+  {
+   "speaker": "caller",
+   "text": "She is actually the one who insisted. She wants to make those special laddoos for you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "That sounds lovely. But who will look after the house here?"
+  },
+  {
+   "speaker": "caller",
+   "text": "The neighbor's son will handle it. By the way, I sent nine thousand five hundred rupees to your account for the physiotherapy."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What? Why did you do that? I told you I have enough pension."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is just a small gift for your health, please do not argue with me."
+  },
+  {
+   "speaker": "receiver",
+   "text": "You children are too stubborn. But thank you, I will use it for the medicines."
+  }
+ ]
+}

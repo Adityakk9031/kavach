@@ -1,0 +1,62 @@
+{
+ "id": "scam_courier_customs_05",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "courier_customs",
+ "subtype": "courier_customs",
+ "split": "test",
+ "caller_number": "+91 98200X41XX",
+ "decisive_turn_index": 4,
+ "first_s5_s6_turn_index": 6,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, is this Mrs. Banerjee from Nagpur?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, who is speaking please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Vikram from the International Logistics Wing. We have an imported package for you, but it has been flagged by customs for an unpaid duty."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Package? I am not expecting any parcel from abroad."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is marked as an urgent gift, but since the tax is unpaid, we cannot release it. If it stays in the warehouse for another two hours, it will be sent back and you will face a legal penalty."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Penalty? But please check again, there must be some mistake."
+  },
+  {
+   "speaker": "caller",
+   "text": "Madam, there is no mistake. You just need to pay a clearance fee of twenty five thousand rupees to settle the customs account immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "That is a very large amount. How do I pay this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I will send you a UPI QR code on WhatsApp right now. Just scan it and send the payment, otherwise the parcel will be seized."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I don't know how to use QR codes, can I come to your office?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Our office is at the airport cargo terminal and not open to public. Just ask your son to do the UPI transfer for you quickly."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Let me call him first then."
+  }
+ ]
+}

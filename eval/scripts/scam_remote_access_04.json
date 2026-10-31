@@ -1,0 +1,62 @@
+{
+ "id": "scam_remote_access_04",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "remote_access",
+ "subtype": "remote_access",
+ "split": "train",
+ "caller_number": "+91 98200XXXXX",
+ "decisive_turn_index": 4,
+ "first_s5_s6_turn_index": 10,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello Mr. Patil, I am Rohan from the digital security cell in Pune. We have noticed some suspicious login attempts on your mobile banking app today."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Hello? Yes, but I have not used my phone for banking since morning. What is the problem?"
+  },
+  {
+   "speaker": "caller",
+   "text": "That is exactly the issue, sir. Someone is trying to bypass your security, and we need to lock your account immediately to prevent a loss."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh my God, please tell me what to do. I have my pension money in that account."
+  },
+  {
+   "speaker": "caller",
+   "text": "Do not worry, I will help you. First, please download the AnyDesk app from the Play Store so I can secure your settings remotely."
+  },
+  {
+   "speaker": "receiver",
+   "text": "AnyDesk? I do not know this app. Is it really necessary for the bank?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, it is a standard tool for our technical team to fix the glitch. Just tell me the nine digit code that appears on your screen."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, wait one minute. The code is 422 891 034."
+  },
+  {
+   "speaker": "caller",
+   "text": "Thank you, I am connected now. I can see the error, but to reverse the unauthorized transaction of one lakh rupees, I need you to verify your identity."
+  },
+  {
+   "speaker": "receiver",
+   "text": "One lakh rupees? I did not send any money! Please stop it quickly."
+  },
+  {
+   "speaker": "caller",
+   "text": "I am trying, sir. Now a verification OTP has been sent to your phone, please read it out to me so I can credit the money back to you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "The message says it is for a payment authorization, not a refund. Why is it saying that?"
+  }
+ ]
+}

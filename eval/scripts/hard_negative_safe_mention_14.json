@@ -1,0 +1,62 @@
+{
+ "id": "hard_negative_safe_mention_14",
+ "label": "legit",
+ "category": "hard_negative",
+ "scam_type": null,
+ "subtype": "safe_mention",
+ "split": "test",
+ "caller_number": "+91 98200XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Gupta from Pune?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Gupta speaking. Who is this calling?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Namaste sir, I am Anjali from the State Bank security team. I am calling just to confirm a transaction of nine thousand five hundred rupees made on your account today."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, yes, I did that for my grandson's books. Is there some problem?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No sir, everything is fine and the payment was successful. I am calling because we noticed a new device login, so we wanted to ensure it was you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I did change my phone last week. Does that mean my account is not safe?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is safe, sir. But please remember that the bank will never call you to ask for your password or OTP to verify anything."
+  },
+  {
+   "speaker": "receiver",
+   "text": "But if you are from the bank, you might need some details to check?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Never, Mr. Gupta. Please never share your PIN or any OTP with anyone over the phone, even if they claim to be from the bank."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I see. I was a bit worried when the phone rang."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is better to be cautious. Just ignore any one who asks for your Aadhaar or card numbers over a call."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you for the warning, beta. I will keep this in mind."
+  }
+ ]
+}

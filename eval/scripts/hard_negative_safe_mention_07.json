@@ -1,0 +1,62 @@
+{
+ "id": "hard_negative_safe_mention_07",
+ "label": "legit",
+ "category": "hard_negative",
+ "scam_type": null,
+ "subtype": "safe_mention",
+ "split": "test",
+ "caller_number": "+91 98201XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Patil from Delhi?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, speaking. Who is this please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Anjali from the City Police Community Outreach cell, sir. I am calling to let you know that we are seeing a lot of fraud cases in your area lately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh dear, is that so? I have been getting many strange calls since morning."
+  },
+  {
+   "speaker": "caller",
+   "text": "Exactly why I am calling. We want to warn you that the police or any bank officer will never ask you for an OTP or your PIN over the phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "But what if they say it is for a refund or some government scheme?"
+  },
+  {
+   "speaker": "caller",
+   "text": "That is the trick, sir. Even if they mention a specific amount, like twelve thousand rupees or more, just hang up immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I see. I was actually worried about a message I got about a payment today."
+  },
+  {
+   "speaker": "caller",
+   "text": "Please ignore those messages and do not click any links. Just remember that your Aadhaar and bank details should never be shared with anyone calling you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you for the warning, beta. You are very kind to call and tell me this."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is my duty, Mr. Patil. Stay safe and please tell your neighbors as well."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I will definitely do that. Have a good day."
+  }
+ ]
+}

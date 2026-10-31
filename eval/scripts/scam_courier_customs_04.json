@@ -1,0 +1,62 @@
+{
+ "id": "scam_courier_customs_04",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "courier_customs",
+ "subtype": "courier_customs",
+ "split": "train",
+ "caller_number": "+91 98201X4567",
+ "decisive_turn_index": 6,
+ "first_s5_s6_turn_index": 6,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Reddy? This is Vikram from the Delhi Customs Clearance wing."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, I am Reddy. Is something wrong? Why are you calling?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, we have intercepted a courier package arriving for you from abroad, but it contains banned items and is currently held at the airport."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Banned items? I have not ordered anything from outside. This must be a mistake."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is why we need to clear this immediately. If you do not settle the penalty, the police will be sent to your home for questioning."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Police? Please, I do not know about any package. What can I do?"
+  },
+  {
+   "speaker": "caller",
+   "text": "To avoid the legal case and release the hold, you need to pay a clearance fine of nine thousand five hundred rupees now."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Nine thousand five hundred? That is a lot of money. Can I come to the office and pay?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, the office is closed for auditing. You must pay it via UPI or get a Google Play gift card right now to stop the police action."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I do not know how to use these gift cards. Can I pay by cheque?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No cheques, Mr. Reddy. Please just send the UPI payment to this number I will message you, or the case will be registered in ten minutes."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Ten minutes? Let me call my son first and ask him."
+  }
+ ]
+}

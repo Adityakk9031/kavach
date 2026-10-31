@@ -85,6 +85,8 @@ async def lifespan(_app):
 app = FastAPI(title="Kavach", version="0.1.0", lifespan=lifespan)
 WEB = Path(__file__).resolve().parent.parent / "web"
 app.mount("/web", StaticFiles(directory=WEB, html=True), name="web")
+(Path(__file__).resolve().parent.parent / "eval" / "audio").mkdir(parents=True, exist_ok=True)
+app.mount("/eval-audio", StaticFiles(directory=Path(__file__).resolve().parent.parent / "eval" / "audio"), name="eval-audio")
 
 
 @app.get("/")
@@ -106,6 +108,34 @@ def health() -> dict:
         "detector_model": s.detector_model,
         "assemblyai_sdk": version("assemblyai"),
     }
+
+
+@app.get("/api/config")
+def public_config() -> dict:
+    """Non-secret settings, recorded with every eval run so results can be reproduced."""
+    s = get_settings()
+    return {"risk_threshold": s.risk_threshold, "risk_rise": s.risk_rise, "risk_decay_per_turn": s.risk_decay_per_turn,
+            "detector_model": s.detector_model, "stt_model": s.stt_model, "stt_mode": s.stt_mode,
+            "language": s.language, "warning_voice_cloned": bool(s.kavach_warning_voice_id)}
+
+
+EVAL_RESULTS = Path(__file__).resolve().parent.parent / "eval" / "results"
+EVAL_AUDIO = Path(__file__).resolve().parent.parent / "eval" / "audio"
+EVAL_SCRIPTS = Path(__file__).resolve().parent.parent / "eval" / "scripts"
+
+
+@app.get("/api/eval/latest")
+def eval_latest(split: str = "test"):
+    path = EVAL_RESULTS / f"latest-{split}.json"
+    if not path.exists():
+        return {"error": f"no finished {split} run yet"}
+    return json.loads(path.read_text())
+
+
+@app.get("/api/eval/script/{script_id}")
+def eval_script(script_id: str):
+    path = EVAL_SCRIPTS / f"{Path(script_id).name}.json"
+    return json.loads(path.read_text()) if path.exists() else {"error": "not found"}
 
 
 @app.get("/api/calls/{call_id}/events")

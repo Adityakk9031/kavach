@@ -1,0 +1,62 @@
+{
+ "id": "scam_digital_arrest_08",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "digital_arrest",
+ "subtype": "digital_arrest",
+ "split": "train",
+ "caller_number": "+91 98221X4502",
+ "decisive_turn_index": 4,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Khan of Hyderabad?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Inspector Vikram from the Cyber Crime division. We have intercepted a courier package containing illegal narcotics linked to your Aadhaar card."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What? This must be a mistake. I have never sent any such package!"
+  },
+  {
+   "speaker": "caller",
+   "text": "That is why we need to conduct a digital arrest to verify your identity. You must stay on this call and not tell anyone, or we will have to send a team to your house immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am very scared, beta. Please tell me what is happening. Why is my name there?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Your documents were used by a syndicate. To clear your name and avoid jail, you must cooperate with our verification process right now."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I don't understand. What do I need to do to fix this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "You need to transfer eighty thousand rupees into our secure government verification account to prove your funds are legitimate."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Eighty thousand? I don't have that much ready in my hand."
+  },
+  {
+   "speaker": "caller",
+   "text": "If the payment is not made in one hour, the warrant will be signed and you will be arrested from your home."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Please give me a little time to call my son."
+  }
+ ]
+}

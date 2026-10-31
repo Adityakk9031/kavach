@@ -1,0 +1,62 @@
+{
+ "id": "legit_doctor_clinic_01",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "doctor_clinic",
+ "split": "train",
+ "caller_number": "+91 98200XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Patil?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Patil. Who is this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Namaste sir, this is Sneha calling from City Care Hospital in Mumbai. I am calling about your cardiology reports."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, the heart tests. Are they ready? I was waiting for the call."
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, the reports have arrived and the doctor has reviewed them. We have scheduled your follow-up appointment for Tuesday at 10 AM."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Tuesday... let me check my diary. Yes, that should be fine, but is it something serious?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Please do not worry sir, the doctor just wants to discuss the results in person. You can collect the hard copy of the report from the reception when you arrive."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I see. Will there be any more charges for this visit?"
+  },
+  {
+   "speaker": "caller",
+   "text": "The total outstanding for the tests and consultation comes to twenty five thousand rupees. You can just settle the bill at the counter on Tuesday."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twenty five thousand? My goodness, it has become so expensive. I will bring the cheque book."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is perfectly fine sir. We will see you on Tuesday at 10 AM then."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay beta, thank you for informing me. Goodbye."
+  }
+ ]
+}

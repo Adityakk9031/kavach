@@ -1,0 +1,70 @@
+{
+ "id": "scam_remote_access_01",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "remote_access",
+ "subtype": "remote_access",
+ "split": "train",
+ "caller_number": "+91 984012XXXX",
+ "decisive_turn_index": 4,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Sharma from Chennai?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Sharma. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, I am Rohan from the Global Security Team. We have detected a critical synchronization error in your mobile banking application that could freeze your accounts today."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What? I have not done anything wrong. My app is working fine."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is a backend server issue, sir, but to prevent the freeze, I need to run a quick diagnostic. Please download the AnyDesk app from the play store so I can secure your profile."
+  },
+  {
+   "speaker": "receiver",
+   "text": "AnyDesk? I do not know how to use these things. Is this really necessary?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It only takes two minutes. Just open the app and tell me the nine digit code you see on the screen, and I will handle the rest for you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, wait. I am opening it. The code is 421 558 903."
+  },
+  {
+   "speaker": "caller",
+   "text": "Thank you, I have access now. I can see the error, but to clear the security block, you must pay a one-time verification fee of nine thousand five hundred rupees."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Nine thousand five hundred! Why should I pay for a server error?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, this is a refundable security deposit. Please just send it to this UPI ID I am sending to your WhatsApp right now or your account will be locked."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I need to ask my son first. I cannot do this alone."
+  },
+  {
+   "speaker": "caller",
+   "text": "There is no time for your son, Mr. Sharma. If the payment is not done in five minutes, your funds will be inaccessible for thirty days."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Please wait, let me just check my balance first."
+  }
+ ]
+}

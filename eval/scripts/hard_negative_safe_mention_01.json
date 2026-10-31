@@ -1,0 +1,62 @@
+{
+ "id": "hard_negative_safe_mention_01",
+ "label": "legit",
+ "category": "hard_negative",
+ "scam_type": null,
+ "subtype": "safe_mention",
+ "split": "train",
+ "caller_number": "+91 98401XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Khan from Chennai?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Anjali from the security desk at your bank. I am calling to confirm a transfer of twelve thousand rupees you made yesterday."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, yes, I sent that to my grandson. Is there some problem with it?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No, the transaction was successful, but we noticed a suspicious login attempt from another city shortly after."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What? Oh my goodness, is my money safe?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, your funds are perfectly safe. I am just calling to remind you that the bank will never call you to ask for your OTP or PIN."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I was worried for a moment. Do I need to give you some code to secure it?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Absolutely not, Mrs. Khan. Please never share any OTP, password, or Aadhaar details with anyone over the phone, even if they claim to be from the bank."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I see. I have heard these things on the news, but it is good you told me."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is better to be cautious these days. Just keep your details private and you will be fine."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you for the warning, Anjali. I will remember this."
+  }
+ ]
+}

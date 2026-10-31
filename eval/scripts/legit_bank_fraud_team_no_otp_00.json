@@ -1,0 +1,70 @@
+{
+ "id": "legit_bank_fraud_team_no_otp_00",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "bank_fraud_team_no_otp",
+ "split": "train",
+ "caller_number": "+91 98401XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Banerjee from Chennai?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Arjun from the fraud monitoring team at your bank. We have noticed a suspicious transaction of twenty five thousand rupees on your card."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twenty five thousand? Oh my god, I did not do any such shopping today!"
+  },
+  {
+   "speaker": "caller",
+   "text": "I suspected as much. Did you authorize any payments to an online electronics store in the last hour?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "No, no, I have been at home all day. Is my money gone?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Do not worry, we have already placed a temporary block on your card to prevent further loss. Is that alright with you?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, yes, please block it immediately. What do I need to do now?"
+  },
+  {
+   "speaker": "caller",
+   "text": "You do not need to do anything. Just be aware that our bank will never ask you for an OTP, your PIN, or the CVV number over the phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I see. Will you be sending me a new card?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, we will mail a replacement to your registered address. Please just wait for the official confirmation SMS."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you so much, Arjun. You have been very helpful."
+  },
+  {
+   "speaker": "caller",
+   "text": "You are welcome, Mrs. Banerjee. Have a safe day ahead."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Goodbye."
+  }
+ ]
+}

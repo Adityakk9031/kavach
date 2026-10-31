@@ -1,0 +1,66 @@
+{
+ "id": "scam_digital_arrest_06",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "digital_arrest",
+ "subtype": "digital_arrest",
+ "split": "train",
+ "caller_number": "+91 98200X4321",
+ "decisive_turn_index": 4,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, is this Mrs. Iyer from Chennai? I am Inspector Vikram from the Cyber Cell office."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Why are you calling me, sir?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Madam, we have intercepted a courier containing illegal narcotics and your Aadhaar number was found inside the package."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What? That is impossible, I have never sent any such thing!"
+  },
+  {
+   "speaker": "caller",
+   "text": "Listen carefully, this is a serious offense and we have an arrest warrant ready. You are now under digital arrest, so you must not hang up or tell anyone about this call."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Digital arrest? I don't understand, please tell me what is happening."
+  },
+  {
+   "speaker": "caller",
+   "text": "It means your communication is monitored. If you tell your family, you will be charged with obstructing a government investigation."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am very scared, sir. Please tell me how to solve this."
+  },
+  {
+   "speaker": "caller",
+   "text": "We can clear your name through a verification process. You need to transfer fifty thousand rupees to our secure government clearance account now."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Fifty thousand? I don't have that much readily available in my savings."
+  },
+  {
+   "speaker": "caller",
+   "text": "You must arrange it immediately or the local police will arrive at your door in one hour. Do you want to go to jail at your age?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "No no, please give me ten minutes to talk to my son."
+  },
+  {
+   "speaker": "caller",
+   "text": "I told you, no talking to anyone. Send the money to the account I am texting you now or face the consequences."
+  }
+ ]
+}

@@ -1,0 +1,62 @@
+{
+ "id": "legit_bank_fraud_team_no_otp_02",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "bank_fraud_team_no_otp",
+ "split": "train",
+ "caller_number": "+91 98200XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Singh from Nagpur?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is he. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, my name is Ananya from the fraud monitoring team at your bank. We have detected a suspicious transaction of nine thousand five hundred rupees on your card."
+  },
+  {
+   "speaker": "receiver",
+   "text": "What? Nine thousand five hundred? I did not do any such shopping today!"
+  },
+  {
+   "speaker": "caller",
+   "text": "I understand. Was this transaction authorized by you or anyone in your family?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "No, no, not at all. Is my money gone?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Please don't worry, I have already blocked your card to prevent further loss. Do you have your card with you right now?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, it is in my wallet. What should I do now?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Since the card is blocked, you just need to visit the branch for a replacement. I will send you the request details via SMS."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Will you need my account number or some password to fix this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No sir, please remember that our bank will never ask for your OTP, PIN, or CVV over the phone. We do not need any credentials from you."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, okay. I was getting a bit nervous. Thank you for the help, beta."
+  }
+ ]
+}

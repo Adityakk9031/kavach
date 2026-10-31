@@ -1,0 +1,70 @@
+{
+ "id": "hard_negative_safe_mention_10",
+ "label": "legit",
+ "category": "hard_negative",
+ "scam_type": null,
+ "subtype": "safe_mention",
+ "split": "train",
+ "caller_number": "+91 9830012345",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Reddy from Lucknow?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is he. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Namaste sir, I am Ananya from the State Bank security department calling regarding your account activity."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Security department? Is there some problem with my money?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No problem at all, sir. I am just calling to confirm that the fifty thousand rupees transfer you made this morning was successful."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh yes, I sent that to my grandson. But why are you calling me now?"
+  },
+  {
+   "speaker": "caller",
+   "text": "We are making awareness calls to our senior citizens today because we have seen many frauds in your area recently."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Frauds? I am very worried now. What should I do?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Please do not worry, sir. Just remember that our bank will never call you to ask for your OTP, PIN, or Aadhaar number over the phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "But what if someone says they are from the bank and asks for it to fix an error?"
+  },
+  {
+   "speaker": "caller",
+   "text": "That is a scam, Mr. Reddy. Never share those details with anyone, even if they sound official or urgent."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I see. Thank you for telling me, beti. I will be very careful."
+  },
+  {
+   "speaker": "caller",
+   "text": "You are welcome, sir. Have a wonderful day and stay safe."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank you, goodbye."
+  }
+ ]
+}

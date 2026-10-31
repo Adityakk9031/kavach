@@ -1,0 +1,62 @@
+{
+ "id": "hard_negative_safe_mention_00",
+ "label": "legit",
+ "category": "hard_negative",
+ "scam_type": null,
+ "subtype": "safe_mention",
+ "split": "train",
+ "caller_number": "+91 98230XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Banerjee of Nagpur?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Rohan from the State Bank security team. I am calling to confirm if you just made a transfer of twelve thousand rupees?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twelve thousand? Oh dear, I did send some money to my grandson, but I am not sure if it went through."
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, it is showing as successful on our end, so you do not need to worry about the transaction."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Thank goodness. Do I need to give you any details to finalize it?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No, not at all. I am only calling to confirm the amount and to remind you about safety."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Safety? Is there some problem with my account?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No problem at all, but we see many scams these days. Please remember that the bank will never ask you for your OTP or PIN over the phone."
+  },
+  {
+   "speaker": "receiver",
+   "text": "My neighbor told me someone called her asking for a code last week."
+  },
+  {
+   "speaker": "caller",
+   "text": "Exactly, please never share those codes or your Aadhaar number with anyone who calls you. Just keep them secret."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I understand. Thank you for telling me, beta. I will be very careful."
+  }
+ ]
+}

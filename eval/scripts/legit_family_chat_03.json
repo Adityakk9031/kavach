@@ -1,0 +1,70 @@
+{
+ "id": "legit_family_chat_03",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "family_chat",
+ "split": "train",
+ "caller_number": "+91 98204X21XX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Namaste Sharma uncle, this is Rohan from the city. How is your health these days?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, Rohan! I am doing fine beta, just a little bit of knee pain lately."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is just old age, uncle. Please make sure you are doing the physiotherapy exercises daily."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I try, but sometimes I forget. How is everything with you?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Everything is good. I was thinking of visiting Jaipur next month for the Diwali holidays."
+  },
+  {
+   "speaker": "receiver",
+   "text": "That would be wonderful. Will you stay at the hotel or come to our house?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I will definitely come to your house. I really miss your wife's homemade sweets."
+  },
+  {
+   "speaker": "receiver",
+   "text": "She will be very happy. When exactly are you arriving?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Probably around the tenth. I have already booked my tickets."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Good, good. Do you need me to arrange anything for your stay?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No need for that, but I did want to tell you that I sent twelve thousand rupees to your account for the temple donation we discussed."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, you remembered that? I will check my passbook tomorrow morning."
+  },
+  {
+   "speaker": "caller",
+   "text": "No rush, uncle. Just take care of yourself and I will see you soon."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Bless you, beta. I will be waiting for you."
+  }
+ ]
+}

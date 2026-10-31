@@ -1,0 +1,66 @@
+{
+ "id": "scam_courier_customs_01",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "courier_customs",
+ "subtype": "courier_customs",
+ "split": "train",
+ "caller_number": "+91 9845012345",
+ "decisive_turn_index": 6,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Khan from Bengaluru?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is this calling?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Rohan from the International Postal Clearance cell. We have a high-value package held in your name at the customs warehouse."
+  },
+  {
+   "speaker": "receiver",
+   "text": "A package? I am not expecting anything from abroad, maybe my son sent something?"
+  },
+  {
+   "speaker": "caller",
+   "text": "The sender has not specified, but it contains restricted items which have triggered a mandatory customs penalty of eighty thousand rupees."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Eighty thousand? That is a very large amount, why is it so high?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is a legal fine for the specific category of goods, Mrs. Khan. If you do not settle this within two hours, the police will be dispatched to your home for illegal importation."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh my goodness, I do not want any trouble with the police. What do I do?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Do not worry, I can help you clear this quickly. Just send the payment via UPI to this official department ID I will text you now."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I do not know how to use UPI for such a big amount, can I come to the office?"
+  },
+  {
+   "speaker": "caller",
+   "text": "There is no time for travel, the portal closes shortly. If you cannot do UPI, you can purchase Google Play gift cards for the same amount and read me the codes."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Gift cards for customs? That sounds very strange, let me call my son first."
+  },
+  {
+   "speaker": "caller",
+   "text": "If you hang up now, the window for the fine closes and the case will be marked as criminal. Pay now to avoid the police visit."
+  }
+ ]
+}

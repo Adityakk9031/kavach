@@ -1,0 +1,58 @@
+{
+ "id": "scam_courier_customs_02",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "courier_customs",
+ "subtype": "courier_customs",
+ "split": "test",
+ "caller_number": "+91 98221XXXXX",
+ "decisive_turn_index": 6,
+ "first_s5_s6_turn_index": 6,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Iyer from Pune?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Maam, I am Rohan from the International Logistics Hub. We have a parcel for you held at customs because the documentation is incomplete."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Parcel? I am not expecting anything from outside. Is there some mistake?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is marked as a high-value gift, maam. If you do not clear the customs holding today, the government will impose a legal penalty on your address."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Penalty? Please tell me what I have to do, I do not want any trouble."
+  },
+  {
+   "speaker": "caller",
+   "text": "You just need to pay a clearance fee of nine thousand five hundred rupees to release the shipment immediately."
+  },
+  {
+   "speaker": "receiver",
+   "text": "That is a lot of money. Can I come to the office and pay it in person?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No, the warehouse is restricted. I will send you a UPI link right now, or you can buy a Google Play gift card and tell me the code."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Gift card for customs? I have never heard of this before."
+  },
+  {
+   "speaker": "caller",
+   "text": "This is the new digital process, Mrs. Iyer. Please hurry or the parcel will be seized by the police by evening."
+  }
+ ]
+}

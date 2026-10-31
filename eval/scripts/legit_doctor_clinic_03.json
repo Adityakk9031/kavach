@@ -1,0 +1,62 @@
+{
+ "id": "legit_doctor_clinic_03",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "doctor_clinic",
+ "split": "train",
+ "caller_number": "+91 94221XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mrs. Banerjee?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Anjali from City Care Hospital in Nagpur. I am calling regarding your cardiologist appointment for Tuesday."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh yes, I remember. Is everything okay with the timing?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, it is confirmed for 10:30 AM. Also, your blood reports are ready for pickup at the front desk."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I see. Will I have to pay for the tests now over the phone?"
+  },
+  {
+   "speaker": "caller",
+   "text": "No, no, please do not pay anything now. You can settle the bill at the counter when you visit."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, thank you. I was worried because the total estimate was quite high, nearly one lakh rupees."
+  },
+  {
+   "speaker": "caller",
+   "text": "That is correct for the full procedure package, but we will handle all payments in person at the clinic."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Alright, that is a relief. I will be there on Tuesday morning."
+  },
+  {
+   "speaker": "caller",
+   "text": "Please remember to bring your previous prescriptions. We will see you then."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, I will keep them ready. Thank you, Anjali."
+  }
+ ]
+}

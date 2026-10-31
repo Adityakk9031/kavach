@@ -1,0 +1,70 @@
+{
+ "id": "legit_doctor_clinic_00",
+ "label": "legit",
+ "category": "legit",
+ "scam_type": null,
+ "subtype": "doctor_clinic",
+ "split": "train",
+ "caller_number": "+91 98450XXXXX",
+ "decisive_turn_index": null,
+ "first_s5_s6_turn_index": null,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Reddy?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Reddy. Who is this?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, I am Ananya from the cardiology department at the clinic in Bengaluru. I am calling to confirm your appointment for tomorrow morning."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Tomorrow? I thought it was on Wednesday. Let me check my diary."
+  },
+  {
+   "speaker": "caller",
+   "text": "It is scheduled for 10 AM tomorrow, sir. Also, your latest scan reports have arrived and are ready for pickup at the front desk."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, the reports are here already? I was getting worried about the delay."
+  },
+  {
+   "speaker": "caller",
+   "text": "Yes, they are all set. Please bring your ID card when you visit tomorrow."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay. Will there be a lot of waiting time for the doctor?"
+  },
+  {
+   "speaker": "caller",
+   "text": "We will try our best to see you on time, Mr. Reddy. Just a heads up, the total bill for the tests and consultation will be around eighty thousand rupees."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Eighty thousand? My goodness, that is quite a lot of money."
+  },
+  {
+   "speaker": "caller",
+   "text": "I understand, sir. You can just settle the payment at the billing counter after your appointment."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Alright, I will bring my cheque book. Thank you for reminding me, beta."
+  },
+  {
+   "speaker": "caller",
+   "text": "You are welcome, sir. We will see you tomorrow at 10 AM. Goodbye."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Goodbye."
+  }
+ ]
+}

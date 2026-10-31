@@ -1,0 +1,66 @@
+{
+ "id": "scam_bank_kyc_07",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "bank_kyc",
+ "subtype": "bank_kyc",
+ "split": "test",
+ "caller_number": "+91 9821X XXXXX",
+ "decisive_turn_index": 8,
+ "first_s5_s6_turn_index": 8,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Good afternoon, am I speaking with Mrs. Banerjee from Lucknow?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is she. Who is calling please?"
+  },
+  {
+   "speaker": "caller",
+   "text": "I am Rohan from the RBI regional monitoring cell, calling regarding your savings account KYC status."
+  },
+  {
+   "speaker": "receiver",
+   "text": "KYC? But I gave my documents to the branch manager last year."
+  },
+  {
+   "speaker": "caller",
+   "text": "Madam, those files were not uploaded correctly in the new system and your account will be blocked by tonight."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh dear, please tell me what to do. I have my pension coming in."
+  },
+  {
+   "speaker": "caller",
+   "text": "Do not worry, I can fix it right now online. I just need to verify your identity first."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Okay, what do you need from me?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Please read out your sixteen digit debit card number and the expiry date."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Is this safe? I was told never to share card details over the phone."
+  },
+  {
+   "speaker": "caller",
+   "text": "This is a secure government line, Mrs. Banerjee. If you do not provide it, the twelve thousand rupees pending in your reward credit will also be forfeited."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twelve thousand? I didn't know about any reward, but please just block the account from closing."
+  },
+  {
+   "speaker": "caller",
+   "text": "Exactly. Now just tell me the card number and the OTP that arrives on your phone."
+  }
+ ]
+}

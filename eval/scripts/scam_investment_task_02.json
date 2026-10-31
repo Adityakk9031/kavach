@@ -1,0 +1,62 @@
+{
+ "id": "scam_investment_task_02",
+ "label": "scam",
+ "category": "scam",
+ "scam_type": "investment_task",
+ "subtype": "investment_task",
+ "split": "test",
+ "caller_number": "+91 91402XXXXX",
+ "decisive_turn_index": 6,
+ "first_s5_s6_turn_index": 6,
+ "generator": "gemma-4-31b",
+ "turns": [
+  {
+   "speaker": "caller",
+   "text": "Hello, am I speaking with Mr. Gupta from Hyderabad?"
+  },
+  {
+   "speaker": "receiver",
+   "text": "Yes, this is Gupta. Who is this calling?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, my name is Rohan from Global Tech Solutions. I am calling regarding the part-time data optimization work you expressed interest in online."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Oh, I remember clicking something, but I am not sure how it works. Is it really easy?"
+  },
+  {
+   "speaker": "caller",
+   "text": "Very easy sir, you just like some videos and we pay you. In fact, your account already shows a profit of twelve thousand rupees from the trial tasks."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Twelve thousand? Really? How do I get this money in my bank?"
+  },
+  {
+   "speaker": "caller",
+   "text": "That is why I called. To activate the withdrawal portal, you just need to pay a small security deposit of two thousand rupees first."
+  },
+  {
+   "speaker": "receiver",
+   "text": "Wait, why should I pay money to get my own profit?"
+  },
+  {
+   "speaker": "caller",
+   "text": "It is just a standard verification fee for tax purposes, Mr. Gupta. Once you pay, the full amount will be credited instantly."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I don't know, this sounds a bit strange. Let me ask my son first."
+  },
+  {
+   "speaker": "caller",
+   "text": "Sir, this offer expires in one hour. Please just send the payment via UPI now so you don't lose your bonus."
+  },
+  {
+   "speaker": "receiver",
+   "text": "I am getting very confused now, please give me some time."
+  }
+ ]
+}
