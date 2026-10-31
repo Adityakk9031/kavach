@@ -108,8 +108,37 @@ states that police would need. Types: {', '.join(TYPES)}.
 - upi_id, bank_account, ifsc, phone_number, url, email: exactly as stated, digits normalised (no spaces).
 - person_name: the name the caller gives for themself. agency: the organisation they claim to be from.
 - officer_id: a badge, case, employee or reference number they give. amount: money they demand. app_name: an app they ask the listener to install or use.
-Only include things the caller actually says in THIS text. If there are none, return an empty list.
+Only include things the caller actually says in THIS text. person_name is ONLY the caller's own name, never the name of the person they are speaking to. If there are none, return an empty list.
 Reply with ONLY JSON: {{"entities": [{{"type": "...", "value": "...", "quote": "short exact words from the text"}}]}}"""
+
+
+TITLES = {"inspector", "officer", "sir", "madam", "mister", "mr", "mrs", "ms", "sub", "constable", "director", "agent",
+          "executive", "manager", "sergeant", "commissioner", "the", "a", "an", "police", "bank", "department", "team"}
+
+
+def plausible(item: LlmItem, listener_names: tuple[str, ...] = ()) -> bool:
+    """Cheap sanity checks on an LLM item before it can reach a police complaint: not empty, not a bare title, the
+    right shape for its type, and not the listener's own name (the caller addresses the victim by name)."""
+    v = item.value.strip()
+    if len(v) < 3:
+        return False
+    words = re.findall(r"[a-z0-9]+", v.lower())
+    if item.type in ("person_name", "agency", "app_name") and all(w in TITLES for w in words):
+        return False
+    if item.type == "upi_id" and "@" not in v:
+        return False
+    if item.type == "ifsc" and not IFSC_RE.fullmatch(v.upper().replace(" ", "")):
+        return False
+    if item.type in ("phone_number", "bank_account") and len(digits(v)) < (10 if item.type == "phone_number" else 8):
+        return False
+    if item.type == "person_name":
+        mine = {w for n in listener_names for w in re.findall(r"[a-z]+", n.lower())} - TITLES
+        theirs = {w for w in words if w not in TITLES}
+        if mine and theirs and theirs <= mine:
+            return False  # that is the person being called, not the caller
+    if item.type == "amount" and not re.search(r"\d|thousand|lakh|crore|hundred|rupee", v.lower()):
+        return False  # "the money" is not an amount
+    return True
 
 
 def supported_by_text(item: LlmItem, text: str) -> bool:
@@ -127,9 +156,11 @@ def supported_by_text(item: LlmItem, text: str) -> bool:
 class EvidenceCollector:
     """Per-call worker. Runs on every final caller turn once the call is flagged (trigger or takeover)."""
 
-    def __init__(self, room: CallRoom, llm: LLM | None, model: str, pipeline=None):
+    def __init__(self, room: CallRoom, llm: LLM | None, model: str, pipeline=None, listener_names: tuple[str, ...] = ()):
         self.room, self.llm, self.model, self.pipeline = room, llm, model, pipeline
+        self.listener_names = listener_names
         self.items: dict[tuple[str, str], dict] = {}
+        self.unscanned: list[str] = []  # caller turns heard before the call was flagged (regex only so far)
         self.queue: asyncio.Queue = asyncio.Queue()
         self._worker = asyncio.create_task(self._run())
         room.on_final_hooks.append(self.on_final)
@@ -159,14 +190,21 @@ class EvidenceCollector:
         text = turn["text"]
         found = regex_items(text)
         if self.llm is not None and self.active():
+            # The opening line ("I am Inspector X from agency Y") is usually said before the call is flagged: scan
+            # it together with the current turn, once, in a single request.
+            llm_text = "\n".join(self.unscanned[-6:] + [text])
+            self.unscanned.clear()
             try:
                 out, _, _ = await self.llm.chat_json(
-                    LlmOut, [{"role": "system", "content": PROMPT}, {"role": "user", "content": text}],
+                    LlmOut, [{"role": "system", "content": PROMPT}, {"role": "user", "content": llm_text}],
                     model=self.model, max_tokens=250, timeout=8, temperature=0.0)
                 for e in out.entities:
-                    found.append(Item(e.type, e.value, e.quote or text[:80], "llm", supported_by_text(e, text)))
+                    found.append(Item(e.type, e.value, e.quote or llm_text[:80], "llm",
+                                      supported_by_text(e, llm_text) and plausible(e, self.listener_names)))
             except LLMError as e:
                 self.room.log_event("evidence_llm_error", {"turn_idx": turn["idx"], "error": str(e)[:160]})
+        elif self.llm is not None:
+            self.unscanned.append(text)
         new = []
         for it in found:
             old = self.items.get(it.key)

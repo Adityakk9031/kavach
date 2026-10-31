@@ -59,7 +59,7 @@ def attach_pipeline(room) -> None:
         if settings.kavach_warning_voice_id:
             warner.attach(room, room.pipeline)
         persona.attach(room)
-        room.evidence = EvidenceCollector(room, llm, settings.persona_model, room.pipeline)
+        room.evidence = EvidenceCollector(room, llm, settings.persona_model, room.pipeline, (settings.decoy.name,))
         room.alerts = CallAlerts(alerter, room, room.pipeline, room.persona, settings.max_alerts_per_call)
 
         room.finalize_hooks.append(make_finalize(room, store, settings))

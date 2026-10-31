@@ -1,0 +1,189 @@
+{
+ "call_id": "takeover-d",
+ "seconds": 188,
+ "scammer_turns": 9,
+ "persona_replies": 10,
+ "persona_audio_frames_heard_by_caller": 985,
+ "planted_details_found_in_evidence": {
+  "upi": "customs.clear@okbank",
+  "account": "50100234567891",
+  "ifsc": "HDFC0001234",
+  "callback": "9820133456",
+  "name": "Inspector Vikram Rathore",
+  "link": "RBI-verify.in"
+ },
+ "n_found": 6,
+ "of": 6,
+ "all_valid_evidence": [
+  [
+   "person_name",
+   "Mr. Ramesh Kumar"
+  ],
+  [
+   "person_name",
+   "Inspector Vikram Rathore"
+  ],
+  [
+   "agency",
+   "Mumbai Cyber Crime Cell"
+  ],
+  [
+   "upi_id",
+   "customs.clear@okbank"
+  ],
+  [
+   "amount",
+   "\u20b950,000"
+  ],
+  [
+   "ifsc",
+   "HDFC0001234"
+  ],
+  [
+   "bank_account",
+   "50100234567891"
+  ],
+  [
+   "phone_number",
+   "9820133456"
+  ],
+  [
+   "person_name",
+   "Vikram Rathore"
+  ],
+  [
+   "agency",
+   "Inspector"
+  ],
+  [
+   "officer_id",
+   "4471"
+  ],
+  [
+   "url",
+   "RBI-verify.in"
+  ],
+  [
+   "upi_id",
+   ""
+  ]
+ ],
+ "persona_guard_replacements": 1,
+ "persona_turns_flagged_decoy_in_db": true,
+ "persona_lines_with_digits_or_addresses": [],
+ "persona_reply_after_caller_stops_ms": {
+  "median": 2220,
+  "n": 9
+ },
+ "takeback": {
+  "persona_was_speaking": true,
+  "server_ms": 0,
+  "cancel_sent_ms": 0,
+  "persona_frames_after_400ms": 0,
+  "receiver_voice_reached_caller_frames": 1,
+  "ui_state_off_event": true
+ },
+ "stt_incidents": 0,
+ "persona_texts": [
+  "Hello? Ah, sorry, I was not hearing properly. Please continue, I am listening.",
+  "Yes, very serious indeed. Please tell me slowly, I am writing everything down here in my notebook, but my eyes are hard to see without my glasses.",
+  "Oh, arrest? That is very serious indeed. Please tell me slowly, who are these officers and what is their badge number? I want to write it down but my glasses are on the table.",
+  "One minute please, I am looking for my glasses. Please repeat that.",
+  "HDFC bank? What is the name of that account holder and what are the first few words of the name? Please spell it out. Also, which branch is this?",
+  "Inspector Vikram Rathore, what are the first few letters of your name and your badge number? Please spell them out for me slowly.",
+  "That website sounds very strange. Can you please spell out that website address for me? I want to write it down carefully before I call my son.",
+  "I have written it down but I am still looking for my glasses to check the ink is dry. Please tell me the full name of the account holder again slowly.",
+  "I do not want to pay anything right now. My son is not here and I am very confused. Please tell me the bank name again, is it State Bank of India?",
+  "Yes, I understand, but my phone is very slow here in Nagpur. Please tell me the first few letters of your full name again slowly."
+ ],
+ "transcript": [
+  [
+   "caller",
+   "Hello, am I speaking with Mr. Ramesh Kumar? This is Inspector Vikram Rathore from the Mumbai Cyber Crime Cell. A parcel in your name was seized with illegal drugs and fake passports."
+  ],
+  [
+   "caller",
+   "Mr. Kumar, are you there?"
+  ],
+  [
+   "caller",
+   "Please stay on the line."
+  ],
+  [
+   "persona",
+   "Hello? Ah, sorry, I was not hearing properly. Please continue, I am listening."
+  ],
+  [
+   "caller",
+   "This is very serious."
+  ],
+  [
+   "persona",
+   "Yes, very serious indeed. Please tell me slowly, I am writing everything down here in my notebook, but my eyes are hard to see without my glasses."
+  ],
+  [
+   "caller",
+   "Listen carefully, do not tell anyone about this call, not even your family, or officers will be sent to arrest you today."
+  ],
+  [
+   "persona",
+   "Oh, arrest? That is very serious indeed. Please tell me slowly, who are these officers and what is their badge number? I want to write it down but my glasses are on the table."
+  ],
+  [
+   "caller",
+   "To clear your name, you must pay a refundable verification deposit of \u20b950,000. Use the UPI ID customs.clear@okbank."
+  ],
+  [
+   "persona",
+   "One minute please, I am looking for my glasses. Please repeat that."
+  ],
+  [
+   "caller",
+   "Or transfer to the HDFC bank account number 50100234567891, IFSC code HDFC0001234."
+  ],
+  [
+   "persona",
+   "HDFC bank? What is the name of that account holder and what are the first few words of the name? Please spell it out. Also, which branch is this?"
+  ],
+  [
+   "caller",
+   "If the line drops, call me back on 9820133456. I am Inspector Vikram Rathore and my badge number is 4471."
+  ],
+  [
+   "persona",
+   "Inspector Vikram Rathore, what are the first few letters of your name and your badge number? Please spell them out for me slowly."
+  ],
+  [
+   "caller",
+   "You can check your case file on the website www RBI-verify.in. Do it now. The arrest warrant goes out in 1 hour."
+  ],
+  [
+   "persona",
+   "That website sounds very strange. Can you please spell out that website address for me? I want to write it down carefully before I call my son."
+  ],
+  [
+   "caller",
+   "Mr. Kumar, I am waiting. Confirm that you have noted the UPI ID and the account number."
+  ],
+  [
+   "persona",
+   "I have written it down but I am still looking for my glasses to check the ink is dry. Please tell me the full name of the account holder again slowly."
+  ],
+  [
+   "caller",
+   "Do not disconnect this call. Pay the deposit immediately, or I will have no choice but to proceed."
+  ],
+  [
+   "persona",
+   "I do not want to pay anything right now. My son is not here and I am very confused. Please tell me the bank name again, is it State Bank of India?"
+  ],
+  [
+   "caller",
+   "Hello, Mr. Kumar, do you understand what I am saying? Answer me now."
+  ],
+  [
+   "persona",
+   "Yes, I understand, but my phone is very slow here in Nagpur. Please tell me the first few letters of your full name again slowly."
+  ]
+ ]
+}

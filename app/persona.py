@@ -101,6 +101,8 @@ class Persona:
 
 
 class CallPersona:
+    REPLY_DELAY_S = 0.7  # wait for the caller to finish: STT can split one long line into two finals
+
     def __init__(self, persona: Persona, room: CallRoom):
         self.persona, self.room = persona, room
         self.s = persona.settings
@@ -170,9 +172,15 @@ class CallPersona:
         self.pending = asyncio.create_task(self._reply(turn=turn))
 
     async def on_speech_started(self, room: CallRoom, channel: str, ev: dict) -> None:
-        """The scammer starts talking over the persona: stop talking, like a polite person would."""
-        if channel == "caller" and self.active and self.speaking:
+        """The scammer starts talking over the persona: stop talking, like a polite person would. If a reply is only
+        being prepared (not yet speaking) drop it: the caller is not done, and their next final will trigger one."""
+        if channel != "caller" or not self.active:
+            return
+        if self.speaking:
             await self._interrupt("caller_speech")
+        elif self.pending and not self.pending.done():
+            self.pending.cancel()
+            room.log_event("persona_reply_dropped", {"why": "caller still talking"})
 
     async def _interrupt(self, why: str) -> None:
         t0 = time.monotonic()
@@ -186,6 +194,8 @@ class CallPersona:
     async def _reply(self, turn: dict | None = None, opening: bool = False) -> None:
         room = self.room
         try:
+            if not opening:
+                await asyncio.sleep(self.REPLY_DELAY_S)
             t_start = time.monotonic()
             llm_ms = None
             if opening:

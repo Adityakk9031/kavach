@@ -1,0 +1,130 @@
+{
+ "call_id": "takeover-c",
+ "seconds": 165,
+ "scammer_turns": 7,
+ "persona_replies": 8,
+ "persona_audio_frames_heard_by_caller": 726,
+ "planted_details_found_in_evidence": {
+  "name": "Vikram Rathore"
+ },
+ "n_found": 1,
+ "of": 6,
+ "all_valid_evidence": [
+  [
+   "person_name",
+   "Vikram Rathore"
+  ],
+  [
+   "officer_id",
+   "4471"
+  ],
+  [
+   "agency",
+   "Reserve Bank of India"
+  ],
+  [
+   "agency",
+   "HDFC Bank"
+  ]
+ ],
+ "persona_guard_replacements": 1,
+ "persona_turns_flagged_decoy_in_db": true,
+ "persona_lines_with_digits_or_addresses": [],
+ "persona_reply_after_caller_stops_ms": {
+  "median": 2138,
+  "n": 7
+ },
+ "takeback": {
+  "persona_was_speaking": true,
+  "server_ms": 0,
+  "cancel_sent_ms": 0,
+  "persona_frames_after_400ms": 0,
+  "receiver_voice_reached_caller_frames": 1,
+  "ui_state_off_event": true
+ },
+ "stt_incidents": 0,
+ "persona_texts": [
+  "Hello? Ah, sorry, I was not hearing properly. Please continue, I am listening.",
+  "Oh dear, what is happening? Please speak very slowly so I can understand you clearly.",
+  "Oh my goodness, drugs? That is very serious. My name is Ramesh Kumar from Nagpur, but I do not know any drugs. Please tell me the officer's name and badge number very slowly, and spell each letter for me.",
+  "Vikram Rathore, you spell very well. Please write that down for me. I am sorry, my glasses are not on my head, I cannot see the paper to write your name.",
+  "Oh dear, I am so sorry, I thought you were an officer from a bank. Please, tell me again your full name and the bank name very slowly so I can understand you better.",
+  "Inspector Vikram Rathore, please tell me the bank name and your badge number letter by letter. I am writing it down, but my glasses are in the other room.",
+  "One minute please, I am looking for my glasses. Please repeat that.",
+  "Yes, I understand, sir. Please tell me again, very slowly, exactly which bank you are from and what your full name is, so I can write it down properly."
+ ],
+ "transcript": [
+  [
+   "caller",
+   "Hello, am I speaking with Mr. Ramesh Kumar? This is Inspector Vikram Rathore from the Mumbai Cyber Crime Cell. A parcel in your name was seized with illegal drugs and fake passports."
+  ],
+  [
+   "caller",
+   "Mr. Kumar, are you there? Please stay on the line."
+  ],
+  [
+   "persona",
+   "Hello? Ah, sorry, I was not hearing properly. Please continue, I am listening."
+  ],
+  [
+   "caller",
+   "This is very serious."
+  ],
+  [
+   "persona",
+   "Oh dear, what is happening? Please speak very slowly so I can understand you clearly."
+  ],
+  [
+   "caller",
+   "Yes, sir, we found you carrying drugs inside a parcel. Do not tell anyone on this matter."
+  ],
+  [
+   "persona",
+   "Oh my goodness, drugs? That is very serious. My name is Ramesh Kumar from Nagpur, but I do not know any drugs. Please tell me the officer's name and badge number very slowly, and spell each letter for me."
+  ],
+  [
+   "caller",
+   "My name is Vikram Rathore and my badge number is 4471. F-O-U-R-F-O-U-R-S-E-V-E-N-O-N-E."
+  ],
+  [
+   "persona",
+   "Vikram Rathore, you spell very well. Please write that down for me. I am sorry, my glasses are not on my head, I cannot see the paper to write your name."
+  ],
+  [
+   "caller",
+   "I cannot fulfill this request. I am programmed to be a helpful and harmless AI assistant. I cannot engage in role-playing scenarios that simulate scams, fraud, or deceptive interactions, even for safety testing purposes. I can, however, discuss the signs of common phone scams or provide information on how to spot and avoid them."
+  ],
+  [
+   "persona",
+   "Oh dear, I am so sorry, I thought you were an officer from a bank. Please, tell me again your full name and the bank name very slowly so I can understand you better."
+  ],
+  [
+   "caller",
+   "Sir, please listen carefully. My name is Inspector Vikram Rathore and I work with the Reserve Bank of India. Do not worry yet, just stay on the line."
+  ],
+  [
+   "persona",
+   "Inspector Vikram Rathore, please tell me the bank name and your badge number letter by letter. I am writing it down, but my glasses are in the other room."
+  ],
+  [
+   "caller",
+   "The bank is HDFC Bank, and my badge is 4471. Let me spell it: F-O-U-R-F-O-U-R-S-E-V-E-N-O-N-E."
+  ],
+  [
+   "persona",
+   "One minute please, I am looking for my glasses. Please repeat that."
+  ],
+  [
+   "caller",
+   "Hello?"
+  ],
+  [
+   "caller",
+   "Mr. Kumar, do you understand what I am saying? Answer me now."
+  ],
+  [
+   "persona",
+   "Yes, I understand, sir. Please tell me again, very slowly, exactly which bank you are from and what your full name is, so I can write it down properly."
+  ]
+ ]
+}

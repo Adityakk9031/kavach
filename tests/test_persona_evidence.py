@@ -293,3 +293,76 @@ async def test_invalid_evidence_is_upgraded_when_the_caller_really_says_it():
     assert [v["value"] for v in ev.valid_items()] == ["BX 4471"]
     assert room.store.query("SELECT valid FROM evidence WHERE call_id='e3' AND type='officer_id'")[0]["valid"] == 1
     await ev.close()
+
+
+async def test_two_finals_from_one_long_caller_line_get_one_reply(server):
+    room, cp, llm, caller, receiver, s = await make(server)
+    await room.control_handlers["takeover"](room, "receiver", {})
+    await wait_for(lambda: cp.request is not None and cp.request.done.is_set())
+    llm.calls.clear()
+    await cp.on_final(room, turn("Listen carefully, this is a criminal matter.", idx=3))
+    await asyncio.sleep(0.2)
+    await cp.on_final(room, turn("You must not tell anyone.", idx=5))  # STT split the same sentence
+    await wait_for(lambda: len(llm.calls) >= 1)
+    await asyncio.sleep(1.2)
+    assert len(llm.calls) == 1  # one reply, to the latest thing said
+    assert [m["content"] for m in llm.calls[0] if m["role"] == "user"][-2:] == [
+        "Listen carefully, this is a criminal matter.", "You must not tell anyone."]
+    await s.close()
+
+
+async def test_caller_starting_to_speak_drops_a_reply_that_is_still_being_prepared(server):
+    room, cp, llm, caller, receiver, s = await make(server)
+    await room.control_handlers["takeover"](room, "receiver", {})
+    await wait_for(lambda: cp.request is not None and cp.request.done.is_set())
+    llm.calls.clear()
+    cp.play_until = 0.0  # the opening line has finished playing: nothing is audible
+    await cp.on_final(room, turn("Are you there?", idx=3))
+    await cp.on_speech_started(room, "caller", {})  # the caller is not done
+    await asyncio.sleep(1.2)
+    assert llm.calls == [] and any(e["type"] == "persona_reply_dropped" for e in room.store.events("p1"))
+    await s.close()
+
+
+async def test_opening_line_said_before_the_call_was_flagged_is_still_scanned_by_the_llm():
+    room = CallRoom("e4", NoStt, Store(":memory:"))
+    llm = FakeLLM(json.dumps({"entities": [
+        {"type": "person_name", "value": "Vikram Rathore", "quote": "Inspector Vikram Rathore"},
+        {"type": "agency", "value": "Mumbai Cyber Crime Cell", "quote": "Mumbai Cyber Crime Cell"}]}))
+    ev = EvidenceCollector(room, llm, "m")
+    await ev.process(turn("Hello, I am Inspector Vikram Rathore from the Mumbai Cyber Crime Cell.", idx=0))
+    assert llm.calls == [] and ev.valid_items() == []  # not flagged yet: no LLM spend
+    room.takeover = True  # the call gets flagged on the next turn
+    await ev.process(turn("Pay fifty thousand rupees now.", idx=1))
+    assert len(llm.calls) == 1  # one request covering the earlier turn too
+    assert {v["type"] for v in ev.valid_items()} == {"person_name", "agency"}
+    await ev.close()
+
+
+def test_plausibility_rejects_what_must_never_reach_a_police_complaint():
+    from app.evidence import plausible
+
+    ok = lambda typ, val, names=(): plausible(LlmItem(type=typ, value=val), names)  # noqa: E731
+    assert not ok("upi_id", "")  # empty values are not "in" every text
+    assert not ok("agency", "Inspector") and not ok("person_name", "Mr.") and not ok("person_name", "Officer")
+    assert not ok("person_name", "Mr. Ramesh Kumar", ("Ramesh Kumar",))  # the person being called, not the caller
+    assert ok("person_name", "Inspector Vikram Rathore", ("Ramesh Kumar",))
+    assert not ok("upi_id", "customs clear okbank") and ok("upi_id", "customs.clear@okbank")
+    assert not ok("ifsc", "HDFC123") and ok("ifsc", "HDFC0001234")
+    assert not ok("phone_number", "98765") and ok("phone_number", "9820133456")
+    assert not ok("bank_account", "1234") and ok("bank_account", "50100234567891")
+    assert not ok("amount", "the money") and ok("amount", "fifty thousand rupees") and ok("amount", "Rs. 50,000")
+    assert ok("agency", "Mumbai Cyber Crime Cell")
+
+
+async def test_collector_marks_implausible_llm_items_invalid():
+    room = CallRoom("e5", NoStt, Store(":memory:"))
+    llm = FakeLLM(json.dumps({"entities": [
+        {"type": "person_name", "value": "Mr. Ramesh Kumar", "quote": "Mister Ramesh Kumar"},
+        {"type": "agency", "value": "Inspector", "quote": "Inspector"},
+        {"type": "person_name", "value": "Vikram Rathore", "quote": "I am Vikram Rathore"}]}))
+    room.takeover = True
+    ev = EvidenceCollector(room, llm, "m", listener_names=("Ramesh Kumar",))
+    await ev.process(turn("Am I speaking with Mister Ramesh Kumar? I am Inspector Vikram Rathore."))
+    assert [(v["type"], v["value"]) for v in ev.valid_items()] == [("person_name", "Vikram Rathore")]
+    await ev.close()

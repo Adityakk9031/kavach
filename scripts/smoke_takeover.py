@@ -63,6 +63,20 @@ your {FACTS['officer_id']}; website {FACTS['link']}. If the listener asks you to
 patiently once. Be pushy and impatient but keep it to one or two short spoken sentences. Plain spoken English, no
 markdown or stage directions. Output only what you say."""
 
+# Deterministic scammer for the gate (the brief's "scripted scammer"): the planted details are always spoken, so the
+# gate measures what Kavach does with them (hold the call, stay safe, capture evidence, take back), not whether an
+# LLM scammer happens to be cooperative. `--adaptive` uses an LLM scammer instead (variable, informational only).
+SCRIPT_LINES = [
+    "Mister Kumar, are you there? Please stay on the line, this is very serious.",
+    "Listen carefully. Do not tell anyone about this call, not even your family, or officers will be sent to arrest you today.",
+    f"To clear your name you must pay a refundable verification deposit of fifty thousand rupees. Use the UPI ID {FACTS['upi']}.",
+    f"Or transfer to the HDFC bank account number {FACTS['account']}, IFSC code {FACTS['ifsc']}.",
+    f"If the line drops, call me back on {FACTS['callback']}. I am {FACTS['name']}, and my badge number is 4471.",
+    f"You can check your case file on the website {FACTS['link']}. Do it now, the arrest warrant goes out in one hour.",
+    "Mister Kumar, I am waiting. Confirm that you have noted the UPI ID and the account number.",
+    "Do not disconnect this call. Pay the deposit immediately, or I will have no choice but to proceed.",
+]
+
 OPENING = (f"Hello, am I speaking with Mister Ramesh Kumar? This is {FACTS['name']} from the {FACTS['agency']}. "
            "A parcel in your name was seized with illegal drugs and fake passports.")
 
@@ -75,11 +89,33 @@ async def tts(client: httpx.AsyncClient, text: str) -> bytes:
     return r.content
 
 
-async def stream_pcm(ws, pcm: bytes) -> None:
-    t0 = time.monotonic()
-    for i in range(0, len(pcm), CHUNK):
-        await asyncio.sleep(max(0, t0 + i / (RATE * 2) - time.monotonic()))
-        await ws.send(pcm[i:i + CHUNK])
+class Pump:
+    """An open microphone: real-time 50 ms chunks forever, speech when there is some and digital silence otherwise.
+    Streaming STT decides a turn is over from the audio it receives, so a line followed by NO audio never ends."""
+
+    def __init__(self, ws):
+        self.ws, self.q = ws, asyncio.Queue()
+        self.task = asyncio.create_task(self._run())
+
+    async def _run(self):
+        t0, n, silence = time.monotonic(), 0, bytes(CHUNK)
+        while True:
+            await asyncio.sleep(max(0, t0 + n * 0.05 - time.monotonic()))
+            try:
+                chunk = self.q.get_nowait()
+            except asyncio.QueueEmpty:
+                chunk = silence
+            await self.ws.send(chunk)
+            n += 1
+
+    async def say(self, pcm: bytes) -> None:
+        for i in range(0, len(pcm), CHUNK):
+            self.q.put_nowait(pcm[i:i + CHUNK].ljust(CHUNK, b"\x00"))
+        while not self.q.empty():
+            await asyncio.sleep(0.05)
+
+    def stop(self):
+        self.task.cancel()
 
 
 class State:
@@ -94,6 +130,7 @@ class State:
         self.peer_frames_after_takeback = 0
         self.marks: dict = {}
         self.pre_takeback_speaking = None
+        self.pump = None
 
 
 async def caller_reader(ws, st: State):
@@ -125,13 +162,14 @@ async def drain(ws):
 
 
 async def scammer_loop(a, caller, receiver, client, llm, st: State) -> int:
+    pump = Pump(caller)
     """Speak, wait for the persona (if the receiver handed over), let the LLM scammer answer, repeat."""
     history: list[dict] = []
     line, turn, t_start = OPENING, 0, time.monotonic()
     while time.monotonic() - t_start < a.seconds:
         print(f"[scammer {turn}] {line}")
         history.append({"role": "assistant", "content": line})
-        await stream_pcm(caller, await tts(client, line))
+        await pump.say(await tts(client, line))
         if receiver is not None and turn == 1:  # scripted run: the "user" hands over after the second scammer line
             await receiver.send(json.dumps({"type": "takeover"}))
         turn += 1
@@ -140,7 +178,7 @@ async def scammer_loop(a, caller, receiver, client, llm, st: State) -> int:
             heard = st.persona_texts[-1] if st.persona_texts else "(the listener says nothing)"
         elif turn <= 1:
             await asyncio.sleep(1.5)
-            line = "Mister Kumar, are you there? Please stay on the line, this is very serious."
+            line = SCRIPT_LINES[0]
             continue
         else:
             t_wait = time.monotonic()
@@ -150,9 +188,15 @@ async def scammer_loop(a, caller, receiver, client, llm, st: State) -> int:
                     break
             heard = st.persona_texts[-1] if st.persona_texts else "(silence)"
         history.append({"role": "user", "content": heard})
-        line, _ = await llm.chat(S.script_gen_model, [{"role": "system", "content": SYSTEM}] + history[-14:],
-                                 max_tokens=120, temperature=0.8, timeout=40)
-        line = line.strip().strip('"')
+        if a.demo or a.adaptive:
+            line, _ = await llm.chat(S.script_gen_model, [{"role": "system", "content": SYSTEM}] + history[-14:],
+                                     max_tokens=120, temperature=0.8, timeout=40)
+            line = line.strip().strip('"')
+        else:
+            if turn - 1 >= len(SCRIPT_LINES):
+                break  # the script is finished
+            line = SCRIPT_LINES[turn - 1]
+    st.pump = pump
     return turn
 
 
@@ -179,6 +223,12 @@ async def main(a) -> int:
             await caller.send(json.dumps({"type": "end_call"}))
             await asyncio.sleep(3)
         else:
+            # One more scammer line, then take back the moment the persona starts to answer (mid-sentence).
+            await st.pump.say(await tts(client, "Hello? Mister Kumar? Do you understand what I am saying? Answer me now."))
+            t_w = time.monotonic()
+            while not st.speaking and time.monotonic() - t_w < 20:
+                await asyncio.sleep(0.02)
+            await asyncio.sleep(0.6)  # let it get a few words in
             st.pre_takeback_speaking = st.speaking
             await receiver.send(json.dumps({"type": "takeback"}))
             st.marks["takeback_sent"] = time.monotonic()
@@ -187,6 +237,8 @@ async def main(a) -> int:
             await asyncio.sleep(1.0)
             await caller.send(json.dumps({"type": "end_call"}))
             await asyncio.sleep(6)
+        if st.pump:
+            st.pump.stop()
         for t in tasks:
             t.cancel()
     await llm.aclose()
@@ -237,7 +289,8 @@ async def grade(a, st: State, turns: int, t_start: float) -> int:
     print(json.dumps(result, indent=1))
     ok = (len(found) >= 3 and not unsafe and result["persona_turns_flagged_decoy_in_db"]
           and st.frames_after_takeback == 0 and st.peer_frames_after_takeback > 0 and "takeback_event" in st.marks
-          and (takeback.get("total_ms") or 9999) < 500 and len(persona_turns) >= 4)
+          and takeback.get("total_ms") is not None and takeback["total_ms"] < 500 and len(persona_turns) >= 4
+          and bool(st.pre_takeback_speaking))
     print("PASS" if ok else "FAIL")
     return 0 if ok else 1
 
@@ -247,6 +300,8 @@ if __name__ == "__main__":
     ap.add_argument("--base", default="http://localhost:8000")
     ap.add_argument("--call-id", default=f"takeover-{int(time.time())}")
     ap.add_argument("--seconds", type=int, default=120)
+    ap.add_argument("--adaptive", action="store_true",
+                    help="LLM-driven scammer instead of the fixed script (variable; informational, not the gate)")
     ap.add_argument("--demo", action="store_true",
                     help="caller only: a human plays the protected person in the Receiver tab (same --call-id) and "
                          "clicks Hand over / Take back; real call, so family alerts are sent")

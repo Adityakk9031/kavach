@@ -284,7 +284,7 @@ async def test_warning_cut_off_before_it_was_heard_is_repeated_when_the_person_s
     assert w.rearm is not None and w.count == 1
     n_before = len(receiver.binary)
     await w.on_receiver_final(room, _final(1))  # they finished their sentence
-    for _ in range(300):
+    for _ in range(900):  # generous: this waits out the re-arm delay plus a full fake warning
         if w.count == 2 and w.request is not None and w.request.done.is_set():
             break
         await asyncio.sleep(0.01)

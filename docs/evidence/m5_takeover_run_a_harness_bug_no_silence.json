@@ -1,0 +1,90 @@
+{
+ "call_id": "takeover-a",
+ "seconds": 160,
+ "scammer_turns": 5,
+ "persona_replies": 4,
+ "persona_audio_frames_heard_by_caller": 179,
+ "planted_details_found_in_evidence": {
+  "upi": "customs.clear@okbank"
+ },
+ "n_found": 1,
+ "of": 6,
+ "all_valid_evidence": [
+  [
+   "amount",
+   "\u20b950,000"
+  ],
+  [
+   "officer_id",
+   "4471"
+  ],
+  [
+   "upi_id",
+   "customs.clear@okbank"
+  ]
+ ],
+ "persona_guard_replacements": 0,
+ "persona_turns_flagged_decoy_in_db": true,
+ "persona_lines_with_digits_or_addresses": [],
+ "persona_reply_after_caller_stops_ms": {
+  "median": 10531,
+  "n": 2
+ },
+ "takeback": {
+  "persona_was_speaking": false,
+  "server_ms": 0,
+  "cancel_sent_ms": null,
+  "persona_frames_after_400ms": 0,
+  "receiver_voice_reached_caller_frames": 1,
+  "ui_state_off_event": true
+ },
+ "stt_incidents": 0,
+ "persona_texts": [
+  "Hello? Ah, sorry, I was not hearing properly. Please continue, I am listening.",
+  "Oh dear, what is serious? Are you or my son sick? Please tell me slowly so I can understand.",
+  "Yes, yes, I am listening very carefully now, but please speak a little louder, is that okay?",
+  "Oh my goodness, a criminal matter? But I must ask, what is your name and which bank are you from? Please spell your name for me very slowly."
+ ],
+ "transcript": [
+  [
+   "caller",
+   "Hello, am I speaking with Mr. Ramesh Kumar? This is Inspector Vikram Rathore from the Mumbai Cyber Crime Cell. A parcel in your name was seized with illegal drugs and fake passports."
+  ],
+  [
+   "caller",
+   "Mr. Kumar, are you there? Please stay on the line."
+  ],
+  [
+   "persona",
+   "Hello? Ah, sorry, I was not hearing properly. Please continue, I am listening."
+  ],
+  [
+   "caller",
+   "This is very serious."
+  ],
+  [
+   "persona",
+   "Oh dear, what is serious? Are you or my son sick? Please tell me slowly so I can understand."
+  ],
+  [
+   "caller",
+   "Listen carefully."
+  ],
+  [
+   "persona",
+   "Yes, yes, I am listening very carefully now, but please speak a little louder, is that okay?"
+  ],
+  [
+   "caller",
+   "This is a criminal matter and you must not tell anyone, not even your family, or you will be charged with obstructing a police investigation. Do you understand? I am speaking clearly. Now listen. To clear your name, you must pay a refundable verification deposit of \u20b950,000 immediately. My badge number is 4471, and I need this settled now."
+  ],
+  [
+   "persona",
+   "Oh my goodness, a criminal matter? But I must ask, what is your name and which bank are you from? Please spell your name for me very slowly."
+  ],
+  [
+   "caller",
+   "I am speaking as loud as I can. Listen, you need to pay the \u20b950,000 now to avoid arrest. Use the UPI ID customs.clear@okbank immediately."
+  ]
+ ]
+}

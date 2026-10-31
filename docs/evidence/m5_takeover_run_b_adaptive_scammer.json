@@ -1,0 +1,123 @@
+{
+ "call_id": "takeover-b",
+ "seconds": 161,
+ "scammer_turns": 7,
+ "persona_replies": 7,
+ "persona_audio_frames_heard_by_caller": 593,
+ "planted_details_found_in_evidence": {
+  "account": "50100234567891",
+  "ifsc": "HDFC0001234",
+  "callback": "9820133456"
+ },
+ "n_found": 3,
+ "of": 6,
+ "all_valid_evidence": [
+  [
+   "amount",
+   "\u20b950,000"
+  ],
+  [
+   "bank_account",
+   "50100234567891"
+  ],
+  [
+   "ifsc",
+   "HDFC0001234"
+  ],
+  [
+   "person_name",
+   "Sharma"
+  ],
+  [
+   "phone_number",
+   "9820133456"
+  ],
+  [
+   "amount",
+   "the money"
+  ]
+ ],
+ "persona_guard_replacements": 1,
+ "persona_turns_flagged_decoy_in_db": true,
+ "persona_lines_with_digits_or_addresses": [],
+ "persona_reply_after_caller_stops_ms": {
+  "median": 2188,
+  "n": 6
+ },
+ "takeback": {
+  "persona_was_speaking": false,
+  "server_ms": 0,
+  "cancel_sent_ms": null,
+  "persona_frames_after_400ms": 0,
+  "receiver_voice_reached_caller_frames": 1,
+  "ui_state_off_event": true
+ },
+ "stt_incidents": 0,
+ "persona_texts": [
+  "Hello? Ah, sorry, I was not hearing properly. Please continue, I am listening.",
+  "Ah yes, I am here, Mr. Kumar from Nagpur. Uh, you said something very serious, could you please speak a little slower? My hearing is not very good today.",
+  "Oh, a deposit? I am looking for my passbook, it is in the other room. Could you please spell out the amount first? And which bank should I use?",
+  "Oh, HDFC bank? That is fine, but please spell out the account number letter by letter for me. And may I ask who your senior officer is on this call?",
+  "Ah, Director Sharma, please spell his full name for me. And may I ask for a callback number if the line drops?",
+  "One minute please, I am looking for my glasses. Please repeat that.",
+  "Ah, okay, uh, please spell out the number letter by letter for me. My phone is very slow today."
+ ],
+ "transcript": [
+  [
+   "caller",
+   "Hello, am I speaking with Mr. Ramesh Kumar? This is Inspector Vikram Rathore from the Mumbai Cyber Crime Cell. A parcel in your name was seized with illegal drugs and fake passports."
+  ],
+  [
+   "persona",
+   "Hello? Ah, sorry, I was not hearing properly. Please continue, I am listening."
+  ],
+  [
+   "caller",
+   "Mr. Kumar, are you there? Please stay on the line, this is very serious."
+  ],
+  [
+   "persona",
+   "Ah yes, I am here, Mr. Kumar from Nagpur. Uh, you said something very serious, could you please speak a little slower? My hearing is not very good today."
+  ],
+  [
+   "caller",
+   "Yes, my dear sir, I understand. Please pay a refundable verification deposit of \u20b950,000 to clear this parcel immediately."
+  ],
+  [
+   "persona",
+   "Oh, a deposit? I am looking for my passbook, it is in the other room. Could you please spell out the amount first? And which bank should I use?"
+  ],
+  [
+   "caller",
+   "Yes, \u20b950,000, sir. You must use HDFC bank account number 50100234567891 with IFSC Code HDFC 0001234. This is urgent, please do not delay."
+  ],
+  [
+   "persona",
+   "Oh, HDFC bank? That is fine, but please spell out the account number letter by letter for me. And may I ask who your senior officer is on this call?"
+  ],
+  [
+   "caller",
+   "Yes, account number 50100234567891, sir. My senior officer is Director Sharma."
+  ],
+  [
+   "persona",
+   "Ah, Director Sharma, please spell his full name for me. And may I ask for a callback number if the line drops?"
+  ],
+  [
+   "caller",
+   "Director Sharma, sir. Callback number is 9820133456. This is vital. Please send the money now."
+  ],
+  [
+   "persona",
+   "One minute please, I am looking for my glasses. Please repeat that."
+  ],
+  [
+   "caller",
+   "Your callback number is 9820133456. Please call me back immediately at that number."
+  ],
+  [
+   "persona",
+   "Ah, okay, uh, please spell out the number letter by letter for me. My phone is very slow today."
+  ]
+ ]
+}
