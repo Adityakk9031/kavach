@@ -115,7 +115,7 @@ Real defects found and fixed along the way: STT split one scammer line into two 
 
 Limits to state plainly: in the scripted gate the scammer reveals details regardless, so it proves capture, safety, pacing and take-back, **not** that the persona can coax details out of a reluctant scammer. The adaptive runs (b: account, IFSC, callback elicited; a, c: little) show that varies. The bot reads the persona's text from events, it does not run STT on the persona's audio.
 
-## M6 — Telegram alerts + 1930 report — ⏳ code and offline tests done; real Telegram message NOT sent yet
+## M6 — Telegram alerts + 1930 report — ✅ gate met 2026-11-01 (arrival on your phone not confirmed by me)
 
 Built: `app/alerts.py` (max 3 per call, slots for takeover and call-end are never spent on anything else, eval calls never alert, failures logged not raised), `app/report.py` (Markdown + ReportLab PDF, "DRAFT — review before filing" banner and footer on every page, next steps 1930 / cybercrime.gov.in / Sanchar Saathi / bank), `app/finalize.py` (report only for flagged calls), receiver-page report panel with the two questions only the user can answer, `/api/calls/{id}/report[.md|.pdf]`.
 
@@ -123,8 +123,17 @@ Built: `app/alerts.py` (max 3 per call, slots for takeover and call-end are neve
 |---|---|---|
 | Every field filled from a call; PDF opens | ✅ offline | `tests/test_report_alerts.py`: seeded call fills all 11 evidence fields, quotes verified against the caller's actual words, PDF text read back with `pypdf` (banner on every page, number, UPI, IFSC, steps) |
 | Alert content, rate limit, mock Telegram API | ✅ offline | 12 tests |
-| **A real Telegram message arrives** | ❌ **blocked** | bot token works (`@naughtkavcha_bot`), but `TELEGRAM_CHAT_ID` is empty: the bot has received no message yet (`getUpdates` empty) |
+| **A real Telegram message arrives** | ✅ API accepted 4 messages | chat id found after you messaged the bot (`1524903598`); test message id 3; then a live scripted scam call (`e2e-scam-1`, mode live) sent warning, takeover and call-end alerts: ids 4, 5, 6, the last with the PDF attached. Telegram's API says delivered; I cannot see your screen |
+| Report from a live call | ✅ | `docs/evidence/m6_sample_complaint_draft.pdf/.md`: 3 pages, 8 captured details, banner on every page |
 
 ## Independent review (separate subagent, spec + repo only, no network)
 
 22 findings (1 blocker, 5 high, 9 medium, 7 low). Fixed with tests: report UI missing (blocker); report/alert for any call that merely mentions a phone number; Telegram token would be logged by httpx; a long warning delayed the family alert and the next detection (hooks now isolated); detector starved by persona/evidence LLM calls (separate budget lane, fail-fast, 3 s total deadline); eval silently dropped errored calls and published incomplete runs; trigger→turn mapping; weak persona guard; invalid evidence never upgraded; unverified quotes in the report; alert slots; call never ended when a tab closed; ended call ids reusable; STT-restart clock offset; TTS Cancelled safety net; null-risk crash; dashboard page. Not fixed (documented limits): shared TTS session cancels across concurrent calls; no auth; receiver mic still reaches the caller while the warning plays (on speakers the scammer may hear it: use headphones); evidence LLM pass only after the call is flagged (LLM budget).
+
+
+## Final state 2026-11-01
+
+- Held-out test, run 2 on final code: recall 18/18, false alarms 1/12 normal + 0/6 hard negatives, warning 1.55 s after the caller stops (see README / VERIFICATION_REPORT.md; run 1 was 0/12 false alarms).
+- Found by the e2e run and fixed: a warning could start after the person had already handed over (now skipped); `warned_at` now means audio actually started; agency is also captured by pattern; nested duplicate quotes dropped.
+- Regression of every earlier gate on the final code and a fresh-clone install: see `docs/evidence/regression_final*/` and VERIFICATION_REPORT.md. Two scoring errors in my own scripts were found and fixed during it (a re-armed warning scored as a failure; barge-in timing when speech had already interrupted).
+- Still needs a human: real microphone test in Chrome with headphones; confirm the Telegram messages arrived; listen to the cloned voice; rehearse docs/DEMO_SCRIPT.md; submit by 2026-11-07 18:00 IST. The AssemblyAI key and bot token were pasted into chat: rotate both after the hackathon.

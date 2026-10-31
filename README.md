@@ -166,7 +166,7 @@ a slow LLM answer made it skip a turn); the full test split was not re-run for t
 
 | Check | Result |
 |---|---|
-| Family-voice warning after the caller's last word | 1.4 to 1.9 s over 8 live runs (target 3 s); it starts 0.4 s after the trigger |
+| Family-voice warning after the caller's last word | 1.3 to 1.9 s over 8 live runs (target 3 s); it starts 0.4 s after the trigger |
 | Barge-in: person speaks, playback stops | stop command reaches the receiver in about 1 ms, including audio already delivered |
 | Takeover: details captured from a scripted scammer in 2.5 minutes | 6 of 6 planted details (UPI ID, account, IFSC, callback number, name, link) |
 | Persona reply after the scammer stops | about 2.2 to 3.2 s (includes a 0.7 s wait to let the caller finish) |
