@@ -142,3 +142,47 @@ async def test_rate_limiter_counts_reserved_tokens():
     t0 = _t.monotonic()
     await rl.acquire(300)  # 600 > 500, must wait for the first to expire
     assert _t.monotonic() - t0 >= 0.25
+
+
+async def test_chat_json_retries_primary_once_before_fallback(monkeypatch):
+    from app.llm import LLMError
+    from pydantic import BaseModel
+
+    class Out(BaseModel):
+        ok: int
+
+    llm = LLM(get_settings())
+    calls = []
+
+    async def fake_chat(model, messages, **kw):
+        calls.append(model)
+        if len(calls) == 1:
+            raise LLMError("transient")
+        return '{"ok": 1}', 5
+
+    monkeypatch.setattr(llm, "chat", fake_chat)
+    out, _, model = await llm.chat_json(Out, [{"role": "user", "content": "x"}], model="primary", fallback_model="slow")
+    await llm.aclose()
+    assert out.ok == 1 and model == "primary" and calls == ["primary", "primary"]
+
+
+async def test_chat_json_falls_back_after_primary_fails_twice(monkeypatch):
+    from app.llm import LLMError
+    from pydantic import BaseModel
+
+    class Out(BaseModel):
+        ok: int
+
+    llm = LLM(get_settings())
+    calls = []
+
+    async def fake_chat(model, messages, **kw):
+        calls.append(model)
+        if model == "primary":
+            raise LLMError("down")
+        return '{"ok": 2}', 5
+
+    monkeypatch.setattr(llm, "chat", fake_chat)
+    out, _, model = await llm.chat_json(Out, [{"role": "user", "content": "x"}], model="primary", fallback_model="slow")
+    await llm.aclose()
+    assert out.ok == 2 and model == "slow" and calls == ["primary", "primary", "slow"]

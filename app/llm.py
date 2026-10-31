@@ -158,6 +158,9 @@ class LLM:
                                         "Reply with ONLY the JSON object, nothing else."}]
                 except LLMError as e:
                     last_err = e
-                    log.warning("LLM call failed: %s", e)
-                    break  # go to the fallback model
+                    log.warning("LLM call failed (attempt %d on %s): %s", attempt + 1, m, e)
+                    if attempt < retries:
+                        await asyncio.sleep(0.3)  # one quick retry of the same model: failures are usually transient
+                        continue
+                    break  # then the fallback model
         raise LLMError(f"all models failed: {last_err}")

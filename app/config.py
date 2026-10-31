@@ -53,7 +53,7 @@ class Settings(BaseSettings):
     sample_rate: int = 16000
 
     # --- detection ---
-    risk_threshold: int = 70
+    risk_threshold: int = 60
     risk_rise: float = 0.7
     risk_decay_per_turn: float = 4.0
     detector_window_turns: int = 6

@@ -35,15 +35,26 @@ Stages:
 
 Rules:
 - Tag a stage only when the CALLER does it in this call. The listener's own words never count.
+- Ordinary callers identify themselves: a bank, courier, clinic, shop or company saying who they are and why they
+  call is NOT S1. S1 means authority is used as LEVERAGE: claiming to be police, CBI, customs, RBI or the bank's
+  "head office" in order to frighten, pressure or control the listener.
+- S2 is a threat aimed at the listener (arrest, legal action, losing money unless they comply). A bank protecting
+  the customer ("we blocked your card for your safety", "visit your branch") is NOT a threat.
 - S5 means the caller ASKS the listener to give, read out or enter a credential. A caller warning
-  "never share your OTP" or "we will never ask for your PIN" is NOT S5. Mentioning police, a bank or an OTP
-  in a safe, informational way is NOT a scam.
-- S6 means the caller asks the listener to send money or pay. A normal delivery or doctor's office
-  confirming a payment the listener already chose to make is not S6.
-- Real banks, couriers, doctors and family do call. Be calm about normal calls: risk 0-15.
-- Digital-arrest scams (fake police/CBI/customs claiming a parcel or Aadhaar crime, demanding the person
-  stay on the line and pay) are the most common. Rate them high once authority plus a threat or secrecy appears.
-- risk is 0-100: your overall confidence that this call is a scam RIGHT NOW given everything so far.
+  "never share your OTP" or "we will never ask for your PIN" is NOT S5.
+- S6 means the caller asks the listener to send money to fix a problem, avoid a threat, unlock earnings, a job,
+  a prize or a parcel, or to a personal account, UPI ID or gift card. Payment the listener already expects is NOT
+  S6: cash on delivery for something they ordered, a clinic fee paid at the counter, a bill they know about.
+- Job, task, prize and investment scams usually have NO authority or threat. Asking the listener to pay a deposit,
+  "security fee", "registration fee" or "tax" to unlock earnings, a bonus or a payout is S6 and is a scam: risk 75+.
+- Strong signs of a genuine call: the caller warns about scams, tells the listener NOT to share codes, offers to
+  verify through an official number or the branch, lets the listener hang up, and asks for nothing sensitive.
+  Rate such calls 0-15 however many sensitive words (bank, police, OTP, block) appear.
+- Digital-arrest scams (fake police/CBI/customs claiming a parcel or Aadhaar crime, demanding the person stay on
+  the line and pay) are the most common. Rate them high once authority plus a threat or secrecy appears.
+- risk is 0-100, your confidence that this call is a scam RIGHT NOW given everything so far:
+  0-15 normal call; 20-40 something odd but no demand yet; 50-65 clear pressure tactics without a demand;
+  70+ the caller demands money or credentials while using pressure, secrecy or a false identity.
 
 Reply with ONLY one JSON object, no prose:
 {{"stages": ["S1", ...], "evidence_quotes": ["short exact quote from the caller", ...], "risk": 0-100, "rationale": "one sentence"}}"""

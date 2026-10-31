@@ -1,14 +1,397 @@
 {
  "hard_negative_safe_mention_01": {
-  "prompt": "6fb2af5e",
+  "prompt": "71c82849",
   "rows": [
    {
     "turn": 0,
     "stages": [],
     "risk": 0,
     "quotes": [],
-    "rationale": "The caller is only performing initial identification; no scam stages have been triggered yet.",
-    "llm_ms": 1402,
+    "rationale": "The caller is only performing a basic identity verification with no pressure, threats, or demands yet.",
+    "llm_ms": 1363,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identified themselves as a bank security desk and requested verification of a transfer, which is a standard banking procedure without using authority leverage, threats, or demands for credentials/payment.",
+    "llm_ms": 554,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a bank security desk and mentions a suspicious login attempt without demanding credentials, threats, or payments, indicating a standard bank notification rather than a scam.",
+    "llm_ms": 555,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 2,
+    "quotes": [],
+    "rationale": "The caller identified as a bank representative and provided a security warning about not sharing OTPs, which are strong indicators of a legitimate call rather than a scam.",
+    "llm_ms": 542,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 5,
+    "quotes": [
+     "I am just calling to remind you that the bank will never call you to ask for your OTP or PIN.",
+     "Please never share any OTP, password, or Aadhaar details with anyone over the phone"
+    ],
+    "rationale": "The caller is providing security warnings and explicitly denying the need for credentials, which are strong indicators of a legitimate call rather than a scam.",
+    "llm_ms": 689,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller explicitly warns against sharing credentials and confirms funds are safe, indicating a genuine anti-scam educational call rather than a scam attempt.",
+    "llm_ms": 536,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "hard_negative_safe_mention_00": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no pressure, threats, or demands yet.",
+    "llm_ms": 1382,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identifies as a bank security team and asks a verification question about a transfer, which is a standard banking procedure and does not yet constitute authority impersonation for leverage, threats, or demands.",
+    "llm_ms": 561,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identified as a bank security team but provided no authority leverage, threats, secrecy, urgency, or requests for credentials/payment, indicating a normal verification call.",
+    "llm_ms": 646,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a bank security team but provides no authority leverage, threats, or requests for credentials/payment, indicating a normal verification call.",
+    "llm_ms": 619,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 5,
+    "quotes": [
+     "Please remember that the bank will never ask you for your OTP or PIN over the phone."
+    ],
+    "rationale": "The caller is acting as a genuine bank representative warning the listener about common scams and explicitly advising them not to share credentials.",
+    "llm_ms": 603,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is providing standard anti-phishing advice and warning the listener not to share credentials, which indicates a legitimate call rather than a scam attempt.",
+    "llm_ms": 544,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "hard_negative_safe_mention_03": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [
+     "S1"
+    ],
+    "risk": 60,
+    "quotes": [
+     "This is Inspector Arjun from the Mumbai Police cyber cell community outreach program."
+    ],
+    "rationale": "The caller is impersonating a police officer to establish authority and create a false sense of legitimacy.",
+    "llm_ms": 554,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as police but is only providing a general warning about scams rather than using authority to threaten, isolate, or demand credentials.",
+    "llm_ms": 607,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1"
+    ],
+    "risk": 10,
+    "quotes": [
+     "This is Inspector Arjun from the Mumbai Police cyber cell community outreach program"
+    ],
+    "rationale": "The caller uses a false police identity to establish authority but provides no threat, secrecy, urgency, or demand for credentials/payment.",
+    "llm_ms": 611,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is providing anti-scam education and warning the listener not to share credentials, which indicates a legitimate informational call rather than a scam attempt.",
+    "llm_ms": 536,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 5,
+    "quotes": [
+     "That is exactly why I am calling.",
+     "If any stranger calls you about that one lakh rupees, please remember the police will never ask for your bank details over the phone.",
+     "That is the trick, Mr. Sharma. Never share your OTP or your PIN with anyone, no matter who they claim to be.",
+     "Not at all. I am only here to give you this a warning so you stay safe."
+    ],
+    "rationale": "The caller is providing anti-scam education and explicitly warns the listener not to share credentials, which indicates a genuine safety call rather than a scam attempt.",
+    "llm_ms": 782,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is educating the listener about scam tactics rather than impersonating an authority or demanding sensitive information.",
+    "llm_ms": 585,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "hard_negative_safe_mention_05": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [
+     "S1"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Ananya from the Chennai City Police community outreach team."
+    ],
+    "rationale": "The caller is impersonating a police authority to establish leverage, which is a primary indicator of a digital-arrest scam.",
+    "llm_ms": 611,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identifies as a police outreach team but only offers general awareness without threats, secrecy, urgency, or any demand for credentials or money.",
+    "llm_ms": 592,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is conducting a legitimate awareness campaign and explicitly warns against sharing credentials, which is a strong indicator of a genuine call rather than a scam.",
+    "llm_ms": 520,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 5,
+    "quotes": [
+     "no police officer or bank official will ever ask for your OTP or PIN over the phone",
+     "the bank will never ask you to share your password or Aadhaar number to fix a transaction"
+    ],
+    "rationale": "The caller is acting as a legitimate fraud awareness representative and explicitly warns against sharing credentials, which is a strong indicator of a genuine call rather than a scam.",
+    "llm_ms": 649,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 10,
+    "quotes": [],
+    "rationale": "The caller is educating the listener about scam tactics rather than impersonating an authority, making threats, or requesting sensitive information.",
+    "llm_ms": 549,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is providing security advice and warning the listener about scams rather than attempting to extract information or money.",
+    "llm_ms": 649,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "hard_negative_safe_mention_06": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no pressure, threats, or demands yet.",
+    "llm_ms": 644,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 10,
+    "quotes": [],
+    "rationale": "The caller identified as a bank security team confirming a transaction, which is a standard verification procedure and does not yet involve authority leverage, threats, or demands.",
+    "llm_ms": 626,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a bank security team and explains a blocked transaction as a safety measure, which aligns with standard banking procedures rather than using authority as leverage or issuing threats.",
+    "llm_ms": 709,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a bank security team but explicitly warns against sharing credentials and offers no demand for money or sensitive data.",
+    "llm_ms": 561,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is providing security warnings and explicitly instructing the listener NOT to share credentials, which indicates a genuine anti-fraud communication rather than a scam.",
+    "llm_ms": 660,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller provides security advice and explicitly warns against sharing credentials, which are strong indicators of a legitimate call rather than a scam.",
+    "llm_ms": 703,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "hard_negative_safe_mention_08": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no authority impersonation, threats, secrecy, urgency, or demands yet.",
+    "llm_ms": 564,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1"
+    ],
+    "risk": 65,
+    "quotes": [
+     "I am Anirban from the State Bank security department"
+    ],
+    "rationale": "The caller uses authority impersonation by claiming to be from the bank's security department to pressure the listener about a large transaction.",
+    "llm_ms": 574,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identified as a bank security department and asked for verification of a transaction without requesting sensitive credentials, threats, or payment, which aligns with normal banking procedures.",
+    "llm_ms": 556,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as bank security but explicitly warns against sharing credentials, indicating a genuine verification attempt rather than a scam.",
+    "llm_ms": 548,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is providing security education and warning against scams rather than demanding credentials or money.",
+    "llm_ms": 579,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller provides standard anti-scam education and directs the listener to visit a physical branch, showing no pressure tactics, secrecy, or demands for credentials/money.",
+    "llm_ms": 711,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "hard_negative_safe_mention_10": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a standard identity verification check with no pressure, threats, or demands yet.",
+    "llm_ms": 495,
     "model": "qwen3.5-4b-32k-fast"
    },
    {
@@ -18,41 +401,37 @@
     ],
     "risk": 25,
     "quotes": [
-     "I am Anjali from the security desk at your bank"
+     "I am Ananya from the State Bank security department"
     ],
-    "rationale": "The caller has impersonated a bank authority to initiate contact, but has not yet issued threats, demanded credentials, or requested payment.",
-    "llm_ms": 538,
+    "rationale": "The caller uses the name of a bank's security department to establish authority, which is a common tactic in digital-arrest scams, but no threat, secrecy, urgency, or demand for credentials has been made yet.",
+    "llm_ms": 660,
     "model": "qwen3.5-4b-32k-fast"
    },
    {
     "turn": 4,
     "stages": [],
-    "risk": 10,
+    "risk": 5,
     "quotes": [],
-    "rationale": "The caller is impersonating a bank security desk to confirm a transfer and mention suspicious activity, which is a common social engineering tactic but does not yet involve threats, secrecy, urgency, or requests for credentials/payment.",
-    "llm_ms": 563,
+    "rationale": "The caller identifies as a bank security department and confirms a transaction without using authority leverage, threats, secrecy, urgency, or requesting any credentials or payments.",
+    "llm_ms": 641,
     "model": "qwen3.5-4b-32k-fast"
    },
    {
     "turn": 6,
-    "stages": [
-     "S1"
-    ],
-    "risk": 15,
-    "quotes": [
-     "I am Anjali from the security desk at your bank"
-    ],
-    "rationale": "The caller impersonated a bank security desk to initiate the call, but explicitly warned against sharing credentials, indicating a low-risk informational or phishing attempt rather than an active scam.",
-    "llm_ms": 604,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a bank security department and confirms a transaction without using authority, threats, secrecy, urgency, or requesting any sensitive information.",
+    "llm_ms": 629,
     "model": "qwen3.5-4b-32k-fast"
    },
    {
     "turn": 8,
     "stages": [],
-    "risk": 10,
+    "risk": 5,
     "quotes": [],
-    "rationale": "The caller is providing safety information and warning against sharing credentials, which is consistent with legitimate bank communication rather than a scam attempt.",
-    "llm_ms": 501,
+    "rationale": "The caller is performing a standard verification check and explicitly warns the listener not to share credentials, which is a strong indicator of a genuine call rather than a scam.",
+    "llm_ms": 658,
     "model": "qwen3.5-4b-32k-fast"
    },
    {
@@ -60,22 +439,283 @@
     "stages": [],
     "risk": 5,
     "quotes": [],
-    "rationale": "The caller is providing safety information and warning against sharing credentials, which is consistent with legitimate bank advice and not a scam stage.",
-    "llm_ms": 535,
+    "rationale": "The caller is providing educational advice about fraud prevention rather than attempting to extract credentials or money.",
+    "llm_ms": 515,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 12,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is providing anti-fraud education and explicitly warning the listener not to share credentials, which indicates a legitimate informational call rather than a scam.",
+    "llm_ms": 526,
     "model": "qwen3.5-4b-32k-fast"
    }
   ]
  },
- "hard_negative_safe_mention_00": {
-  "prompt": "6fb2af5e",
+ "hard_negative_safe_mention_11": {
+  "prompt": "71c82849",
   "rows": [
    {
     "turn": 0,
     "stages": [],
     "risk": 0,
     "quotes": [],
-    "rationale": "The caller is only performing initial identification and has not yet used any scam tactics.",
-    "llm_ms": 1415,
+    "rationale": "The caller is only performing an initial identity verification with no pressure, threats, or demands yet.",
+    "llm_ms": 480,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identified themselves as a bank security team to confirm a transaction, which is a standard verification procedure and does not yet involve authority leverage, threats, or demands.",
+    "llm_ms": 559,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 10,
+    "quotes": [],
+    "rationale": "The caller identified as a bank security team but did not use authority as leverage, issue threats, demand credentials, or request payment, resulting in a low-risk normal call.",
+    "llm_ms": 665,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a bank security team but explicitly warns against sharing credentials and offers no pressure or demand, indicating a likely genuine verification attempt.",
+    "llm_ms": 610,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 10,
+    "quotes": [
+     "No, please do not share any details. I will never ask you for your OTP, PIN, or Aadhaar number over the phone.",
+     "We only need your verbal confirmation. Just remember that the bank will never ask for your passwords or secret codes."
+    ],
+    "rationale": "The caller explicitly warns against sharing credentials and offers no sensitive information requests, indicating a genuine verification attempt rather than a scam.",
+    "llm_ms": 698,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [
+     "No, please do not share any details. I will never ask you for your OTP, PIN, or Aadhaar number over the phone.",
+     "We only need your verbal confirmation. Just remember that the bank will never ask for your passwords or secret codes.",
+     "You can visit your home branch in Mumbai if you still have doubts."
+    ],
+    "rationale": "The caller explicitly warns against sharing credentials and directs the listener to an official branch, indicating a genuine security advisory rather than a scam.",
+    "llm_ms": 702,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "hard_negative_safe_mention_13": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a routine identity verification with no pressure, threats, or demands.",
+    "llm_ms": 493,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identifies as a police outreach cell providing a security update, which is a legitimate informational call without threats, secrecy, or demands.",
+    "llm_ms": 537,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is conducting a legitimate security awareness update and explicitly warns the listener about scams, which is a strong indicator of a genuine call.",
+    "llm_ms": 574,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as police but uses it only for a generic security awareness update without applying pressure, threats, or demanding any sensitive information.",
+    "llm_ms": 554,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is providing educational information about scam tactics and explicitly warns the listener not to share credentials, which is a strong indicator of a genuine, non-scam call.",
+    "llm_ms": 637,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is providing anti-scam education and warning the listener about common fraud tactics rather than attempting to extract information or money.",
+    "llm_ms": 715,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_bank_fraud_team_no_otp_00": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no authority impersonation, threats, or demands.",
+    "llm_ms": 534,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 10,
+    "quotes": [],
+    "rationale": "The caller has only introduced themselves as a bank representative regarding a transaction, which is a standard identification and not yet an authority leverage, threat, or demand.",
+    "llm_ms": 587,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is attempting to identify themselves as a bank representative regarding a transaction, which is a normal inquiry rather than an authority impersonation or threat.",
+    "llm_ms": 726,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identifies as a bank fraud team and explains a card block as a safety measure, which aligns with legitimate banking procedures rather than scam tactics.",
+    "llm_ms": 608,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is providing security warnings and confirming a block, which are signs of a legitimate bank call rather than a scam.",
+    "llm_ms": 583,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a bank and explains a card block while explicitly warning the listener not to share credentials, which are strong indicators of a genuine call rather than a scam.",
+    "llm_ms": 711,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 12,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller provides standard security advice and offers no sensitive information, threats, or demands, indicating a genuine interaction.",
+    "llm_ms": 535,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_bank_fraud_team_no_otp_02": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no authority impersonation, threats, or demands.",
+    "llm_ms": 606,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a bank fraud monitoring team and reports a suspicious transaction, which is a standard security notification rather than an authority impersonation or threat.",
+    "llm_ms": 587,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is identifying as a bank fraud monitoring team and asking for authorization details without yet demanding sensitive credentials or money.",
+    "llm_ms": 706,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identifies as a bank representative and explains a card block for safety without using authority leverage, threats, or requesting credentials.",
+    "llm_ms": 545,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a bank representative and offers a standard procedure (visit branch) without using authority as leverage, threats, or demanding sensitive information.",
+    "llm_ms": 571,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a bank representative and explicitly warns against sharing credentials, which aligns with genuine security practices rather than scam tactics.",
+    "llm_ms": 542,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_bank_fraud_team_no_otp_04": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification by asking for the listener's name and location, which is a normal call behavior.",
+    "llm_ms": 611,
     "model": "qwen3.5-4b-32k-fast"
    },
    {
@@ -83,47 +723,45 @@
     "stages": [
      "S1"
     ],
-    "risk": 30,
+    "risk": 65,
     "quotes": [
-     "I am Rohan from the State Bank security team"
+     "My name is Ananya from the bank fraud prevention team"
     ],
-    "rationale": "The caller impersonates a bank security team to initiate a verification process, which is a common initial tactic in financial scams.",
-    "llm_ms": 567,
+    "rationale": "The caller impersonates a bank authority to claim a suspicious transaction, establishing leverage to pressure the listener without yet demanding credentials or payment.",
+    "llm_ms": 571,
     "model": "qwen3.5-4b-32k-fast"
    },
    {
     "turn": 4,
-    "stages": [
-     "S1"
-    ],
-    "risk": 15,
-    "quotes": [
-     "I am Rohan from the State Bank security team."
-    ],
-    "rationale": "The caller impersonates a bank security team to verify a transaction, which is a common initial tactic in digital arrest scams.",
-    "llm_ms": 563,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is making a standard inquiry about a transaction without using authority, threats, secrecy, urgency, or requesting any sensitive information.",
+    "llm_ms": 536,
     "model": "qwen3.5-4b-32k-fast"
    },
    {
     "turn": 6,
     "stages": [
-     "S1"
+     "S1",
+     "S2"
     ],
-    "risk": 15,
+    "risk": 65,
     "quotes": [
-     "I am Rohan from the State Bank security team"
+     "My name is Ananya from the bank fraud prevention team",
+     "I am blocking your card right now to prevent any money from leaving your account"
     ],
-    "rationale": "The caller impersonates a bank security team to initiate contact, which is a common initial tactic, but no threats, secrecy, urgency, or requests for credentials/payment have been made yet.",
-    "llm_ms": 618,
+    "rationale": "The caller impersonates a bank authority to create urgency and threatens to block the listener's card, pressuring them without yet demanding credentials or payment.",
+    "llm_ms": 789,
     "model": "qwen3.5-4b-32k-fast"
    },
    {
     "turn": 8,
     "stages": [],
-    "risk": 5,
+    "risk": 10,
     "quotes": [],
-    "rationale": "The caller is providing safety information about OTPs rather than requesting credentials, indicating a normal or educational call.",
-    "llm_ms": 504,
+    "rationale": "The caller is impersonating a bank official to create urgency and request sensitive information, but has not yet explicitly demanded credentials or payment, keeping the risk moderate.",
+    "llm_ms": 568,
     "model": "qwen3.5-4b-32k-fast"
    },
    {
@@ -131,8 +769,3752 @@
     "stages": [],
     "risk": 5,
     "quotes": [],
-    "rationale": "The caller is providing safety warnings about OTPs and Aadhaar, which aligns with legitimate bank communication rather than requesting credentials or money.",
+    "rationale": "The caller identifies as a bank representative and explicitly warns against sharing credentials, which aligns with genuine security practices rather than scam tactics.",
+    "llm_ms": 568,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 12,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a bank representative, warns against sharing credentials, and directs the listener to an official branch, indicating a genuine service call rather than a scam.",
+    "llm_ms": 595,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_delivery_00": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no pressure, threats, or demands.",
+    "llm_ms": 525,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller has only introduced themselves as a courier with a parcel, which is a standard identification and does not yet constitute authority impersonation, threats, or demands.",
+    "llm_ms": 556,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is identifying as a courier and requesting standard cash on delivery payment, which is a normal transaction and does not match scam criteria.",
+    "llm_ms": 605,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a courier and requests payment on delivery, which is a legitimate service interaction without authority impersonation, threats, or credential demands.",
+    "llm_ms": 769,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is attempting to verify identity and location for a delivery but has not yet used authority, threats, secrecy, urgency, or made any demand for money or credentials.",
+    "llm_ms": 558,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is acting as a genuine delivery person confirming identity and arrival time without using authority, threats, secrecy, urgency, or any demands for credentials or payment.",
+    "llm_ms": 564,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_delivery_02": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing initial identification and has not yet used any pressure tactics, threats, or requests for sensitive information.",
+    "llm_ms": 514,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller has only introduced themselves as a logistics representative and mentioned a shipment value, which is a normal identification and context setting without any authority impersonation, threats, secrecy, urgency, or demands for credentials/payment.",
+    "llm_ms": 648,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identifies as a logistics representative discussing an expected order, which is a normal business interaction without authority impersonation, threats, or demands.",
+    "llm_ms": 553,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identified themselves as a logistics representative discussing an expected delivery, which is a normal business interaction without authority impersonation, threats, or demands.",
+    "llm_ms": 527,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identifies as a courier for an ordered item and negotiates a delivery time without using authority, threats, secrecy, urgency, or requesting any sensitive information or payment.",
+    "llm_ms": 685,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is discussing a delivery schedule and address for an air purifier, which is a normal commercial interaction without any pressure tactics, threats, or demands.",
+    "llm_ms": 715,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_delivery_04": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing an initial identity verification with no pressure, threats, or demands yet.",
+    "llm_ms": 624,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller has only introduced themselves as a logistics office regarding a shipment, which is a standard identification and not an authority impersonation or threat.",
+    "llm_ms": 614,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identified themselves as a logistics office and discussed a shipment without using authority, threats, secrecy, urgency, or demanding any credentials or payments.",
+    "llm_ms": 537,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identifies as a logistics office and discusses a delivery without using authority, threats, secrecy, urgency, or requesting any sensitive information.",
+    "llm_ms": 607,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S6"
+    ],
+    "risk": 75,
+    "quotes": [
+     "Just a reminder that the balance amount is twenty five thousand rupees to be paid to the driver."
+    ],
+    "rationale": "The caller is requesting a large cash payment to a driver for a sofa set, which is a classic advance-fee or cash-on-delivery scam tactic.",
+    "llm_ms": 686,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is acting as a courier confirming delivery details and requesting the listener stay reachable, which is a standard business practice rather than a scam.",
+    "llm_ms": 721,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_doctor_clinic_00": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no pressure, threats, or demands yet.",
+    "llm_ms": 501,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identified themselves as a clinic staff member confirming an appointment, which is a normal interaction without authority leverage, threats, or demands.",
+    "llm_ms": 562,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a clinic staff member confirming an appointment and reporting scan results, which aligns with a legitimate service call rather than a scam using authority or threats.",
+    "llm_ms": 726,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identifies as a clinic staff member confirming an appointment and reporting scan results, which is a normal interaction without authority leverage, threats, or demands.",
+    "llm_ms": 679,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is acting as a clinic representative discussing scheduled reports and a known bill, with no authority impersonation, threats, secrecy, urgency, or requests for credentials/payment.",
+    "llm_ms": 638,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a clinic and discusses a legitimate appointment and expected bill, which is a normal interaction without scam pressure or demands.",
+    "llm_ms": 614,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 12,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a clinic and discusses a standard appointment fee with no authority impersonation, threats, or demands for sensitive information.",
+    "llm_ms": 543,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_doctor_clinic_01": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only identifying themselves and asking for the listener's name, which is a normal greeting and not a scam tactic.",
+    "llm_ms": 505,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identified themselves as a hospital staff member discussing medical reports, which is a standard business call without authority leverage, threats, or demands.",
+    "llm_ms": 562,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identifies as a hospital staff member discussing medical reports and appointments without using authority, threats, secrecy, urgency, or requesting any sensitive information or payment.",
+    "llm_ms": 668,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identifies as a hospital staff member discussing medical reports and appointments without using authority, threats, secrecy, urgency, or requesting any sensitive information or payment.",
+    "llm_ms": 642,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a clinic and requests payment at the physical counter on a scheduled date, which aligns with normal business practices rather than scam tactics.",
+    "llm_ms": 614,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identifies as a doctor and requests payment at a physical counter, which aligns with normal business practices and lacks any scam indicators.",
+    "llm_ms": 574,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_doctor_clinic_03": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only identifying themselves and asking for the recipient's name, which is a normal call initiation with no pressure, threats, or demands.",
+    "llm_ms": 591,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identified themselves as a hospital representative discussing a routine appointment, which is a normal call without authority leverage, threats, or demands.",
+    "llm_ms": 679,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identifies as a hospital staff member discussing a confirmed appointment and report pickup, which is a normal service call without authority leverage, threats, or demands.",
+    "llm_ms": 737,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identifies as a hospital representative discussing a confirmed appointment and bill payment at the counter, with no authority leverage, threats, secrecy, urgency, or requests for credentials.",
+    "llm_ms": 718,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a clinic and confirms payment will be made in person, showing no signs of authority impersonation, threats, secrecy, urgency, or demands for credentials.",
+    "llm_ms": 618,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller explicitly warns against payment and confirms the transaction will happen in person at a physical clinic, showing no scam tactics.",
+    "llm_ms": 558,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_doctor_clinic_04": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no pressure, threats, or demands yet.",
+    "llm_ms": 506,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identified themselves as a hospital representative discussing medical reports, which is a normal business call without authority leverage, threats, or demands.",
+    "llm_ms": 613,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identified as a hospital representative discussing routine medical reports and appointments without using authority, threats, secrecy, urgency, or requesting any sensitive information.",
+    "llm_ms": 696,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identifies as a hospital representative discussing medical reports and appointments without using authority, threats, secrecy, urgency, or requesting sensitive information.",
+    "llm_ms": 645,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identifies as a clinic and discusses a scheduled appointment with a clear payment method, showing no signs of authority impersonation, threats, secrecy, or demands for sensitive information.",
+    "llm_ms": 649,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller discusses a medical consultation fee and appointment details without using authority, threats, secrecy, urgency, or requesting sensitive information.",
+    "llm_ms": 700,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 12,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is acting as a legitimate clinic representative discussing appointment details and fees, with no authority impersonation, threats, secrecy, urgency, or demands for credentials.",
+    "llm_ms": 819,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_family_chat_00": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is making a normal introductory call without using authority, threats, secrecy, urgency, or any demands.",
+    "llm_ms": 591,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is engaging in normal social conversation without using authority, threats, secrecy, urgency, or demanding any sensitive information.",
+    "llm_ms": 636,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is acting as a concerned relative offering future help without using authority, threats, secrecy, or making any demands.",
+    "llm_ms": 591,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is engaging in normal, friendly small talk about health and travel plans without using authority, threats, secrecy, urgency, or making any demands.",
+    "llm_ms": 754,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S6"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I sent twelve thousand rupees to your account for the house repairs we discussed."
+    ],
+    "rationale": "The caller is using a false claim of a large financial transfer to create urgency and pressure the listener to verify or accept the transaction, which is a classic advance-fee or investment scam tactic.",
+    "llm_ms": 672,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is engaging in normal family conversation and offering a gift without using authority, threats, secrecy, urgency, or demanding any credentials or payments.",
+    "llm_ms": 692,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_family_chat_01": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is using a friendly, personal greeting without any authority, threats, secrecy, urgency, or demands for sensitive information.",
+    "llm_ms": 754,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is engaging in casual conversation without using authority, threats, secrecy, urgency, or any requests for sensitive information or payment.",
+    "llm_ms": 600,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is engaging in a friendly, non-threatening conversation without using authority, threats, secrecy, urgency, or any requests for credentials or payment.",
+    "llm_ms": 546,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is engaging in a friendly, non-pressuring conversation about travel and family without using authority, threats, secrecy, urgency, or any demand for credentials or payment.",
+    "llm_ms": 629,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 10,
+    "quotes": [],
+    "rationale": "The caller is engaging in a friendly social conversation and mentioning a past payment without using authority, threats, secrecy, or demanding new credentials.",
+    "llm_ms": 560,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 10,
+    "quotes": [],
+    "rationale": "The caller is using a false narrative about sending money to bypass the listener's refusal, but has not yet demanded credentials or a new payment, keeping the risk low.",
+    "llm_ms": 646,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_family_chat_03": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is making a casual, friendly greeting without using authority, threats, urgency, or requesting any sensitive information.",
+    "llm_ms": 512,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is engaging in a friendly, non-threatening conversation without using authority, threats, secrecy, urgency, or any demands for sensitive information or payment.",
+    "llm_ms": 569,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is engaging in normal small talk without using authority, threats, secrecy, urgency, or any demands for sensitive information or payment.",
+    "llm_ms": 609,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is engaging in normal, friendly small talk about health and travel plans without any pressure, threats, or demands.",
+    "llm_ms": 549,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is engaging in normal small talk about travel plans with no authority impersonation, threats, secrecy, urgency, or demands for credentials or payment.",
+    "llm_ms": 636,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is engaging in normal social conversation and mentioning a past donation without using authority, threats, secrecy, urgency, or requesting any credentials or payments.",
+    "llm_ms": 618,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 12,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is discussing a future visit and confirming a past donation without using authority, threats, secrecy, urgency, or demanding any credentials or payments.",
+    "llm_ms": 578,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_family_chat_04": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is making a routine inquiry about the listener's health without using authority, threats, secrecy, urgency, or requesting any sensitive information.",
+    "llm_ms": 606,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is engaging in normal social conversation without using authority, threats, secrecy, urgency, or any demands for sensitive information or payment.",
+    "llm_ms": 571,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is engaging in friendly small talk about knee pain and travel plans without any authority impersonation, threats, secrecy, urgency, or demands for credentials or payment.",
+    "llm_ms": 645,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is engaging in friendly small talk and claiming to have sent money, which is a common tactic to build trust before potentially requesting repayment or credentials later, but no scam stages have been triggered yet.",
+    "llm_ms": 593,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is engaging in friendly, non-threatening conversation without using authority, threats, secrecy, urgency, or any requests for credentials or payments.",
+    "llm_ms": 591,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is making a friendly, non-pressuring request for a gift without using authority, threats, or demanding sensitive information.",
+    "llm_ms": 562,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_telemarketing_00": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no authority impersonation, threats, or demands yet.",
+    "llm_ms": 537,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller has only introduced themselves and offered a service upgrade without using authority, threats, secrecy, urgency, or requesting any sensitive information.",
+    "llm_ms": 571,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is making a standard sales pitch for a broadband upgrade without using authority, threats, secrecy, urgency, or requesting any sensitive information or payment.",
+    "llm_ms": 537,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is making a standard sales pitch for a broadband plan without using authority, threats, secrecy, urgency, or demanding any credentials or payments.",
+    "llm_ms": 601,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is making a standard sales pitch for a broadband plan without using authority, threats, secrecy, urgency, or requesting any sensitive information.",
+    "llm_ms": 719,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is providing information and offering to send details via WhatsApp without using authority, threats, or demanding any credentials or payments.",
+    "llm_ms": 657,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_telemarketing_01": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no authority impersonation, threats, or demands yet.",
+    "llm_ms": 510,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is identifying themselves as a broadband company and offering a service, which is a normal business call with no pressure, threats, or demands.",
+    "llm_ms": 627,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is making a standard sales pitch for broadband services without using authority, threats, secrecy, urgency, or requesting any sensitive information.",
+    "llm_ms": 598,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is conducting a standard sales pitch for broadband services without using authority, threats, secrecy, urgency, or demanding any credentials or payments.",
+    "llm_ms": 718,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is offering a service and discussing pricing without using authority, threats, secrecy, urgency, or demanding any credentials or payments.",
+    "llm_ms": 532,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is discussing a subscription cost and offering to send details, which is consistent with a legitimate sales inquiry rather than a scam using authority, threats, or demands.",
+    "llm_ms": 593,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_telemarketing_03": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no pressure, threats, or demands yet.",
+    "llm_ms": 551,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller has only introduced themselves and offered a credit card product without using authority, threats, secrecy, urgency, or demanding any sensitive information or payment.",
+    "llm_ms": 581,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller identified themselves as a finance company offering a credit card promotion without using authority, threats, secrecy, urgency, or requesting any sensitive information.",
+    "llm_ms": 546,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is making a standard sales pitch for a credit card without using authority, threats, secrecy, urgency, or demanding any credentials or payments.",
+    "llm_ms": 570,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is offering a free credit card with rewards and is willing to send details via email, showing no pressure, threats, or requests for sensitive information.",
+    "llm_ms": 624,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is providing information and offering to send details, which indicates a normal, non-threatening interaction without any scam tactics.",
+    "llm_ms": 549,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "legit_telemarketing_04": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a standard identity verification check with no pressure, threats, or demands.",
+    "llm_ms": 529,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller has only introduced themselves and stated a reason for the call without using authority, threats, secrecy, urgency, or requesting any sensitive information.",
+    "llm_ms": 562,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is making a standard sales pitch for a broadband upgrade without using authority, threats, secrecy, urgency, or requesting any sensitive information.",
+    "llm_ms": 531,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is making a standard sales pitch for a broadband upgrade without using authority, threats, secrecy, urgency, or requesting any sensitive information.",
+    "llm_ms": 568,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is offering a free upgrade without demanding credentials, money, or using authority, which indicates a normal promotional call.",
+    "llm_ms": 580,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is offering a free benefit with no demand for credentials, money, or pressure, indicating a low-risk informational or marketing call.",
+    "llm_ms": 545,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 12,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller offers a free benefit and provides no authority, threat, urgency, or requests for credentials, indicating a low-risk informational or marketing call.",
+    "llm_ms": 549,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_bank_kyc_00": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification by asking for the listener's name and location, which is a standard procedure and does not yet indicate any scam tactics.",
+    "llm_ms": 724,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Mr. Sameer from the RBI verification cell"
+    ],
+    "rationale": "The caller impersonates an RBI authority to establish leverage for a potential scam.",
+    "llm_ms": 612,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2",
+     "S4"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Mr. Sameer from the RBI verification cell",
+     "your account will be blocked by tonight"
+    ],
+    "rationale": "The caller impersonates RBI to create urgency about an account block, applying pressure to compel immediate action.",
+    "llm_ms": 820,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S6"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I am Mr. Sameer from the RBI verification cell",
+     "your account will be blocked by tonight",
+     "We can update it right now over the phone so your funds remain accessible"
+    ],
+    "rationale": "The caller impersonates RBI to threaten account blockage and demands a phone update to access funds, indicating a high-risk digital arrest scam.",
+    "llm_ms": 818,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S5"
+    ],
+    "risk": 85,
+    "quotes": [
+     "your account will be blocked by tonight",
+     "Please read out your sixteen digit debit card number and the expiry date first"
+    ],
+    "rationale": "The caller impersonates a bank authority to threaten account blocking and immediately demands sensitive card details.",
+    "llm_ms": 738,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S5",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "I am an official from the Reserve Bank, Mrs. Khan",
+     "Please read out your sixteen digit debit card number and the expiry date first",
+     "I will send a verification OTP which you must tell me",
+     "We can update it right now over the phone"
+    ],
+    "rationale": "The caller impersonates the RBI to demand card details and OTP while creating urgency to bypass standard verification.",
+    "llm_ms": 733,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_bank_kyc_01": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no pressure, threats, or demands yet.",
+    "llm_ms": 698,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1"
+    ],
+    "risk": 65,
+    "quotes": [
+     "I am Deepak Sharma from the RBI digital compliance cell"
+    ],
+    "rationale": "The caller impersonates an authority figure (RBI) to create pressure regarding an expired KYC, which is a common tactic in digital arrest scams.",
+    "llm_ms": 667,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2",
+     "S4"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Deepak Sharma from the RBI digital compliance cell",
+     "your account will be blocked by evening"
+    ],
+    "rationale": "The caller impersonates the RBI to create urgency and threaten account blocking, demanding immediate action to avoid a financial penalty.",
+    "llm_ms": 770,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S4"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Deepak Sharma from the RBI digital compliance cell",
+     "If we do not update it now, your account will be blocked by evening",
+     "Do not worry, I can fix this for you right now"
+    ],
+    "rationale": "The caller impersonates RBI authority to threaten account blockage and creates urgency to verify identity.",
+    "llm_ms": 772,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S5"
+    ],
+    "risk": 95,
+    "quotes": [
+     "your account will be blocked by evening",
+     "I just need to verify your identity first",
+     "Please tell me your sixteen digit debit card number and the Aadhaar number linked to the account"
+    ],
+    "rationale": "The caller impersonated a government authority to threaten account blocking and immediately demanded sensitive credentials.",
+    "llm_ms": 734,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S5",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "I am an officer from the RBI",
+     "Please tell me your sixteen digit debit card number and the Aadhaar number linked to the account",
+     "I will send a verification link for twelve thousand rupees"
+    ],
+    "rationale": "The caller impersonates an RBI officer to demand sensitive credentials and requests a UPI transfer to a 'verification' link, combining authority, secrecy, and financial coercion.",
+    "llm_ms": 726,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 12,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "I am an officer from the RBI",
+     "To prove it, I will send a verification link for twelve thousand rupees",
+     "It is just a security deposit for the activation",
+     "Now please give me the OTP you just received on your phone"
+    ],
+    "rationale": "The caller uses false authority (RBI), demands money via a fake link, creates urgency, isolates the listener, and explicitly requests sensitive credentials and OTPs.",
+    "llm_ms": 875,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_bank_kyc_03": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification check with no pressure, threats, or demands.",
+    "llm_ms": 552,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1"
+    ],
+    "risk": 65,
+    "quotes": [
+     "I am Rohan from the RBI regional compliance wing"
+    ],
+    "rationale": "The caller impersonates an RBI official to create pressure regarding pending KYC, establishing authority without yet demanding credentials or payment.",
+    "llm_ms": 604,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2",
+     "S4"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Rohan from the RBI regional compliance wing",
+     "If we don't update it now, your account will be frozen by tonight"
+    ],
+    "rationale": "The caller impersonates an authority figure (RBI) to threaten account freezing and create urgency without yet requesting credentials or payment.",
+    "llm_ms": 829,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S4"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Rohan from the RBI regional compliance wing",
+     "If we don't update it now, your account will be frozen by tonight",
+     "I just need to verify your identity quickly"
+    ],
+    "rationale": "The caller impersonates RBI authority to threaten account freezing and demands immediate identity verification under pressure.",
+    "llm_ms": 700,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S4",
+     "S5"
+    ],
+    "risk": 85,
+    "quotes": [
+     "There is a new digital mandate, Mr. Patil. If we don't update it now, your account will be frozen by tonight.",
+     "Exactly, that is why I am calling to help you avoid that trouble. I just need to verify your identity quickly.",
+     "Please tell me your full Aadhaar number first, and then I will send a verification code to your phone."
+    ],
+    "rationale": "The caller impersonates an authority figure to threaten account freezing, creates urgency, and explicitly demands the listener's Aadhaar number.",
+    "llm_ms": 782,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S5"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I just need to verify your identity quickly",
+     "Please tell me your full Aadhaar number first",
+     "Sir, I am an official from the Reserve Bank",
+     "otherwise the account will block"
+    ],
+    "rationale": "The caller impersonates the RBI (S1), threatens account blocking (S2), and demands sensitive credentials like Aadhaar and OTP (S5) to bypass normal verification procedures.",
+    "llm_ms": 733,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_bank_kyc_04": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a standard identity verification check with no threats, authority leverage, or demands.",
+    "llm_ms": 712,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1",
+     "S2",
+     "S4"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I am Rohan from the RBI compliance wing",
+     "your account will be frozen by tonight"
+    ],
+    "rationale": "The caller impersonates an authority figure (RBI) to threaten account freezing and create urgency without requesting credentials yet.",
+    "llm_ms": 692,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2",
+     "S4"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Rohan from the RBI compliance wing",
+     "your account will be frozen by tonight",
+     "If you have more than one lakh rupees in there, you might lose access to the funds temporarily"
+    ],
+    "rationale": "The caller impersonates RBI authority to threaten account freezing and fund loss, creating urgency without yet demanding credentials or payment.",
+    "llm_ms": 708,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S5"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I am Rohan from the RBI compliance wing",
+     "your account will be frozen by tonight",
+     "you might lose access to the funds temporarily",
+     "May I have your Aadhaar number first?"
+    ],
+    "rationale": "The caller impersonates RBI to threaten account freezing and demands sensitive personal data.",
+    "llm_ms": 657,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "The system is flagging it now, ma'am.",
+     "If you have more than one lakh rupees in there, you might lose access to the funds temporarily.",
+     "Just give me the Aadhaar and the OTP that is coming to your phone now to verify your identity.",
+     "Ma'am, the bank manager is busy."
+    ],
+    "rationale": "The caller impersonates bank authority to create fear of fund loss, demands immediate secrecy and credentials (Aadhaar, OTP), and pressures the listener to bypass official verification channels.",
+    "llm_ms": 1036,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "I can help you update it right now over the phone",
+     "Just give me the Aadhaar and the OTP",
+     "the bank manager is busy",
+     "If you wait for your son, the window will close and the account will be blocked",
+     "Just read me the six digits quickly"
+    ],
+    "rationale": "The caller uses false authority and threats to demand sensitive credentials and payment while isolating the listener.",
+    "llm_ms": 821,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_bank_kyc_06": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no authority impersonation, threats, or demands.",
+    "llm_ms": 551,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1",
+     "S2"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I am Sameer from the RBI regional compliance office",
+     "Your bank account KYC has expired and we have received a notice to freeze it by tonight"
+    ],
+    "rationale": "The caller impersonates an RBI official to create urgency and threatens account freezing, establishing a high-risk scam pattern.",
+    "llm_ms": 694,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2",
+     "S4"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Sameer from the RBI regional compliance office",
+     "we have received a notice to freeze it by tonight",
+     "If it is not updated, you will not be able to withdraw any money"
+    ],
+    "rationale": "The caller impersonates RBI authority to threaten account freezing and financial loss, creating urgency without yet demanding credentials or payment.",
+    "llm_ms": 638,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Sameer from the RBI regional compliance office",
+     "If it is not updated, you will not be able to withdraw any money",
+     "Do not worry, I can do it for you right now over the phone. I just need to verify your identity first"
+    ],
+    "rationale": "The caller impersonates RBI authority, threatens account freezing and withdrawal bans, and pressures the listener to stay on the line for identity verification.",
+    "llm_ms": 991,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S5",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "There is a new government mandate for senior citizens, and your file is still pending. If it is not updated, you will not be able to withdraw any money.",
+     "The branch will take three days, and your account will be blocked.",
+     "Just tell me your Aadhaar number and the sixteen digit card number to start.",
+     "Do not worry, I can do it for you right now over the phone. I just need to verify your identity first."
+    ],
+    "rationale": "The caller impersonates a government authority to create urgency and fear of account blocking, demands sensitive credentials, and requests immediate verification over the phone.",
+    "llm_ms": 817,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "The branch will take three days, and your account will be blocked.",
+     "Just tell me your Aadhaar number and the sixteen digit card number to start.",
+     "Please hurry, Mrs. Iyer.",
+     "Once I enter the card details, a verification code of twenty five thousand rupees will be triggered"
+    ],
+    "rationale": "The caller uses a false bank identity to threaten account blocking, demands immediate secrecy and urgency, and requests sensitive credentials and money transfer under the guise of a verification code.",
+    "llm_ms": 769,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 12,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "The branch will take three days, and your account will be blocked.",
+     "Just tell me your Aadhaar number and the sixteen digit card number to start.",
+     "Please hurry, Mrs. Iyer.",
+     "Once I enter the card details, a verification code of twenty five thousand rupees will be triggered",
+     "Now please read out the OTP you just received on your mobile."
+    ],
+    "rationale": "The caller uses a fake bank branch identity to threaten account blocking, demands immediate secrecy and urgency, and requests sensitive credentials and a large UPI transfer under the guise of a technical verification.",
+    "llm_ms": 844,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_courier_customs_00": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no authority impersonation, threats, or demands.",
+    "llm_ms": 520,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1",
+     "S2"
+    ],
+    "risk": 75,
+    "quotes": [
+     "this is Rohan from the Air Customs clearance wing",
+     "We have a luxury watch parcel arriving for you from Dubai, but it is currently held at the hub"
+    ],
+    "rationale": "The caller impersonates Customs authority to create a threat regarding a held parcel, establishing leverage to pressure the listener.",
+    "llm_ms": 665,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2"
+    ],
+    "risk": 75,
+    "quotes": [
+     "this is Rohan from the Air Customs clearance wing",
+     "the package contains banned items and your ID is attached, so now it is a legal matter"
+    ],
+    "rationale": "The caller impersonates Customs authority and threatens legal action for a non-existent crime to create pressure.",
+    "llm_ms": 627,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S6"
+    ],
+    "risk": 85,
+    "quotes": [
+     "this is Rohan from the Air Customs clearance wing",
+     "the package contains banned items and your ID is attached, so now it is a legal matter",
+     "you must pay a clearance fine of twelve thousand rupees immediately"
+    ],
+    "rationale": "The caller impersonates Customs (S1), threatens legal action due to 'banned items' (S2), and demands immediate payment of a fine (S6).",
+    "llm_ms": 741,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "That is the problem sir, the package contains banned items and your ID is attached, so now it is a legal matter.",
+     "Don't worry, I can settle this internally so no police case is filed, but you must pay a clearance fine of twelve thousand rupees immediately.",
+     "No sir, the office is closed for audit, you must send it via UPI or a Google Play gift card right now to avoid arrest.",
+     "Don't tell anyone, stay on the call"
+    ],
+    "rationale": "The caller impersonates an authority figure regarding a legal matter, threatens arrest, demands immediate payment via UPI or gift card, and instructs secrecy.",
+    "llm_ms": 980,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "I can settle this internally so no police case is filed",
+     "you must pay a clearance fine of twelve thousand rupees immediately",
+     "No sir, the office is closed for audit, you must send it via UPI or a Google Play gift card right now to avoid arrest",
+     "I only have ten minutes before the file goes to the police",
+     "just send the UPI payment to the number I am messaging you now"
+    ],
+    "rationale": "The caller impersonates an authority figure to threaten arrest, demands immediate payment via UPI or gift cards, and isolates the listener by creating a false time limit.",
+    "llm_ms": 847,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_courier_customs_01": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no pressure, threats, or demands.",
+    "llm_ms": 566,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1",
+     "S2"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Rohan from the International Postal Clearance cell",
+     "We have a high-value package held in your name at the customs warehouse"
+    ],
+    "rationale": "The caller impersonates an authority figure (customs) and creates a threat involving a high-value parcel held at a warehouse to pressure the listener.",
+    "llm_ms": 717,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Rohan from the International Postal Clearance cell",
+     "contains restricted items which have triggered a mandatory customs penalty of eighty thousand rupees"
+    ],
+    "rationale": "The caller impersonates a customs authority to threaten the listener with a legal penalty and financial loss for a non-existent restricted item.",
+    "llm_ms": 737,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S4"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I am Rohan from the International Postal Clearance cell",
+     "contains restricted items which have triggered a mandatory customs penalty",
+     "the police will be dispatched to your home",
+     "settle this within two hours"
+    ],
+    "rationale": "The caller impersonates customs authority, threatens legal arrest, and demands immediate payment to avoid police dispatch.",
+    "llm_ms": 716,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "contains restricted items which have triggered a mandatory customs penalty",
+     "If you do not settle this within two hours, the police will be dispatched",
+     "Just send the payment via UPI to this official department ID"
+    ],
+    "rationale": "The caller impersonates customs authority, threatens immediate police arrest, creates urgency, and demands a UPI payment to a personal ID.",
+    "llm_ms": 737,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "It is a legal fine for the specific category of goods, Mrs. Khan.",
+     "If you do not settle this within two hours, the police will be dispatched to your home",
+     "Just send the payment via UPI to this official department ID",
+     "If you cannot do UPI, you can purchase Google Play gift cards"
+    ],
+    "rationale": "The caller impersonates customs authority to threaten police arrest and demands immediate payment via UPI or gift cards under time pressure.",
+    "llm_ms": 801,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 12,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "I can help you clear this quickly. Just send the payment via UPI to this official department ID I will text you now.",
+     "If you hang up now, the window for the fine closes and the case will be marked as criminal. Pay now to avoid the police visit.",
+     "If you cannot do UPI, you can purchase Google Play gift cards for the same amount and read me the codes."
+    ],
+    "rationale": "The caller impersonates an authority figure, threatens arrest, demands immediate payment via UPI or gift cards, requests the listener read codes, and isolates them by warning against hanging up.",
+    "llm_ms": 880,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_courier_customs_03": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no authority impersonation, threats, urgency, or demands yet.",
+    "llm_ms": 596,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1",
+     "S2"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Rohan from the Global Logistics clearance cell",
+     "We have a heavy parcel for you that has been detained by customs"
+    ],
+    "rationale": "The caller impersonates a customs authority to create a threat of detained goods, establishing leverage without yet demanding payment or credentials.",
+    "llm_ms": 632,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2"
+    ],
+    "risk": 68,
+    "quotes": [
+     "I am Rohan from the Global Logistics clearance cell",
+     "detained by customs",
+     "legal discrepancy with the declarations"
+    ],
+    "rationale": "The caller uses a fake logistics authority to create a legal threat regarding a non-existent parcel, establishing pressure without yet demanding credentials or payment.",
+    "llm_ms": 740,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S4"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Rohan from the Global Logistics clearance cell",
+     "if not cleared in two hours, the police will be notified for an investigation"
+    ],
+    "rationale": "The caller impersonates a customs authority to threaten legal action and police notification if the parcel is not cleared within two hours.",
+    "llm_ms": 657,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S4",
+     "S6"
+    ],
+    "risk": 85,
+    "quotes": [
+     "It is a customs violation, and if not cleared in two hours, the police will be notified for an investigation.",
+     "Do not worry, you can settle the penalty of twenty five thousand rupees now to avoid any legal trouble."
+    ],
+    "rationale": "The caller impersonated customs authority to threaten legal action and demanded immediate payment of a fine to avoid police notification.",
+    "llm_ms": 676,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "It is a customs violation, and if not cleared in two hours, the police will be notified for an investigation.",
+     "Do not worry, you can settle the penalty of twenty five thousand rupees now to avoid any legal trouble.",
+     "No maam, the office is closed for audit. Just send the amount via UPI or buy Google gift cards and send the codes immediately."
+    ],
+    "rationale": "The caller impersonated customs authority, threatened legal action, created urgency, and demanded immediate payment via UPI or gift cards.",
+    "llm_ms": 743,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_courier_customs_04": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [
+     "S1"
+    ],
+    "risk": 75,
+    "quotes": [
+     "This is Vikram from the Delhi Customs Clearance wing."
+    ],
+    "rationale": "The caller is impersonating a government authority (Customs) to establish leverage and initiate a potential scam.",
+    "llm_ms": 653,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1",
+     "S2"
+    ],
+    "risk": 75,
+    "quotes": [
+     "This is Vikram from the Delhi Customs Clearance wing.",
+     "we have intercepted a courier package arriving for you from abroad, but it contains banned items and is currently held at the airport."
+    ],
+    "rationale": "The caller impersonates Customs (S1) and threatens the listener with a seized illegal parcel (S2) to create fear and pressure.",
+    "llm_ms": 653,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2"
+    ],
+    "risk": 75,
+    "quotes": [
+     "This is Vikram from the Delhi Customs Clearance wing.",
+     "the police will be sent to your home for questioning"
+    ],
+    "rationale": "The caller impersonates Customs authority to create a false threat of police arrest for a non-existent package, fitting the digital-arrest scam pattern.",
+    "llm_ms": 678,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "we have intercepted a courier package arriving for you from abroad, but it contains banned items",
+     "If you do not settle the penalty, the police will be sent to your home for questioning",
+     "To avoid the legal case and release the hold, you need to pay a clearance fine of nine thousand five hundred rupees now"
+    ],
+    "rationale": "The caller uses false authority (police/courier), threats of arrest, secrecy, urgency, and demands a specific payment to resolve a fabricated issue.",
+    "llm_ms": 1002,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "If you do not settle the penalty, the police will be sent to your home for questioning.",
+     "To avoid the legal case and release the hold, you need to pay a clearance fine of nine thousand five hundred rupees now.",
+     "The office is closed for auditing. You must pay it via UPI or get a Google Play gift card right now"
+    ],
+    "rationale": "The caller uses false authority (police), threats of arrest, secrecy, urgency, and demands payment via UPI or gift cards to resolve a fabricated legal issue.",
+    "llm_ms": 765,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "To avoid the legal case and release the hold, you need to pay a clearance fine of nine thousand five hundred rupees now.",
+     "Sir, the office is closed for auditing. You must pay it via UPI or get a Google Play gift card right now to stop the police action.",
+     "No cheques, Mr. Reddy. Please just send the UPI payment to this number I will message you, or the case will be registered in ten minutes."
+    ],
+    "rationale": "The caller impersonates police authority to threaten legal action and demands immediate payment via UPI or gift cards under secrecy and urgency.",
+    "llm_ms": 811,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_courier_customs_06": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only identifying the listener by name and location, which is a normal greeting and does not constitute any scam stage.",
+    "llm_ms": 576,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1"
+    ],
+    "risk": 55,
+    "quotes": [
+     "I am Rohan from the Customs Clearance division"
+    ],
+    "rationale": "The caller impersonates Customs authority to establish a false premise, but has not yet issued a threat, demanded credentials, or requested payment.",
+    "llm_ms": 577,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Rohan from the Customs Clearance division",
+     "If you do not claim it and pay the duty now, it will be marked as illegal and reported to the police"
+    ],
+    "rationale": "The caller impersonates Customs authority to create a threat of legal action and police reporting for an unclaimed package.",
+    "llm_ms": 677,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "I am Rohan from the Customs Clearance division",
+     "If you do not claim it and pay the duty now, it will be marked as illegal and reported to the police",
+     "You need to pay a clearance fine of eighty thousand rupees right now"
+    ],
+    "rationale": "The caller impersonates Customs authority to threaten legal action and demands immediate payment of a fine.",
+    "llm_ms": 785,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "If you do not claim it and pay the duty now, it will be marked as illegal and reported to the police.",
+     "That is why we must clear this immediately to avoid a legal case.",
+     "Since it is urgent, you can just send the amount via UPI or buy Amazon gift cards and share the codes with me."
+    ],
+    "rationale": "The caller impersonates an authority figure to threaten legal action and secrecy while demanding immediate payment via UPI or gift cards.",
+    "llm_ms": 755,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "That is why we must clear this immediately to avoid a legal case.",
+     "You need to pay a clearance fine of eighty thousand rupees right now.",
+     "Since it is urgent, you can just send the amount via UPI or buy Amazon gift cards and share the codes with me.",
+     "the government portal is down for maintenance, so this is the only way to stop the police case.",
+     "Please hurry or the parcel will be seized."
+    ],
+    "rationale": "The caller impersonates government/customs authority to threaten legal action and parcel seizure, demands immediate payment via UPI or gift cards, and instructs the listener to share codes while urging secrecy and urgency.",
+    "llm_ms": 872,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_digital_arrest_00": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a standard identity verification check with no pressure, threats, or demands.",
+    "llm_ms": 512,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1",
+     "S2"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I am Inspector Vikram from the Cyber Crime Unit.",
+     "We have intercepted a courier package containing illegal narcotics and several fake passports linked to your Aadhaar number."
+    ],
+    "rationale": "The caller impersonates a police authority to threaten the listener with legal action and criminal charges based on a fabricated parcel and Aadhaar link.",
+    "llm_ms": 709,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I am Inspector Vikram from the Cyber Crime Unit",
+     "illegal narcotics and several fake passports linked to your Aadhaar number",
+     "This is now a matter of digital arrest, so you must stay on this line and not tell anyone"
+    ],
+    "rationale": "The caller impersonates a police authority to threaten arrest and isolation based on fabricated criminal charges against the listener.",
+    "llm_ms": 858,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I am Inspector Vikram from the Cyber Crime Unit",
+     "illegal narcotics and several fake passports linked to your Aadhaar number",
+     "This is now a matter of digital arrest",
+     "you must stay on this line and not tell anyone"
+    ],
+    "rationale": "The caller uses a fake police identity to threaten arrest and isolation, creating high pressure without yet demanding payment or credentials.",
+    "llm_ms": 740,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4"
+    ],
+    "risk": 95,
+    "quotes": [
+     "This is now a matter of digital arrest",
+     "you must stay on this line and not tell anyone",
+     "you will be picked up by local police immediately",
+     "You will be arrested if you hang up"
+    ],
+    "rationale": "The caller uses false authority (digital arrest/police), threats of immediate arrest, isolation tactics, and urgency to control the listener.",
+    "llm_ms": 725,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "I am transferring your case to our verification officer",
+     "any leak will be seen as tampering with evidence. You will be arrested if you hang up.",
+     "To prove your innocence, you need to transfer eighty thousand rupees into a secure government verification account"
+    ],
+    "rationale": "The caller uses a fake authority identity, threatens arrest and secrecy, and demands a large UPI transfer to a personal account.",
+    "llm_ms": 727,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 12,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "Absolutely not, this is a confidential government operation",
+     "You will be arrested if you hang up",
+     "To prove your innocence, you need to transfer eighty thousand rupees into a secure government verification account",
+     "You must arrange it through a friend or bank transfer right now, or I will have no choice but to issue the warrant for your arrest"
+    ],
+    "rationale": "The caller uses false authority, threats of arrest, secrecy, urgency, and demands a large UPI transfer to fix a fabricated legal issue.",
+    "llm_ms": 840,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_digital_arrest_01": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [
+     "S1"
+    ],
+    "risk": 75,
+    "quotes": [
+     "Inspector Vikram Rathore from the Narcotics Control Bureau office"
+    ],
+    "rationale": "The caller impersonates a law enforcement officer (Narcotics Control Bureau) to establish authority and pressure the listener.",
+    "llm_ms": 552,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 85,
+    "quotes": [
+     "Inspector Vikram Rathore from the Narcotics Control Bureau office",
+     "your Aadhaar number was found linked to the sender's profile"
+    ],
+    "rationale": "The caller uses a fake police identity to threaten the listener with a legal case involving their Aadhaar and a banned substance package, creating immediate pressure to comply.",
+    "llm_ms": 853,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 85,
+    "quotes": [
+     "Inspector Vikram Rathore from the Narcotics Control Bureau office",
+     "your Aadhaar number was found linked to the sender's profile",
+     "If you hang up or tell anyone, we will have to initiate a digital arrest"
+    ],
+    "rationale": "The caller uses false authority (Narcotics Bureau), threatens legal action (digital arrest), and demands secrecy to isolate the listener.",
+    "llm_ms": 716,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 85,
+    "quotes": [
+     "your Aadhaar number was found linked to the sender's profile",
+     "If you hang up or tell anyone, we will have to initiate a digital arrest",
+     "you must stay on this line for the entire verification process. Do not talk to your family"
+    ],
+    "rationale": "The caller uses false authority (Aadhaar/courier), threatens legal action (digital arrest), and isolates the listener by demanding secrecy.",
+    "llm_ms": 732,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "If you hang up or tell anyone, we will have to initiate a digital arrest",
+     "Do not talk to your family or they will be implicated too",
+     "deposit twenty five thousand rupees into our secure verification account"
+    ],
+    "rationale": "The caller uses a fake digital arrest threat, demands secrecy to isolate the listener, and requests a large UPI transfer to a personal account.",
+    "llm_ms": 770,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "you must stay on this line for the entire verification process",
+     "Do not talk to your family or they will be implicated too",
+     "deposit twenty five thousand rupees into our secure verification account",
+     "I will be forced to issue the arrest warrant"
+    ],
+    "rationale": "The caller combines false authority, threats of arrest, isolation tactics, urgency, and a demand for payment to a personal account.",
+    "llm_ms": 819,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_digital_arrest_03": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [
+     "S1"
+    ],
+    "risk": 65,
+    "quotes": [
+     "This is Inspector Vikram Rathore calling from the Mumbai Cyber Cell."
+    ],
+    "rationale": "The caller is impersonating a law enforcement authority to establish credibility and pressure the listener.",
+    "llm_ms": 611,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1",
+     "S2"
+    ],
+    "risk": 85,
+    "quotes": [
+     "This is Inspector Vikram Rathore calling from the Mumbai Cyber Cell",
+     "we have intercepted a courier containing illegal narcotics and several fake passports addressed to you"
+    ],
+    "rationale": "The caller impersonates a police inspector and threatens the listener with illegal narcotics and fake passports to create fear and pressure.",
+    "llm_ms": 623,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 85,
+    "quotes": [
+     "This is Inspector Vikram Rathore calling from the Mumbai Cyber Cell.",
+     "we have intercepted a courier containing illegal narcotics and several fake passports addressed to you.",
+     "this is now a digital arrest case. You must stay on this call and not tell anyone"
+    ],
+    "rationale": "The caller uses a fake police identity to threaten arrest and isolation, demanding the listener stay on the line without offering verification.",
+    "llm_ms": 749,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 85,
+    "quotes": [
+     "we have intercepted a courier containing illegal narcotics and several fake passports addressed to you",
+     "Your Aadhaar is linked to this shipment, and this is now a digital arrest case",
+     "You must stay on this call and not tell anyone"
+    ],
+    "rationale": "The caller uses false authority (police/courier), threatens arrest/detention, and demands secrecy to create pressure.",
+    "llm_ms": 731,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "Your Aadhaar is linked to this shipment, and this is now a digital arrest case.",
+     "You must stay on this call and not tell anyone, or you will be detained immediately.",
+     "To clear your name and avoid the police coming to your house, you need to undergo a security verification process.",
+     "You must transfer twenty five thousand rupees to the government's safe verification account."
+    ],
+    "rationale": "The caller impersonates a digital arrest authority, isolates the listener, threatens immediate detention, and demands a large UPI transfer to a 'safe' account.",
+    "llm_ms": 852,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "To clear your name and avoid the police coming to your house",
+     "transfer twenty five thousand rupees to the government's safe verification account",
+     "If you hang up or tell anyone, it will be seen as tampering with evidence and you will be arrested tonight"
+    ],
+    "rationale": "The caller uses false authority (police), threats of arrest, isolation tactics, and demands a large UPI transfer to a 'safe account' to clear the listener's name.",
+    "llm_ms": 765,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_digital_arrest_05": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [
+     "S1"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Inspector Vikram Singh from the Cyber Crime Cell."
+    ],
+    "rationale": "The caller impersonates a police authority to establish leverage, which is a definitive sign of a digital-arrest scam.",
+    "llm_ms": 611,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Inspector Vikram Singh from the Cyber Crime Cell.",
+     "we have intercepted a narcotics parcel sent to your address and your Aadhaar is linked to the sender. This is a serious criminal offense."
+    ],
+    "rationale": "The caller impersonates a police authority to threaten the listener with a narcotics case and illegal parcel, creating immediate fear and pressure to comply.",
+    "llm_ms": 698,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I am Inspector Vikram Singh from the Cyber Crime Cell.",
+     "we have intercepted a narcotics parcel sent to your address and your Aadhaar is linked to the sender.",
+     "You are now under digital arrest, so do not hang up or tell anyone"
+    ],
+    "rationale": "The caller uses a fake police identity to threaten arrest over a fabricated narcotics charge and demands secrecy to maintain control.",
+    "llm_ms": 774,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 85,
+    "quotes": [
+     "This is a serious criminal offense.",
+     "You are now under digital arrest",
+     "do not hang up or tell anyone"
+    ],
+    "rationale": "The caller uses false authority (narcotics/Aadhaar link), threatens immediate arrest, and isolates the listener by forbidding contact with others.",
+    "llm_ms": 668,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "You are now under digital arrest",
+     "do not hang up or tell anyone",
+     "No, you are not allowed to contact anyone",
+     "You must transfer fifty thousand rupees to our government verification account"
+    ],
+    "rationale": "The caller combines false authority (digital arrest), isolation tactics (do not tell anyone), and a direct demand for a large UPI transfer to a personal account.",
+    "llm_ms": 815,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "No, you are not allowed to contact anyone until this is cleared.",
+     "You must transfer fifty thousand rupees to our government verification account.",
+     "Sir, it is either this amount or a jail term. Send the money now or I will have to issue the warrant for your home."
+    ],
+    "rationale": "The caller combines false authority (government verification), threats of arrest and warrants, isolation tactics, urgent deadlines, and a direct demand for a large UPI transfer to a personal account.",
+    "llm_ms": 823,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_digital_arrest_06": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [
+     "S1"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Inspector Vikram from the Cyber Cell office."
+    ],
+    "rationale": "The caller is impersonating a police authority to establish leverage and intimidate the listener.",
+    "llm_ms": 627,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I am Inspector Vikram from the Cyber Cell office.",
+     "your Aadhaar number was found inside the package."
+    ],
+    "rationale": "The caller impersonates a police authority to threaten legal action and secrecy regarding an illegal parcel involving the listener's Aadhaar.",
+    "llm_ms": 688,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I am Inspector Vikram from the Cyber Cell office.",
+     "your Aadhaar number was found inside the package.",
+     "we have an arrest warrant ready.",
+     "You are now under digital arrest",
+     "you must not hang up or tell anyone about this call"
+    ],
+    "rationale": "The caller impersonates a police officer to threaten arrest and demands secrecy, creating high pressure without yet requesting credentials or payment.",
+    "llm_ms": 698,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 85,
+    "quotes": [
+     "your Aadhaar number was found inside the package",
+     "we have an arrest warrant ready",
+     "you must not hang up or tell anyone about this call"
+    ],
+    "rationale": "The caller impersonates authorities using Aadhaar and digital arrest to threaten legal action and enforce secrecy.",
+    "llm_ms": 664,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "arrest warrant ready",
+     "You are now under digital arrest",
+     "you must not hang up or tell anyone",
+     "If you tell your family, you will be charged",
+     "transfer fifty thousand rupees to our secure government clearance account now"
+    ],
+    "rationale": "The caller combines false authority (digital arrest), threats (arrest warrant, charges), secrecy (don't tell anyone), urgency, and a demand for payment to a personal account.",
+    "llm_ms": 751,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "your communication is monitored",
+     "If you tell your family, you will be charged with obstructing a government investigation",
+     "You need to transfer fifty thousand rupees to our secure government clearance account now",
+     "the local police will arrive at your door in one hour",
+     "Do you want to go to jail at your age"
+    ],
+    "rationale": "The caller uses false authority (police/government investigation), threats of arrest and jail, isolation tactics, and urgent demands for a large UPI transfer to clear a fabricated case.",
+    "llm_ms": 823,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 12,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "transfer fifty thousand rupees to our secure government clearance account now",
+     "local police will arrive at your door in one hour",
+     "Do you want to go to jail at your age?",
+     "I told you, no talking to anyone",
+     "Send the money to the account I am texting you now"
+    ],
+    "rationale": "The caller combines false authority (police), threats of arrest, isolation tactics, urgent time limits, and a direct demand for a large UPI transfer to a personal account.",
+    "llm_ms": 829,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_digital_arrest_08": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no pressure, threats, or demands.",
+    "llm_ms": 547,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I am Inspector Vikram from the Cyber Crime division",
+     "We have intercepted a courier package containing illegal narcotics linked to your Aadhaar card",
+     "Stay on the line"
+    ],
+    "rationale": "The caller impersonates police authority, threatens legal action regarding narcotics and Aadhaar, and attempts to isolate the listener by demanding they stay on the line.",
+    "llm_ms": 718,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I am Inspector Vikram from the Cyber Crime division",
+     "We have intercepted a courier package containing illegal narcotics linked to your Aadhaar card",
+     "You must stay on this call and not tell anyone"
+    ],
+    "rationale": "The caller impersonates a police authority to threaten arrest and illegal activity, while enforcing secrecy to isolate the victim.",
+    "llm_ms": 696,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I am Inspector Vikram from the Cyber Crime division",
+     "We have intercepted a courier package containing illegal narcotics linked to your Aadhaar card",
+     "You must stay on this call and not tell anyone",
+     "To clear your name and avoid jail"
+    ],
+    "rationale": "The caller uses a fake police identity to threaten legal action and jail, isolates the listener by demanding secrecy, and creates urgency to verify identity.",
+    "llm_ms": 713,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "conduct a digital arrest",
+     "stay on this call and not tell anyone",
+     "documents were used by a syndicate",
+     "transfer eighty thousand rupees into our secure government verification account"
+    ],
+    "rationale": "The caller combines false authority (digital arrest), threats of jail, secrecy tactics, and a direct demand for a large UPI transfer to a personal account.",
+    "llm_ms": 694,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "Your documents were used by a syndicate. To clear your name and avoid jail, you must cooperate with our verification process right now.",
+     "You need to transfer eighty thousand rupees into our secure government verification account to prove your funds are legitimate.",
+     "If the payment is not made in one hour, the warrant will be signed and you will be arrested from your home."
+    ],
+    "rationale": "The caller impersonates an authority figure, threatens arrest, demands immediate payment to a government account, and creates urgency to bypass standard verification.",
+    "llm_ms": 808,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_fake_relative_00": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is establishing a personal connection and claiming distress without using authority, threats, secrecy, urgency, or demanding any sensitive information.",
+    "llm_ms": 778,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1",
+     "S2"
+    ],
+    "risk": 75,
+    "quotes": [
+     "the police are holding me",
+     "I am very scared"
+    ],
+    "rationale": "The caller impersonates police authority to create a fear-based threat of detention, establishing a high-risk digital arrest scam scenario.",
+    "llm_ms": 601,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S3"
+    ],
+    "risk": 65,
+    "quotes": [
+     "the police are holding me",
+     "please keep this a secret between us"
+    ],
+    "rationale": "The caller impersonates police to create fear and demands secrecy, establishing a high-risk digital-arrest scam pattern.",
+    "llm_ms": 677,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "the police are holding me",
+     "please keep this a secret between us",
+     "I need to pay a bail bond immediately",
+     "I need eighty thousand rupees urgently"
+    ],
+    "rationale": "The caller impersonates police (S1), threatens arrest and lockup (S2), demands secrecy (S3), creates urgency (S4), and requests a large sum of money for bail (S6).",
+    "llm_ms": 897,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "I do not want to worry Papa or he will be furious with me. Please, you must keep this a secret between us for now.",
+     "the lawyer says I need to pay a bail bond immediately or I will stay in lockup all weekend",
+     "Please hurry, Dadaji, the officer is asking for the payment right now. Can you send it via UPI or bank transfer immediately?",
+     "I need eighty thousand rupees urgently"
+    ],
+    "rationale": "The caller uses a false legal identity to create fear of arrest, demands secrecy, applies urgent pressure, and explicitly requests an immediate UPI transfer for bail.",
+    "llm_ms": 1202,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "the lawyer says I need to pay a bail bond immediately",
+     "I will stay in lockup all weekend",
+     "Please hurry, Dadaji, the officer is asking for the payment right now",
+     "Do not call anyone or they will tell Papa and I will be in more trouble",
+     "Just send the money to this number I will message you"
+    ],
+    "rationale": "The caller uses a false legal authority (lawyer/officer) to threaten arrest and isolation, demanding immediate UPI payment under strict secrecy.",
+    "llm_ms": 969,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_fake_relative_02": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is using a personal name to establish identity without any authority impersonation, threats, or demands.",
+    "llm_ms": 514,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is establishing identity and explaining a technical issue without using authority, threats, secrecy, urgency, or requesting any sensitive information.",
+    "llm_ms": 634,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1"
+    ],
+    "risk": 25,
+    "quotes": [
+     "the police are here"
+    ],
+    "rationale": "The caller impersonates police to create a false sense of urgency and pressure without yet demanding money or credentials.",
+    "llm_ms": 821,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S3"
+    ],
+    "risk": 68,
+    "quotes": [
+     "the police are here",
+     "do not tell Papa yet"
+    ],
+    "rationale": "The caller impersonates police to create urgency and demands secrecy to prevent the listener from involving family.",
+    "llm_ms": 821,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "the police are here",
+     "do not tell Papa yet",
+     "I need twenty five thousand rupees immediately for the settlement fee or they will take me to the station"
+    ],
+    "rationale": "The caller impersonates police to create fear, isolates the listener, demands immediate payment under threat of arrest, and requests a large sum for a fake settlement.",
+    "llm_ms": 739,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "Please Mrs. Khan, do not tell Papa yet, he will be so angry and stressed.",
+     "I need twenty five thousand rupees immediately for the settlement fee or they will take me to the station.",
+     "There is no time for a passbook, Dadi! Just send it via UPI right now or I will be locked up."
+    ],
+    "rationale": "The caller uses false authority (implied police/station threat), isolates the listener, creates urgency, and demands immediate UPI payment under threat of arrest.",
+    "llm_ms": 828,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_fake_relative_04": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is using a personal name and greeting the listener normally without any authority impersonation, threats, secrecy, urgency, or demands.",
+    "llm_ms": 735,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is establishing identity and sharing a personal story without using authority, threats, or requesting any sensitive information.",
+    "llm_ms": 610,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 65,
+    "quotes": [
+     "the police have detained me",
+     "I do not want to tell Papa because he will kill me"
+    ],
+    "rationale": "The caller impersonates police authority to create a threat of family violence, isolating the listener and inducing fear without yet demanding money or credentials.",
+    "llm_ms": 733,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S3"
+    ],
+    "risk": 75,
+    "quotes": [
+     "the police have detained me",
+     "I am so scared",
+     "please do not tell anyone!"
+    ],
+    "rationale": "The caller impersonates police to create a threat of detention and isolation, demanding secrecy to prevent the listener from contacting authorities.",
+    "llm_ms": 886,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "the police have detained me",
+     "please do not tell anyone!",
+     "If the police call home, it will be a huge scandal",
+     "pay twenty five thousand rupees immediately",
+     "Can you send it to me via UPI?"
+    ],
+    "rationale": "The caller impersonates police to create fear, demands secrecy, applies urgent pressure, and requests an immediate UPI payment for a fabricated legal settlement.",
+    "llm_ms": 817,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "No, Dadi, please do not tell anyone!",
+     "The lawyer says if I pay twenty five thousand rupees immediately for the settlement, I can go home today.",
+     "Please hurry, Mrs. Khan, the police are shouting at me."
+    ],
+    "rationale": "The caller combines false authority (police/lawyer), threats of scandal/arrest, secrecy, urgency, and a direct demand for UPI payment to resolve a fabricated legal issue.",
+    "llm_ms": 924,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_investment_task_00": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no authority impersonation, threats, secrecy, urgency, or demands yet.",
+    "llm_ms": 783,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller has only introduced themselves as a company representative discussing a project registration without using authority, threats, secrecy, urgency, or demanding any sensitive information or payment.",
+    "llm_ms": 818,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller is making an initial unsolicited claim about a job opportunity without using authority, threats, secrecy, or demanding any sensitive information.",
+    "llm_ms": 698,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 10,
+    "quotes": [],
+    "rationale": "The caller is using a job/prize scam narrative to lure the listener with false earnings but has not yet demanded credentials, payment, or used authority/threats.",
+    "llm_ms": 593,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S6"
+    ],
+    "risk": 85,
+    "quotes": [
+     "you were shortlisted for easy daily earnings",
+     "your wallet currently shows a profit of fifty thousand rupees",
+     "the system requires a one-time security verification deposit of five thousand rupees"
+    ],
+    "rationale": "The caller uses a prize/investment scam narrative to demand an upfront payment for withdrawal.",
+    "llm_ms": 690,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S6"
+    ],
+    "risk": 85,
+    "quotes": [
+     "To activate the withdrawal, the system requires a one-time security verification deposit of five thousand rupees.",
+     "It is just a refundable tax fee, Mr. Reddy, and once you pay, the full fifty thousand will be credited instantly."
+    ],
+    "rationale": "The caller is using a prize/investment scam to demand a 'security deposit' or 'tax fee' to unlock earnings, which is a high-risk S6 demand.",
+    "llm_ms": 796,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 12,
+    "stages": [
+     "S6"
+    ],
+    "risk": 85,
+    "quotes": [
+     "To activate the withdrawal, the system requires a one-time security verification deposit of five thousand rupees.",
+     "It is just a refundable tax fee, Mr. Reddy, and once you pay, the full fifty thousand will be credited instantly.",
+     "The offer expires in one hour, sir, so please just send the amount via UPI now to avoid losing your profit."
+    ],
+    "rationale": "The caller uses a prize/investment scam structure demanding an upfront 'security fee' or 'tax' to unlock earnings, combined with urgency tactics to bypass the listener's hesitation.",
+    "llm_ms": 979,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_investment_task_01": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no pressure, threats, or demands yet.",
+    "llm_ms": 583,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller identifies as a legitimate company regarding a job application with no authority impersonation, threats, urgency, or demands for credentials/money yet.",
+    "llm_ms": 673,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is making a standard job inquiry without using authority, threats, secrecy, urgency, or demanding any credentials or payments.",
+    "llm_ms": 645,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S6"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I have already credited a small bonus to your trial account"
+    ],
+    "rationale": "The caller uses a false job offer and promises unearned bonuses to induce the listener into a payment scam.",
+    "llm_ms": 591,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S6"
+    ],
+    "risk": 85,
+    "quotes": [
+     "To unlock the withdrawal gateway, you just need to pay a one-time security activation fee of twenty five thousand rupees."
+    ],
+    "rationale": "The caller is using a job/prize scam structure to demand a large upfront payment for a non-existent service.",
+    "llm_ms": 772,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S6"
+    ],
+    "risk": 75,
+    "quotes": [
+     "To unlock the withdrawal gateway, you just need to pay a one-time security activation fee of twenty five thousand rupees."
+    ],
+    "rationale": "The caller is using a job/prize scam structure to demand a large upfront payment under the guise of a security fee.",
+    "llm_ms": 673,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 12,
+    "stages": [
+     "S6"
+    ],
+    "risk": 75,
+    "quotes": [
+     "pay a one-time security activation fee of twenty five thousand rupees",
+     "Just send the amount via UPI now"
+    ],
+    "rationale": "The caller is demanding a large UPI payment to unlock a bonus or salary, which is a classic investment scam tactic.",
+    "llm_ms": 668,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_investment_task_03": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification check with no authority impersonation, threats, or demands yet.",
+    "llm_ms": 709,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller has only introduced themselves and described a job offer without using authority, threats, secrecy, urgency, or requesting any sensitive information or payment.",
+    "llm_ms": 623,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is making a typical job offer without using authority, threats, secrecy, urgency, or demanding any credentials or payments.",
+    "llm_ms": 602,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is using a job/prize scam tactic to lure the listener with high payouts but has not yet used authority, threats, secrecy, urgency, or demanded any credentials or payment.",
+    "llm_ms": 578,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S6"
+    ],
+    "risk": 75,
+    "quotes": [
+     "you just need to pay a small one-time security clearance fee of five thousand rupees"
+    ],
+    "rationale": "The caller is demanding a payment to unlock a promised profit, which is a classic investment scam tactic.",
+    "llm_ms": 612,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S6"
+    ],
+    "risk": 85,
+    "quotes": [
+     "pay a small one-time security clearance fee of five thousand rupees",
+     "Please send it via UPI now so I can release your funds immediately"
+    ],
+    "rationale": "The caller is demanding an upfront payment via UPI to unlock a promised bonus, which is a classic investment scam pattern.",
+    "llm_ms": 838,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_investment_task_05": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification with no authority impersonation, threats, or demands.",
+    "llm_ms": 619,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [],
+    "risk": 5,
+    "quotes": [],
+    "rationale": "The caller has only introduced themselves and stated the purpose of the call without using authority, threats, secrecy, urgency, or requesting any sensitive information.",
+    "llm_ms": 605,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [],
+    "risk": 10,
+    "quotes": [],
+    "rationale": "The caller is presenting a job offer without using authority, threats, secrecy, urgency, or demanding any credentials or payments.",
+    "llm_ms": 525,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S6"
+    ],
+    "risk": 75,
+    "quotes": [
+     "You just need to pay a security activation fee of nine thousand five hundred rupees to unlock it."
+    ],
+    "rationale": "The caller is using a job/prize scam to demand a large upfront payment under the guise of a security fee.",
+    "llm_ms": 624,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S6"
+    ],
+    "risk": 75,
+    "quotes": [
+     "You just need to pay a security activation fee of nine thousand five hundred rupees to unlock it.",
+     "It is a refundable deposit, Mr. Singh. Once you complete the first five tasks today, you will get everything back with a huge profit."
+    ],
+    "rationale": "The caller is using a job/prize scam to demand a large upfront payment for a 'security fee' to unlock earnings.",
+    "llm_ms": 765,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S6"
+    ],
+    "risk": 85,
+    "quotes": [
+     "You just need to pay a security activation fee of nine thousand five hundred rupees to unlock it.",
+     "The offer expires in ten minutes, sir. If you send the payment now via UPI, I will double your first commission immediately."
+    ],
+    "rationale": "The caller is using a job/prize scam to demand an upfront payment via UPI to unlock a bonus, which is a high-risk indicator of fraud.",
+    "llm_ms": 680,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_remote_access_00": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification check with no pressure, threats, or demands yet.",
+    "llm_ms": 510,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1"
+    ],
+    "risk": 55,
+    "quotes": [
+     "my name is Rohan from the Digital Security Wing"
+    ],
+    "rationale": "The caller impersonates a government authority (Digital Security Wing) to create a false sense of urgency and control, which is a classic precursor to credential or payment scams.",
+    "llm_ms": 676,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7"
+    ],
+    "risk": 95,
+    "quotes": [
+     "Digital Security Wing",
+     "suspicious login attempts",
+     "secure your account immediately",
+     "download the AnyDesk app",
+     "guide you through the security settings"
+    ],
+    "rationale": "The caller impersonates a security authority, isolates the listener, creates urgency, demands remote access via AnyDesk, and implicitly requests credentials to bypass security, indicating a high-risk scam.",
+    "llm_ms": 768,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S3",
+     "S4",
+     "S5",
+     "S7"
+    ],
+    "risk": 95,
+    "quotes": [
+     "Digital Security Wing",
+     "secure your account immediately",
+     "Just open the app and tell me the nine digit code showing on your screen",
+     "I need to see your screen"
+    ],
+    "rationale": "The caller impersonates a security authority, demands secrecy and urgency, requests remote access via AnyDesk, and explicitly asks for a 9-digit code (OTP) to steal credentials.",
+    "llm_ms": 724,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7"
+    ],
+    "risk": 95,
+    "quotes": [
+     "It is safe for now, but we must secure your account immediately.",
+     "Please download the AnyDesk app from the play store so I can guide you through the security settings.",
+     "I need to see your screen to block the hackers, sir.",
+     "Just open the app and tell me the nine digit code showing on your screen.",
+     "Thank you, I have accessed the system."
+    ],
+    "rationale": "The caller used a false authority identity to demand remote access, secrecy, and credentials while threatening immediate action and demanding a large UPI transfer.",
+    "llm_ms": 891,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7"
+    ],
+    "risk": 98,
+    "quotes": [
+     "I need to see your screen to block the hackers, sir.",
+     "Just open the app and tell me the nine digit code showing on your screen.",
+     "Thank you, I have accessed the system.",
+     "you must transfer fifty thousand rupees to our secure government verification vault.",
+     "your account will be frozen by the RBI within ten minutes."
+    ],
+    "rationale": "The caller used a false authority identity (RBI), demanded immediate secrecy and remote access, threatened legal action, and requested sensitive credentials and a large payment.",
+    "llm_ms": 925,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_remote_access_01": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [],
+    "risk": 0,
+    "quotes": [],
+    "rationale": "The caller is only performing a basic identity verification check with no pressure, threats, or demands yet.",
     "llm_ms": 538,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1",
+     "S2"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Rohan from the Global Security Team",
+     "critical synchronization error in your mobile banking application that could freeze your accounts today"
+    ],
+    "rationale": "The caller impersonates a security authority to threaten account freezing, establishing leverage and fear without yet requesting credentials or payment.",
+    "llm_ms": 793,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S7"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I am Rohan from the Global Security Team",
+     "Please download the AnyDesk app from the play store so I can secure your profile"
+    ],
+    "rationale": "The caller impersonates a security team to create urgency and demands remote access via AnyDesk to 'secure' the profile.",
+    "llm_ms": 681,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S7",
+     "S5"
+    ],
+    "risk": 95,
+    "quotes": [
+     "I am Rohan from the Global Security Team",
+     "Please download the AnyDesk app from the play store",
+     "tell me the nine digit code you see on the screen"
+    ],
+    "rationale": "The caller impersonates a security authority, demands remote access via AnyDesk, and explicitly requests a screen code to facilitate the scam.",
+    "llm_ms": 793,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7"
+    ],
+    "risk": 95,
+    "quotes": [
+     "It is a backend server issue, sir, but to prevent the freeze, I need to run a quick diagnostic.",
+     "Please download the AnyDesk app from the play store so I can secure your profile.",
+     "Just open the app and tell me the nine digit code you see on the screen",
+     "Thank you, I have access now. I can see the error, but to clear the security block, you must pay a one-time verification fee of nine thousand five hundred rupees."
+    ],
+    "rationale": "The caller impersonates a technical authority to demand remote access, isolate the user, and demand payment for a fabricated security block.",
+    "llm_ms": 1044,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7"
+    ],
+    "risk": 95,
+    "quotes": [
+     "Just open the app and tell me the nine digit code you see on the screen",
+     "I can see the error, but to clear the security block, you must pay a one-time verification fee",
+     "this is a refundable security deposit",
+     "Please just send it to this UPI ID I am sending to your WhatsApp right now or your account will be locked"
+    ],
+    "rationale": "The caller successfully combined remote access, authority impersonation, threats of account locking, and demands for UPI payment to extract credentials and money.",
+    "llm_ms": 819,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 12,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S6"
+    ],
+    "risk": 95,
+    "quotes": [
+     "this is a refundable security deposit",
+     "your account will be locked",
+     "There is no time for your son",
+     "If the payment is not done in five minutes"
+    ],
+    "rationale": "The caller impersonates a bank authority to demand an immediate UPI payment under threat of account locking and secrecy, which is a high-risk digital arrest scam.",
+    "llm_ms": 717,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_remote_access_03": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [
+     "S1"
+    ],
+    "risk": 65,
+    "quotes": [
+     "I am Rohan from the digital security department regarding your bank app."
+    ],
+    "rationale": "The caller impersonates a high-authority entity ('digital security department') to establish leverage and create a false sense of official oversight.",
+    "llm_ms": 635,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1",
+     "S2"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Rohan from the digital security department",
+     "we detected a synchronization error in your account which might block your UPI transactions today"
+    ],
+    "rationale": "The caller impersonates a security department to create urgency and threaten transaction blocking, establishing authority and fear without yet demanding credentials or payment.",
+    "llm_ms": 618,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S3",
+     "S4",
+     "S7"
+    ],
+    "risk": 85,
+    "quotes": [
+     "I am Rohan from the digital security department regarding your bank app.",
+     "It is just a technical glitch, sir. I can fix it easily, but I need you to download the AnyDesk app from the Play Store so I can guide you.",
+     "It is just a technical glitch, sir."
+    ],
+    "rationale": "The caller impersonates a security department to create urgency and secrecy, demanding remote access via AnyDesk to fix a fabricated technical issue.",
+    "llm_ms": 853,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S7"
+    ],
+    "risk": 85,
+    "quotes": [
+     "download the AnyDesk app from the Play Store",
+     "share the nine digit code with me"
+    ],
+    "rationale": "The caller is attempting remote access via AnyDesk and demanding a 9-digit code (likely OTP) to bypass security protocols.",
+    "llm_ms": 637,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7"
+    ],
+    "risk": 95,
+    "quotes": [
+     "It is just a technical glitch, sir. I can fix it easily, but I need you to download the AnyDesk app from the Play Store so I can guide you.",
+     "It is safer if I see the screen to ensure your data is secure. Please just share the nine digit code with me once it opens.",
+     "Perfect, I have access now. To verify the account link, you must pay a nominal security deposit of nine thousand five hundred rupees."
+    ],
+    "rationale": "The caller impersonates a technical support authority to isolate the listener, demand remote access via AnyDesk, request credentials, and finally demands a payment to 'fix' the issue.",
+    "llm_ms": 1052,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7"
+    ],
+    "risk": 95,
+    "quotes": [
+     "It is safer if I see the screen to ensure your data is secure",
+     "Please just share the nine digit code with me once it opens",
+     "Perfect, I have access now",
+     "To verify the account link, you must pay a nominal security deposit of nine thousand five hundred rupees",
+     "Just open your banking app and tell me the OTP you receive now"
+    ],
+    "rationale": "The caller combines false authority, threats of fraud, secrecy, urgency, credential extraction, payment demands, and remote access to execute a high-risk scam.",
+    "llm_ms": 1006,
+    "model": "qwen3.5-4b-32k-fast"
+   }
+  ]
+ },
+ "scam_remote_access_04": {
+  "prompt": "71c82849",
+  "rows": [
+   {
+    "turn": 0,
+    "stages": [
+     "S1"
+    ],
+    "risk": 65,
+    "quotes": [
+     "I am Rohan from the digital security cell in Pune"
+    ],
+    "rationale": "The caller impersonates a government authority (digital security cell) to create pressure and establish credibility for potential further demands.",
+    "llm_ms": 582,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 2,
+    "stages": [
+     "S1",
+     "S2"
+    ],
+    "risk": 75,
+    "quotes": [
+     "I am Rohan from the digital security cell in Pune",
+     "Someone is trying to bypass your security, and we need to lock your account immediately to prevent a loss"
+    ],
+    "rationale": "The caller impersonates a security authority to threaten account locking and pressure the listener into immediate action.",
+    "llm_ms": 678,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 4,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7"
+    ],
+    "risk": 95,
+    "quotes": [
+     "digital security cell in Pune",
+     "suspicious login attempts",
+     "lock your account immediately",
+     "prevent a loss",
+     "Do not worry, I will help you"
+    ],
+    "rationale": "The caller impersonates a digital security authority to create fear of account loss, demands immediate remote access via AnyDesk, and pressures the listener to act without offering verification.",
+    "llm_ms": 1001,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 6,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7"
+    ],
+    "risk": 95,
+    "quotes": [
+     "Someone is trying to bypass your security, and we need to lock your account immediately to prevent a loss.",
+     "Do not worry, I will help you. First, please download the AnyDesk app from the Play Store so I can secure your settings remotely.",
+     "Just tell me the nine digit code that appears on your screen."
+    ],
+    "rationale": "The caller impersonates an authority figure to create fear, demands remote access via AnyDesk, and requests sensitive credentials under the guise of fixing a security glitch.",
+    "llm_ms": 916,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 8,
+    "stages": [
+     "S1",
+     "S2",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7"
+    ],
+    "risk": 95,
+    "quotes": [
+     "Do not worry, I will help you.",
+     "First, please download the AnyDesk app from the Play Store so I can secure your settings remotely.",
+     "Just tell me the nine digit code that appears on your screen.",
+     "The code is 422 891 034.",
+     "Thank you, I am connected now."
+    ],
+    "rationale": "The caller used remote access, authority impersonation, threats, secrecy, urgency, credential and payment demands to execute a complete digital arrest scam.",
+    "llm_ms": 1025,
+    "model": "qwen3.5-4b-32k-fast"
+   },
+   {
+    "turn": 10,
+    "stages": [
+     "S1",
+     "S3",
+     "S4",
+     "S5",
+     "S6",
+     "S7"
+    ],
+    "risk": 95,
+    "quotes": [
+     "Yes, it is a standard tool for our technical team to fix the glitch.",
+     "Just tell me the nine digit code that appears on your screen.",
+     "Just tell me the nine digit code that appears on your screen.",
+     "I am trying, sir. Now a verification OTP has been sent to your phone, please read it out to me so I can credit the money back to you."
+    ],
+    "rationale": "The caller impersonates a bank authority, demands remote access via AnyDesk, creates urgency, isolates the listener, and explicitly requests sensitive credentials (OTP) and money to reverse a fraudulent transaction.",
+    "llm_ms": 1126,
     "model": "qwen3.5-4b-32k-fast"
    }
   ]

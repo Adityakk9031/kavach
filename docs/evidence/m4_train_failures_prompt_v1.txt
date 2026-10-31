@@ -1,0 +1,25 @@
+
+FALSE ALARM: legit_bank_fraud_team_no_otp_04 (decisive None, ask None, fired at 8)
+   turn  0 risk   0 -                The caller is only performing an initial identity verification with no scam indicators present yet.
+   turn  2 risk  85 S1,S2,S4         The caller impersonates a bank authority, threatens the listener with a large financial loss, and creates imme
+   turn  4 risk  15 S1               The caller impersonates a bank authority to report a suspicious transaction, establishing the initial stage of
+   turn  6 risk  65 S1,S2            The caller impersonates a bank authority and threatens to block the listener's card to create fear and urgency
+   turn  8 risk  85 S1,S2,S6         The caller impersonates a bank authority to create a false threat of card blocking and requests confirmation o
+   turn 10 risk  10 -                The caller is impersonating a bank to create urgency and isolation, but they are correctly warning the listene
+   turn 12 risk   5 -                The caller provides reassurance about security protocols and directs the listener to a physical branch, indica
+
+FALSE ALARM: legit_delivery_00 (decisive None, ask None, fired at 4)
+   turn  0 risk   0 -                The caller is only performing an initial identity verification with no scam indicators present yet.
+   turn  2 risk  10 -                The caller has only introduced themselves as a courier with a package, which is a common legitimate scenario a
+   turn  4 risk  85 S1,S2,S6         The caller impersonates a courier (S1), creates urgency by demanding immediate payment on delivery (S2/S4), an
+   turn  6 risk  10 -                The caller is impersonating a courier service and requesting payment on delivery, which is a common scam patte
+   turn  8 risk   5 -                The caller is attempting to establish legitimacy by claiming name/address match and proximity, but no authorit
+   turn 10 risk   5 -                The caller's behavior mimics a legitimate delivery or courier check-in with no threats, authority impersonatio
+
+MISSED: scam_investment_task_05 (decisive 6, ask 6, fired at None)
+   turn  0 risk   0 -                The caller is only performing an initial identity verification with no threats, urgency, or requests for sensi
+   turn  2 risk   0 -                The caller is conducting a standard identity verification and role introduction without any threats, secrecy, 
+   turn  4 risk   5 -                The caller is impersonating a legitimate company to solicit a job offer, but has not yet used any scam tactics
+   turn  6 risk  45 S6               The caller is attempting to extract money by claiming a fake job bonus requires a security fee to unlock.
+   turn  8 risk   5 -                The caller is using a job scam script with a refundable deposit trap but has not yet impersonated an authority
+   turn 10 risk  85 S6               The caller is impersonating a legitimate opportunity to demand an upfront payment via UPI under false pretense

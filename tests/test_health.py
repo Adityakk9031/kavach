@@ -32,7 +32,7 @@ def test_defaults_match_plan():
     assert s.language == "english"
     assert s.stt_language_codes == ["en"]
     assert s.sample_rate == 16000
-    assert s.risk_threshold == 70
+    assert s.risk_threshold == 60
     assert s.persona_voice_id != s.kavach_warning_voice_id
 
 
