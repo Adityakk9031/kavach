@@ -23,13 +23,17 @@
       <p class="status bad" id="micError" style="color: var(--danger)"></p>
       <p class="muted">Use headphones: the warning plays here, and speakers can leak it back into your mic.</p>
     </section>
+    <section class="panel" id="warningBox" hidden>
+      <strong id="warnTitle"></strong>
+      <p id="warnText" class="muted"></p>
+    </section>
     <section class="panel" id="detection"></section>
     <section class="panel">
       <div id="transcript"></div>
     </section>
   </main>
   <script type="module">
-    import { connectCall, startMic, Player, callIdFromUrl } from './audio.js';
+    import { connectCall, startMic, Player, callIdFromUrl, SOURCE } from './audio.js';
     import { transcriptView, statusView, levelMeter, detectionView } from './ui.js';
 
     const callId = callIdFromUrl();
@@ -41,6 +45,32 @@
     const $ = (id) => document.getElementById(id);
     let call, player, mic;
 
+    function showWarning(ev) {
+      const box = $('warningBox');
+      box.hidden = false;
+      const titles = { speaking: 'Kavach is speaking', done: 'Warning finished', interrupted: 'Warning stopped: you spoke',
+                       error: 'Warning failed' };
+      $('warnTitle').textContent = titles[ev.state] || ev.state;
+      if (ev.text) $('warnText').textContent = ev.text + (ev.cloned === false ? '  (fallback voice, not the cloned voice)' : '');
+      if (ev.error) $('warnText').textContent = ev.error;
+    }
+
+    // Local voice detection: 3 consecutive loud 50 ms chunks while the warning plays = barge-in. Stop playback
+    // here first (no network round trip), then tell the server to cancel the TTS request.
+    let loud = 0;
+    function vad(pcm) {
+      if (!player || !player.isPlaying(SOURCE.WARNING)) { loud = 0; return; }
+      let peak = 0;
+      for (let i = 0; i < pcm.length; i++) peak = Math.max(peak, Math.abs(pcm[i]));
+      loud = peak > 2500 ? loud + 1 : 0;
+      if (loud >= 3) {
+        loud = 0;
+        player.flush(SOURCE.WARNING);
+        call.send({ type: 'barge_in' });
+        call.clientEvent('playback_stopped', { source: SOURCE.WARNING });
+      }
+    }
+
     $('answer').onclick = async () => {
       player = new Player((source, leadMs) => call.clientEvent('playback_started', { source, lead_ms: leadMs }));
       await player.resume();
@@ -49,6 +79,7 @@
           if (sv.handle(ev) || dv.handle(ev)) return;
           if (ev.type === 'transcript') tv.show(ev);
           else if (ev.type === 'flush_playback') player.flush(ev.source);
+          else if (ev.type === 'warning') showWarning(ev);
           else if (ev.type === 'call_ended') $('status').textContent = 'Call ended.';
         },
         onAudio(source, pcm) { player.play(source, pcm); },
@@ -57,7 +88,7 @@
         $('answer').disabled = true;
         $('end').disabled = false;
         try {
-          mic = await startMic((buf) => { meter(new Int16Array(buf)); call.sendAudio(buf); });
+          mic = await startMic((buf) => { const pcm = new Int16Array(buf); meter(pcm); vad(pcm); call.sendAudio(buf); });
         } catch (e) {
           $('micError').textContent = `Microphone unavailable (${e.name}). You can still hear the caller.`;
         }
@@ -74,6 +105,7 @@
         const ev = JSON.parse(e.data);
         if (sv.handle(ev) || dv.handle(ev)) return;
         if (ev.type === 'transcript') tv.show(ev);
+        else if (ev.type === 'warning') showWarning(ev);
       };
     }
   </script>

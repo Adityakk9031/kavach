@@ -101,7 +101,9 @@ class CallRoom:
         self.on_final_hooks: list[Callable] = []
         self.on_speech_started_hooks: list[Callable] = []
         self.on_end_hooks: list[Callable] = []
+        self.control_handlers: dict[str, Callable] = {}  # JSON control message type -> async (room, role, msg)
         self.pipeline = None
+        self.warning = None
         self.store.start_call(call_id)
 
     # ---- lifecycle -------------------------------------------------------------------------------

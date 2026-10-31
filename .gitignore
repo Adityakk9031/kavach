@@ -5,6 +5,6 @@ __pycache__/
 .pytest_cache/
 data/
 eval/audio/
-*.wav
 *.pcm
 .DS_Store
+data/**/*.wav

@@ -53,3 +53,22 @@ Caveats / findings:
 - First LLM call after a cold connection is ~1.2 s vs 0.6–0.8 s warm; call-start pre-warm not yet implemented.
 - Latency budget so far: STT final ≈ 0.45 s + detector ≈ 0.7–1.2 s → trigger 1.05–1.65 s after the turn end. Leaves ~1.35–1.95 s for TTS first audio.
 - `gemma-4-31b` fallback timed out (ReadTimeout) under the 2.5 s limit; it is too slow to be a useful live fallback.
+
+## M3 — Family-voice warning + barge-in — ✅ gate met (browser mic path not yet exercised)
+
+Built: `app/tts.py` (TTS-1 WebSocket session: PascalCase frames, drops Audio between our `Cancel` and the server's `Cancelled`, per-request TTFA, KeepAlive, long-lived shared pool), `app/warner.py` (7 stage templates + default, parent name from config, numbers as words; trigger → speak to Receiver only; barge-in from browser VAD and from STT `SpeechStarted`; 0.4 s echo guard; fallback voice is announced in the UI, never silent), receiver page warning banner + local voice detector (3 consecutive loud 50 ms chunks while the warning plays → flush local playback, then `barge_in` to server). Cloned-voice session is opened at server start (1.7 s once).
+
+| Gate item | Status | Evidence |
+|---|---|---|
+| Offline: protocol, cancel tail-dropping, templates, warner flow | ✅ | `uv run pytest -k "not transcripts"` → `33 passed` (fake TTS server emits post-Cancel audio tail; asserted never delivered; next request after Cancel delivered in full; templates contain no digits/brackets) |
+| Warning plays in the cloned voice ≤ 3 s after the trigger turn | ✅ 2026-10-31 | `scripts/smoke_warning.py --barge none --runs 3`: caller's last word → first warning audio at the Receiver: **1536, 1665, 1678 ms**; trigger → audio 385/451/405 ms; TTS first audio 384/450/404 ms. `Begin.resolved_voice` = `01a19208-766c-7003-97c5-4f0cf646ade8` (your clone) in every run; `cloned: true`. 9.1–9.4 s of audio per warning. Sample: `docs/evidence/m3_warning_cloned_voice_sample.wav` |
+| Barge-in stops it | ✅ 2026-10-31 | `--barge browser --runs 2` (barge-in sent 1.0 s after first frame): both runs `speaking → interrupted`; stop-playback command reached the Receiver in **1 ms**; run 1: TTS still generating, `Cancel` truncated the warning at 1.74 s; run 2: all 8.88 s already delivered, the flush still cut ~7.9 s of buffered playback. Events in SQLite (`barge_in`, `warn_first_audio`, `warn_tts_sent`). Turn-end → first audio in these two runs: 1915 and 1496 ms |
+
+Bug found and fixed during the gate: the server delivers the warning ~8× faster than real time, so it was fully delivered ~1 s in while the browser kept playing for ~8 s more; barge-in originally only worked while the TTS request was open. Now it stays live until the estimated end of playback (`play_until`); regression test `test_barge_in_after_delivery_but_during_playback_still_flushes`.
+
+Not verified (explicit):
+- Real microphone capture and the browser voice-detector threshold (peak > 2500 for 3×50 ms): the in-app browser blocks the mic. Needs a manual check in Chrome with headphones.
+- Subjective voice quality: listen to the sample wav.
+- Latencies are local loopback with TTS-rendered audio; real mic audio and network add some.
+- Barge-in via STT `SpeechStarted` (backup path) is wired and unit-tested but not exercised live; SpeechStarted arrives ~1 s into speech.
+- A shared TTS session means a `Cancel` in one call would cancel text queued by another concurrent call. Fine for the demo and a sequential eval; do not run concurrent eval calls through the warner.

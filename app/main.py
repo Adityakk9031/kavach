@@ -19,6 +19,8 @@ from app.llm import LLM
 from app.pipeline import CallPipeline
 from app.store import Store
 from app.stt import NullStt, SttSession
+from app.tts import TtsPool
+from app.warner import Warner
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
@@ -36,9 +38,15 @@ llm = LLM(settings)
 detector = Detector(settings, llm)
 
 
+tts_pool = TtsPool(settings)
+warner = Warner(settings, tts_pool)
+
+
 def attach_pipeline(room) -> None:
     if settings.assemblyai_api_key:
         room.pipeline = CallPipeline(room, detector)
+        if settings.kavach_warning_voice_id:
+            warner.attach(room, room.pipeline)
 
 
 rooms = RoomRegistry(stt_factory, store, settings.sample_rate, on_new_room=attach_pipeline)
@@ -60,8 +68,17 @@ async def loop_lag_monitor(threshold_ms: int = 300) -> None:
 @asynccontextmanager
 async def lifespan(_app):
     task = asyncio.create_task(loop_lag_monitor())
+    if settings.assemblyai_api_key and settings.kavach_warning_voice_id:
+        # Open the cloned-voice session now so the first warning skips handshake + voice load.
+        async def warm():
+            try:
+                await warner.session()
+            except Exception:
+                logging.getLogger("kavach").exception("could not pre-warm warning voice")
+        asyncio.create_task(warm())
     yield
     task.cancel()
+    await tts_pool.close()
     await llm.aclose()
 
 
@@ -128,7 +145,9 @@ async def call_socket(ws: WebSocket, call_id: str, role: str, caller_number: str
 
 async def handle_control(room, role: str, msg: dict) -> None:
     kind = msg.get("type")
-    if kind == "end_call":
+    if kind in room.control_handlers:
+        await room.control_handlers[kind](room, role, msg)
+    elif kind == "end_call":
         await room.end()
     elif kind == "client_event":
         # Browser-side timings (e.g. playback actually started) for latency logging.
