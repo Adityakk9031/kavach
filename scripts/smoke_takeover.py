@@ -231,12 +231,20 @@ async def main(a) -> int:
             await caller.send(json.dumps({"type": "end_call"}))
             await asyncio.sleep(3)
         else:
-            # One more scammer line, then take back the moment the persona starts to answer (mid-sentence).
-            await st.pump.say(await tts(client, "Hello? Mister Kumar? Do you understand what I am saying? Answer me now."))
-            t_w = time.monotonic()
-            while not st.speaking and time.monotonic() - t_w < 20:
-                await asyncio.sleep(0.02)
-            await asyncio.sleep(0.6)  # let it get a few words in
+            # Take back while the persona is mid-sentence. Keep talking until it is actually speaking (up to 3 tries).
+            extra = ["Hello? Mister Kumar? Do you understand what I am saying? Answer me now.",
+                     "Mister Kumar, are you listening to me? This is your last warning.",
+                     "I need an answer from you right now. Do you understand?"]
+            for attempt in range(3):
+                await st.pump.say(await tts(client, extra[attempt]))
+                t_w = time.monotonic()
+                while not st.speaking and time.monotonic() - t_w < 12:
+                    await asyncio.sleep(0.01)
+                if not st.speaking:
+                    continue
+                await asyncio.sleep(0.5)  # let it get a few words in
+                if st.speaking:
+                    break
             st.pre_takeback_speaking = st.speaking
             await receiver.send(json.dumps({"type": "takeback"}))
             st.marks["takeback_sent"] = time.monotonic()

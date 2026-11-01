@@ -1,5 +1,6 @@
 """M2: risk math (offline) and the 10 fixed transcripts (live LLM, needs ASSEMBLYAI_API_KEY)."""
 
+import asyncio
 import json
 import os
 
@@ -88,6 +89,7 @@ async def run_call(detector: Detector, turns):
         seen.append({"channel": speaker, "text": text})
         if speaker != "caller":
             continue
+        await asyncio.sleep(5.5)  # a real caller turn is seconds apart; this also respects the account's 8-per-minute lane
         decision, info = await detector.process(tracker, seen)
         assert decision is not None, info
         log.append({"turn": len(seen), "stages": decision.stages_now, "risk_llm": decision.risk_llm,
@@ -97,6 +99,7 @@ async def run_call(detector: Detector, turns):
 
 
 @live
+@pytest.mark.timeout(180)
 @pytest.mark.parametrize("name", list(SCAMS))
 async def test_scam_transcripts_trigger(name):
     llm = LLM(get_settings(), limiters=SHARED_LIMITERS)
@@ -110,6 +113,7 @@ async def test_scam_transcripts_trigger(name):
 
 
 @live
+@pytest.mark.timeout(180)
 @pytest.mark.parametrize("name", list(LEGIT))
 async def test_legit_transcripts_do_not_trigger(name):
     llm = LLM(get_settings(), limiters=SHARED_LIMITERS)

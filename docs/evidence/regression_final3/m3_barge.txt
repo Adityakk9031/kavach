@@ -1,0 +1,99 @@
+--- run 1/3 call_id=warn-browser-1793516873-0
+{
+ "call_id": "warn-browser-1793516873-0",
+ "barge": "browser",
+ "triggered": true,
+ "warning_heard": true,
+ "rearmed": true,
+ "first_attempt_cancelled_before_audio": false,
+ "warning_voice": {
+  "requested": "kavach-warning-voice-id-46ade8",
+  "resolved_uuid": "01a19208-766c-7003-97c5-4f0cf646ade8",
+  "cloned": true
+ },
+ "trigger_to_first_audio_ms": 416,
+ "turn_end_to_first_audio_ms": 1417,
+ "tts_ttfa_ms": 414,
+ "warning_frames": 184,
+ "warning_audio_s": 14.56,
+ "warning_states": [
+  "speaking",
+  "interrupted",
+  "speaking",
+  "done"
+ ],
+ "wav": "data/warning/warn-browser-1793516873-0.wav",
+ "barge_to_stop_playback_cmd_ms": 0,
+ "already_interrupted_by_speech_before_scripted_barge": false,
+ "frames_after_cancel_plus_250ms": 91,
+ "tts_still_generating_at_barge": false,
+ "warning_audio_that_would_have_kept_playing_s": 13.6,
+ "interrupted": true
+}
+--- run 2/3 call_id=warn-browser-1793516949-1
+{
+ "call_id": "warn-browser-1793516949-1",
+ "barge": "browser",
+ "triggered": true,
+ "warning_heard": true,
+ "rearmed": true,
+ "first_attempt_cancelled_before_audio": false,
+ "warning_voice": {
+  "requested": "kavach-warning-voice-id-46ade8",
+  "resolved_uuid": "01a19208-766c-7003-97c5-4f0cf646ade8",
+  "cloned": true
+ },
+ "trigger_to_first_audio_ms": 397,
+ "turn_end_to_first_audio_ms": 1396,
+ "tts_ttfa_ms": 393,
+ "warning_frames": 181,
+ "warning_audio_s": 14.32,
+ "warning_states": [
+  "speaking",
+  "interrupted",
+  "speaking",
+  "done"
+ ],
+ "wav": "data/warning/warn-browser-1793516949-1.wav",
+ "barge_to_stop_playback_cmd_ms": 0,
+ "already_interrupted_by_speech_before_scripted_barge": false,
+ "frames_after_cancel_plus_250ms": 89,
+ "tts_still_generating_at_barge": false,
+ "warning_audio_that_would_have_kept_playing_s": 13.3,
+ "interrupted": true
+}
+--- run 3/3 call_id=warn-browser-1793517026-2
+{
+ "call_id": "warn-browser-1793517026-2",
+ "barge": "browser",
+ "triggered": true,
+ "warning_heard": true,
+ "rearmed": true,
+ "first_attempt_cancelled_before_audio": true,
+ "warning_voice": {
+  "requested": "kavach-warning-voice-id-46ade8",
+  "resolved_uuid": "01a19208-766c-7003-97c5-4f0cf646ade8",
+  "cloned": true
+ },
+ "trigger_to_first_audio_ms": 405,
+ "turn_end_to_first_audio_ms": null,
+ "tts_ttfa_ms": 403,
+ "warning_frames": 95,
+ "warning_audio_s": 7.52,
+ "warning_states": [
+  "speaking",
+  "interrupted",
+  "speaking",
+  "interrupted"
+ ],
+ "wav": "data/warning/warn-browser-1793517026-2.wav",
+ "barge_to_stop_playback_cmd_ms": 1,
+ "already_interrupted_by_speech_before_scripted_barge": true,
+ "frames_after_cancel_plus_250ms": 0,
+ "tts_still_generating_at_barge": true,
+ "warning_audio_that_would_have_kept_playing_s": 6.5,
+ "interrupted": true
+}
+
+turn_end -> first warning audio (ms): [1396, 1417]
+PASS

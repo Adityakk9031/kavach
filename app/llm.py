@@ -100,7 +100,7 @@ class RateLimiter:
 # (requests per window, reserved tokens per window), kept under this account's observed limits (30 req/min and
 # 20k tokens/min on qwen, 30 req/min and 200k tokens/min on gemma). Each model's budget is split into lanes so the
 # detector (the call path) cannot be starved by persona/evidence calls during a takeover.
-MODEL_LIMITS = {"qwen3.5-4b-32k-fast": {"detector": (12, 7500), "persona": (10, 5500), "other": (6, 3000)},
+MODEL_LIMITS = {"qwen3.5-4b-32k-fast": {"detector": (12, 8000), "persona": (10, 7000), "other": (6, 3000)},
                 "gemma-4-31b": {"detector": (8, 50000), "persona": (8, 50000), "other": (12, 80000)}}
 DEFAULT_LIMITS = {"detector": (8, 5000), "persona": (8, 5000), "other": (8, 5000)}
 
@@ -124,7 +124,7 @@ class LLM:
                    timeout: float | None = None, lane: str = "other", max_wait: float | None = None) -> tuple[str, int]:
         """Returns (reply text, latency ms). `lane` picks the rate budget; `max_wait` makes it fail fast."""
         body = {"model": model, "messages": messages, "max_tokens": max_tokens, "temperature": temperature}
-        est_prompt = sum(len(m["content"]) for m in messages) // 3 + 50
+        est_prompt = sum(len(m["content"]) for m in messages) // 4 + 50  # English averages ~4 characters per token
         limits = MODEL_LIMITS.get(model, DEFAULT_LIMITS)[lane]
         limiter = self.limiters.setdefault((model, lane), RateLimiter(*limits))
         t0 = time.perf_counter()

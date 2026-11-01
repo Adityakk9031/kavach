@@ -1,0 +1,34 @@
+server ok, stt_model=universal-3-6-pro
+streaming 39.8 s per channel, call_id=reg3-m1
+  [receiver] STT session: universal-3-6-pro
+  [caller  ] STT session: universal-3-6-pro
+  [caller  ] STT   378 ms | Hello, am I speaking with Mr. Sharma? This is Inspector Vikram Rathore from the Mumbai Cybercrime Cell.
+  [receiver] STT   421 ms | Yes, this is Sharma speaking. What is this about?
+  [caller  ] STT   431 ms | A parcel booked in your name was seized at customs with illegal drugs and fake passports inside.
+  [receiver] STT   419 ms | What? I have not sent any parcel to anyone.
+  [caller  ] STT   447 ms | Your Aadhaar number was used. You must stay on this call and not tell anyone, or we will issue an arrest warrant.
+  [receiver] STT   382 ms | Please, I don't understand. What should I do?
+event counts seen by receiver socket: {"stt_status:receiver:partial": 1, "presence:None:partial": 2, "stt_status:caller:partial": 1, "speech_started:caller:partial": 3, "transcript:caller:partial": 23, "transcript:caller:final": 3, "evidence:None:partial": 1, "speech_started:receiver:partial": 3, "transcript:receiver:partial": 9, "detection:None:partial": 3, "transcript:receiver:final": 3, "warning:None:partial": 2, "call_ended:None:partial": 1}
+{
+  "call_id": "reg3-m1",
+  "stt_model": {
+    "caller": "universal-3-6-pro",
+    "receiver": "universal-3-6-pro"
+  },
+  "finals": 6,
+  "latency_ms": {
+    "caller": {
+      "n": 3,
+      "median": 431,
+      "max": 447
+    },
+    "receiver": {
+      "n": 3,
+      "median": 419,
+      "max": 421
+    }
+  },
+  "mean_word_match": 0.976
+}
+saved data/smoke/result-reg3-m1.json
+PASS

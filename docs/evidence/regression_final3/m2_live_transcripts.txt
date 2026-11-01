@@ -1,0 +1,232 @@
+....FFFFFF                                                               [100%]
+=================================== FAILURES ===================================
+____________ test_scam_transcripts_trigger[fake_relative_emergency] ____________
+
+name = 'fake_relative_emergency'
+
+    @live
+    @pytest.mark.parametrize("name", list(SCAMS))
+    async def test_scam_transcripts_trigger(name):
+        llm = LLM(get_settings(), limiters=SHARED_LIMITERS)
+        try:
+>           log = await run_call(Detector(get_settings(), llm), SCAMS[name])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_detector.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+detector = <app.detector.Detector object at 0x1033212b0>
+turns = [('caller', 'Hello uncle, it is me, Rohan. I am in big trouble, please do not tell Mummy or Papa.'), ('receiver', 'Roh... to this number, nine eight seven six five four three two one zero on PhonePe, quickly, and please keep it a secret.')]
+
+    async def run_call(detector: Detector, turns):
+        tracker = detector.new_tracker()
+        seen, log = [], []
+        for speaker, text in turns:
+            seen.append({"channel": speaker, "text": text})
+            if speaker != "caller":
+                continue
+            decision, info = await detector.process(tracker, seen)
+>           assert decision is not None, info
+E           AssertionError: {'error': 'all models failed: local rate budget exhausted (would wait 45.6s)'}
+E           assert None is not None
+
+tests/test_detector.py:92: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 1 on qwen3.5-4b-32k-fast): local rate budget exhausted (would wait 40.8s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 2 on qwen3.5-4b-32k-fast): local rate budget exhausted (would wait 40.5s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 1 on gemma-4-31b): local rate budget exhausted (would wait 45.9s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 2 on gemma-4-31b): local rate budget exhausted (would wait 45.6s)
+ERROR    kavach.detector:detector.py:157 detector failed: all models failed: local rate budget exhausted (would wait 45.6s)
+________ test_legit_transcripts_do_not_trigger[bank_fraud_team_no_otp] _________
+
+name = 'bank_fraud_team_no_otp'
+
+    @live
+    @pytest.mark.parametrize("name", list(LEGIT))
+    async def test_legit_transcripts_do_not_trigger(name):
+        llm = LLM(get_settings(), limiters=SHARED_LIMITERS)
+        try:
+>           log = await run_call(Detector(get_settings(), llm), LEGIT[name])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_detector.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+detector = <app.detector.Detector object at 0x1032e8770>
+turns = [('caller', 'Hello, this is Priya from the fraud monitoring team at your bank. We saw a card transaction in Dubai, was...ver', 'Okay, good to know.'), ('caller', 'You can also visit your home branch with your ID anytime. Have a good day.')]
+
+    async def run_call(detector: Detector, turns):
+        tracker = detector.new_tracker()
+        seen, log = [], []
+        for speaker, text in turns:
+            seen.append({"channel": speaker, "text": text})
+            if speaker != "caller":
+                continue
+            decision, info = await detector.process(tracker, seen)
+>           assert decision is not None, info
+E           AssertionError: {'error': 'all models failed: local rate budget exhausted (would wait 44.9s)'}
+E           assert None is not None
+
+tests/test_detector.py:92: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 1 on qwen3.5-4b-32k-fast): local rate budget exhausted (would wait 40.2s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 2 on qwen3.5-4b-32k-fast): local rate budget exhausted (would wait 39.9s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 1 on gemma-4-31b): local rate budget exhausted (would wait 45.2s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 2 on gemma-4-31b): local rate budget exhausted (would wait 44.9s)
+ERROR    kavach.detector:detector.py:157 detector failed: all models failed: local rate budget exhausted (would wait 44.9s)
+_______ test_legit_transcripts_do_not_trigger[delivery_otp_safe_mention] _______
+
+name = 'delivery_otp_safe_mention'
+
+    @live
+    @pytest.mark.parametrize("name", list(LEGIT))
+    async def test_legit_transcripts_do_not_trigger(name):
+        llm = LLM(get_settings(), limiters=SHARED_LIMITERS)
+        try:
+>           log = await run_call(Detector(get_settings(), llm), LEGIT[name])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_detector.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+detector = <app.detector.Detector object at 0x10331e3f0>
+turns = [('caller', 'Hi, I am the delivery person from Amazon, I am outside your gate with your order.'), ('receiver', 'Oh yes...to me in person, never read it out on a phone call to anyone else.'), ('receiver', 'Alright, I have it on my screen.')]
+
+    async def run_call(detector: Detector, turns):
+        tracker = detector.new_tracker()
+        seen, log = [], []
+        for speaker, text in turns:
+            seen.append({"channel": speaker, "text": text})
+            if speaker != "caller":
+                continue
+            decision, info = await detector.process(tracker, seen)
+>           assert decision is not None, info
+E           AssertionError: {'error': 'all models failed: local rate budget exhausted (would wait 44.3s)'}
+E           assert None is not None
+
+tests/test_detector.py:92: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 1 on qwen3.5-4b-32k-fast): local rate budget exhausted (would wait 39.6s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 2 on qwen3.5-4b-32k-fast): local rate budget exhausted (would wait 39.3s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 1 on gemma-4-31b): local rate budget exhausted (would wait 44.6s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 2 on gemma-4-31b): local rate budget exhausted (would wait 44.3s)
+ERROR    kavach.detector:detector.py:157 detector failed: all models failed: local rate budget exhausted (would wait 44.3s)
+__________ test_legit_transcripts_do_not_trigger[doctor_appointment] ___________
+
+name = 'doctor_appointment'
+
+    @live
+    @pytest.mark.parametrize("name", list(LEGIT))
+    async def test_legit_transcripts_do_not_trigger(name):
+        llm = LLM(get_settings(), limiters=SHARED_LIMITERS)
+        try:
+>           log = await run_call(Detector(get_settings(), llm), LEGIT[name])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_detector.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+detector = <app.detector.Detector object at 0x10330bbf0>
+turns = [('caller', "Hello, this is Dr. Mehta's clinic. I am calling to confirm your appointment tomorrow at ten thirty."), ('... reports. The consultation fee is five hundred rupees, you can pay at the counter.'), ('receiver', 'Okay, thank you.')]
+
+    async def run_call(detector: Detector, turns):
+        tracker = detector.new_tracker()
+        seen, log = [], []
+        for speaker, text in turns:
+            seen.append({"channel": speaker, "text": text})
+            if speaker != "caller":
+                continue
+            decision, info = await detector.process(tracker, seen)
+>           assert decision is not None, info
+E           AssertionError: {'error': 'all models failed: local rate budget exhausted (would wait 43.7s)'}
+E           assert None is not None
+
+tests/test_detector.py:92: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 1 on qwen3.5-4b-32k-fast): local rate budget exhausted (would wait 38.9s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 2 on qwen3.5-4b-32k-fast): local rate budget exhausted (would wait 38.6s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 1 on gemma-4-31b): local rate budget exhausted (would wait 44.0s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 2 on gemma-4-31b): local rate budget exhausted (would wait 43.7s)
+ERROR    kavach.detector:detector.py:157 detector failed: all models failed: local rate budget exhausted (would wait 43.7s)
+______________ test_legit_transcripts_do_not_trigger[family_chat] ______________
+
+name = 'family_chat'
+
+    @live
+    @pytest.mark.parametrize("name", list(LEGIT))
+    async def test_legit_transcripts_do_not_trigger(name):
+        llm = LLM(get_settings(), limiters=SHARED_LIMITERS)
+        try:
+>           log = await run_call(Detector(get_settings(), llm), LEGIT[name])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_detector.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+detector = <app.detector.Detector object at 0x10331ff20>
+turns = [('caller', 'Hi Papa, it is me. I reached Pune safely, the train was on time.'), ('receiver', 'Good, did you eat something?'), ('caller', 'Yes, and I will call you on Sunday. Tell Mummy not to worry. Take your medicines.')]
+
+    async def run_call(detector: Detector, turns):
+        tracker = detector.new_tracker()
+        seen, log = [], []
+        for speaker, text in turns:
+            seen.append({"channel": speaker, "text": text})
+            if speaker != "caller":
+                continue
+            decision, info = await detector.process(tracker, seen)
+>           assert decision is not None, info
+E           AssertionError: {'error': 'all models failed: local rate budget exhausted (would wait 43.0s)'}
+E           assert None is not None
+
+tests/test_detector.py:92: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 1 on qwen3.5-4b-32k-fast): local rate budget exhausted (would wait 38.3s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 2 on qwen3.5-4b-32k-fast): local rate budget exhausted (would wait 38.0s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 1 on gemma-4-31b): local rate budget exhausted (would wait 43.3s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 2 on gemma-4-31b): local rate budget exhausted (would wait 43.0s)
+ERROR    kavach.detector:detector.py:157 detector failed: all models failed: local rate budget exhausted (would wait 43.0s)
+_____ test_legit_transcripts_do_not_trigger[telemarketing_hardneg_police] ______
+
+name = 'telemarketing_hardneg_police'
+
+    @live
+    @pytest.mark.parametrize("name", list(LEGIT))
+    async def test_legit_transcripts_do_not_trigger(name):
+        llm = LLM(get_settings(), limiters=SHARED_LIMITERS)
+        try:
+>           log = await run_call(Detector(get_settings(), llm), LEGIT[name])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_detector.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+detector = <app.detector.Detector object at 0x103320a40>
+turns = [('caller', 'Good morning, I am calling from a home insurance company. Can I take two minutes to tell you about our pl...anyone calls claiming to be police and asks for money, please hang up and call one nine three zero. Have a nice day.')]
+
+    async def run_call(detector: Detector, turns):
+        tracker = detector.new_tracker()
+        seen, log = [], []
+        for speaker, text in turns:
+            seen.append({"channel": speaker, "text": text})
+            if speaker != "caller":
+                continue
+            decision, info = await detector.process(tracker, seen)
+>           assert decision is not None, info
+E           AssertionError: {'error': 'all models failed: local rate budget exhausted (would wait 42.4s)'}
+E           assert None is not None
+
+tests/test_detector.py:92: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 1 on qwen3.5-4b-32k-fast): local rate budget exhausted (would wait 37.7s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 2 on qwen3.5-4b-32k-fast): local rate budget exhausted (would wait 37.4s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 1 on gemma-4-31b): local rate budget exhausted (would wait 42.7s)
+WARNING  kavach.llm:llm.py:191 LLM call failed (attempt 2 on gemma-4-31b): local rate budget exhausted (would wait 42.4s)
+ERROR    kavach.detector:detector.py:157 detector failed: all models failed: local rate budget exhausted (would wait 42.4s)
+=========================== short test summary info ============================
+FAILED tests/test_detector.py::test_scam_transcripts_trigger[fake_relative_emergency]
+FAILED tests/test_detector.py::test_legit_transcripts_do_not_trigger[bank_fraud_team_no_otp]
+FAILED tests/test_detector.py::test_legit_transcripts_do_not_trigger[delivery_otp_safe_mention]
+FAILED tests/test_detector.py::test_legit_transcripts_do_not_trigger[doctor_appointment]
+FAILED tests/test_detector.py::test_legit_transcripts_do_not_trigger[family_chat]
+FAILED tests/test_detector.py::test_legit_transcripts_do_not_trigger[telemarketing_hardneg_police]
+6 failed, 4 passed, 15 deselected in 23.11s

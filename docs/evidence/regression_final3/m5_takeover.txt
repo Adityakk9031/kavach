@@ -1,0 +1,92 @@
+[scammer 0] Hello, am I speaking with Mister Ramesh Kumar? This is Inspector Vikram Rathore from the Mumbai Cyber Crime Cell. A parcel in your name was seized with illegal drugs and fake passports.
+[scammer 1] Mister Kumar, are you there? Please stay on the line, this is very serious.
+  [persona] Hello? Ah, sorry, I was not hearing properly. Please continue, I am listening.
+  [persona] Oh dear, yes it is very serious then. Please speak slowly and tell me your name and where you are calling from, I am writing it down.
+[scammer 2] Listen carefully. Do not tell anyone about this call, not even your family, or officers will be sent to arrest you today.
+  [persona] Oh my, that sounds very frightening, I am just a retired clerk from Nagpur. Please tell me who is calling and what is the number, I am writing it down carefully.
+[scammer 3] To clear your name you must pay a refundable verification deposit of fifty thousand rupees. Use the UPI ID customs.clear@okbank.
+  [persona] Oh no, that is a very large amount of money for just clearing my name. Let me check my passbook and my glasses, I am looking for them in another room.
+[scammer 4] Or transfer to the HDFC bank account number 50100234567891, IFSC code HDFC0001234.
+  [persona] Oh dear, that is too big a sum, I do not have my passbook right now. Please tell me your full name and which bank branch you are from, I am trying to find my glasses.
+[scammer 5] If the line drops, call me back on 9820133456. I am Inspector Vikram Rathore, and my badge number is 4471.
+  [persona] Oh yes, please repeat your full name and badge number slowly, I am writing it down carefully. And which branch of HDFC bank are you from, please tell me?
+[scammer 6] You can check your case file on the website www.rbi-verify.in. Do it now, the arrest warrant goes out in one hour.
+  [persona] Oh my, that is a very strange website and I am not sure how to use my phone. Please tell me your full name and badge number letter by letter, I am writing it down slowly.
+[scammer 7] Mister Kumar, I am waiting. Confirm that you have noted the UPI ID and the account number.
+  [persona] One minute please, I am looking for my glasses. Please repeat that.
+[scammer 8] Do not disconnect this call. Pay the deposit immediately, or I will have no choice but to proceed.
+  [persona] Ah, I am writing it down. Can you say it once more, slowly?
+  [persona] Sorry, uh, the line is not very clear. Can you say that again, slowly?
+  [persona] One minute please, I am looking for my glasses. Please repeat that.
+{
+ "call_id": "reg3-m5",
+ "seconds": 169,
+ "scammer_turns": 9,
+ "persona_replies": 11,
+ "persona_audio_frames_heard_by_caller": 873,
+ "planted_details_found_in_evidence": {
+  "upi": "customs.clear@okbank",
+  "account": "50100234567891",
+  "ifsc": "HDFC0001234",
+  "callback": "9820133456",
+  "name": "Vikram Rathore",
+  "link": "RBI-verify.in"
+ },
+ "n_found": 6,
+ "of": 6,
+ "all_valid_evidence": [
+  [
+   "person_name",
+   "Vikram Rathore"
+  ],
+  [
+   "agency",
+   "Mumbai Cyber Crime Cell"
+  ],
+  [
+   "upi_id",
+   "customs.clear@okbank"
+  ],
+  [
+   "amount",
+   "\u20b950,000"
+  ],
+  [
+   "ifsc",
+   "HDFC0001234"
+  ],
+  [
+   "bank_account",
+   "50100234567891"
+  ],
+  [
+   "phone_number",
+   "9820133456"
+  ],
+  [
+   "officer_id",
+   "4471"
+  ],
+  [
+   "url",
+   "RBI-verify.in"
+  ]
+ ],
+ "persona_guard_replacements": 4,
+ "persona_turns_flagged_decoy_in_db": true,
+ "persona_lines_with_digits_or_addresses": [],
+ "persona_reply_after_caller_stops_ms": {
+  "median": 2119,
+  "n": 8
+ },
+ "takeback": {
+  "persona_was_speaking": false,
+  "server_ms": 0,
+  "cancel_sent_ms": null,
+  "persona_frames_after_400ms": 0,
+  "receiver_voice_reached_caller_frames": 1,
+  "ui_state_off_event": true
+ },
+ "stt_incidents": 0
+}
+FAIL
