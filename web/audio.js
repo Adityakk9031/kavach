@@ -4,6 +4,7 @@
 export const SAMPLE_RATE = 16000;
 export const CHUNK_SAMPLES = 800; // 50 ms
 export const SOURCE = { PEER: 0, WARNING: 1, PERSONA: 2 };
+export const DUCK_LEVEL = 0.25; // the other party's volume while the family-voice warning plays
 
 // AudioWorklet that downsamples the mic to 16 kHz Int16 and posts 50 ms chunks.
 const CAPTURE_WORKLET = `
@@ -130,12 +131,27 @@ export class Player {
     this.next[source] = start + buf.duration;
     (this.nodes[source] ||= new Set()).add(node);
     node.onended = () => this.nodes[source].delete(node);
+    if (source === SOURCE.WARNING) this.duckPeer(this.next[source]);
     if (idle && this.onFirstAudio) this.onFirstAudio(source, (start - now) * 1000);
   }
   flush(source) {
     for (const n of this.nodes[source] || []) { try { n.stop(); } catch (_) {} }
     this.nodes[source] = new Set();
     this.next[source] = 0;
+    if (source === SOURCE.WARNING) this.unduckPeer();
+  }
+  // While the warning plays, turn the other party's voice down so the person can hear the family voice clearly;
+  // restore it a moment after the warning's scheduled audio ends (or at once if the warning is flushed).
+  duckPeer(endTime) {
+    const g = this.gain(SOURCE.PEER).gain, now = this.ctx.currentTime;
+    g.cancelScheduledValues(now);
+    g.setTargetAtTime(DUCK_LEVEL, now, 0.05);
+    g.setTargetAtTime(1.0, endTime + 0.1, 0.15);
+  }
+  unduckPeer() {
+    const g = this.gain(SOURCE.PEER).gain, now = this.ctx.currentTime;
+    g.cancelScheduledValues(now);
+    g.setTargetAtTime(1.0, now, 0.05);
   }
   isPlaying(source) {
     return (this.next[source] || 0) > this.ctx.currentTime;

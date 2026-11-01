@@ -20,7 +20,7 @@ from app.llm import LLM
 from app import report as report_mod
 from app.alerts import Alerter, CallAlerts
 from app.evidence import EvidenceCollector
-from app.finalize import make_finalize
+from app.finalize import handle_answer_callback, make_finalize
 from app.persona import Persona
 from app.pipeline import CallPipeline
 from app.store import Store
@@ -92,8 +92,13 @@ async def lifespan(_app):
             except Exception:
                 logging.getLogger("kavach").exception("could not pre-warm warning voice")
         asyncio.create_task(warm())
+    poller = None
+    if alerter.enabled:  # listen for the family's button presses (money / OTP answers)
+        poller = asyncio.create_task(alerter.poll(lambda u: handle_answer_callback(u, alerter, store, settings)))
     yield
     task.cancel()
+    if poller:
+        poller.cancel()
     await tts_pool.close()
     await alerter.aclose()
     await llm.aclose()

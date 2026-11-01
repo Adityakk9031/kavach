@@ -6,6 +6,7 @@ message. Sending never blocks the call: failures are logged as events. With no t
 """
 
 import asyncio
+import json
 import logging
 from datetime import datetime
 from pathlib import Path
@@ -37,6 +38,18 @@ def snippet(text: str, limit: int = 140) -> str:
 
 def stage_list(stages: list[str]) -> str:
     return ", ".join(STAGE_NAMES.get(s, s) for s in sorted(stages)) or "none yet"
+
+
+def answer_keyboard(token: str, money: bool | None = None, otp: bool | None = None) -> dict:
+    """Four buttons under the call-end message: the two questions only a person can answer. A ✅ marks the chosen
+    answer. callback_data is `a:<token>:<m|o>:<y|n>` (well under Telegram's 64-byte limit)."""
+    def btn(label: str, q: str, yes: bool, current: bool | None) -> dict:
+        mark = "✅ " if current is yes else ""
+        return {"text": f"{mark}{label}", "callback_data": f"a:{token}:{q}:{'y' if yes else 'n'}"}
+
+    return {"inline_keyboard": [
+        [btn("Money sent: Yes", "m", True, money), btn("Money sent: No", "m", False, money)],
+        [btn("OTP/PIN shared: Yes", "o", True, otp), btn("OTP/PIN shared: No", "o", False, otp)]]}
 
 
 class AlertPolicy:
@@ -79,13 +92,51 @@ class Alerter:
         self.client = client or httpx.AsyncClient(timeout=15)
         self.base = f"https://api.telegram.org/bot{settings.telegram_bot_token}"
 
-    async def send_message(self, text: str) -> dict:
-        r = await self.client.post(f"{self.base}/sendMessage", json={
-            "chat_id": self.settings.telegram_chat_id, "text": text[:4000], "disable_web_page_preview": True})
+    async def send_message(self, text: str, reply_markup: dict | None = None) -> dict:
+        payload = {"chat_id": self.settings.telegram_chat_id, "text": text[:4000], "disable_web_page_preview": True}
+        if reply_markup:
+            payload["reply_markup"] = reply_markup
+        r = await self.client.post(f"{self.base}/sendMessage", json=payload)
         body = r.json()
         if not body.get("ok"):
             raise RuntimeError(body.get("description", f"HTTP {r.status_code}"))
         return body
+
+    async def answer_callback(self, callback_id: str, text: str) -> None:
+        """Stops the spinner on the pressed button and shows a short confirmation."""
+        await self.client.post(f"{self.base}/answerCallbackQuery", json={"callback_query_id": callback_id, "text": text})
+
+    async def edit_markup(self, chat_id: int | str, message_id: int, reply_markup: dict) -> None:
+        await self.client.post(f"{self.base}/editMessageReplyMarkup", json={
+            "chat_id": chat_id, "message_id": message_id, "reply_markup": reply_markup})
+
+    async def poll(self, handler, long_poll_s: int = 25) -> None:
+        """Receive button presses (callback queries) by long polling, and hand each update to `handler`. Runs until
+        cancelled; transient network or API errors are retried."""
+        offset = None
+        while True:
+            try:
+                params = {"timeout": long_poll_s, "allowed_updates": json.dumps(["callback_query"])}
+                if offset is not None:
+                    params["offset"] = offset
+                r = await self.client.get(f"{self.base}/getUpdates", params=params, timeout=long_poll_s + 15)
+                body = r.json()
+                if not body.get("ok"):
+                    log.warning("getUpdates failed: %s", body.get("description"))
+                    await asyncio.sleep(5)
+                    continue
+                for update in body["result"]:
+                    offset = update["update_id"] + 1
+                    try:
+                        await handler(update)
+                    except Exception:
+                        log.exception("telegram update handler failed")
+                await asyncio.sleep(0)  # always give the loop a chance to run (and to cancel us)
+            except asyncio.CancelledError:
+                raise
+            except Exception as e:
+                log.warning("telegram polling error: %s", e)
+                await asyncio.sleep(5)
 
     async def send_document(self, path: Path, caption: str) -> dict:
         with open(path, "rb") as f:
@@ -147,9 +198,10 @@ class CallAlerts:
                                                 self.pipeline.max_risk, self.last_stages), None)
 
     async def call_ended(self, report_text: str, pdf_path: Path | None) -> None:
-        await self._send("call_end", report_text, None, document=pdf_path)
+        await self._send("call_end", report_text, None, document=pdf_path, keyboard=True)
 
-    async def _send(self, kind: str, text: str, stages: list[str] | None, document: Path | None = None) -> None:
+    async def _send(self, kind: str, text: str, stages: list[str] | None, document: Path | None = None,
+                    keyboard: bool = False) -> None:
         room = self.room
         if room.mode == "eval":
             room.log_event("alert_skipped", {"kind": kind, "reason": "eval call"})
@@ -167,7 +219,8 @@ class CallAlerts:
 
         async def go():
             try:
-                body = await self.alerter.send_message(text)
+                markup = answer_keyboard(room.store.make_answer_token(room.call_id)) if keyboard else None
+                body = await self.alerter.send_message(text, markup)
                 if document is not None and document.exists():
                     await self.alerter.send_document(document, "1930 complaint draft (review before filing)")
                 room.log_event("alert_sent", {"kind": kind, "message_id": body["result"]["message_id"]})

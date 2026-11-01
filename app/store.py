@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS events (
   id INTEGER PRIMARY KEY AUTOINCREMENT, call_id TEXT NOT NULL, ts_mono REAL, ts_wall REAL,
   type TEXT NOT NULL, payload TEXT
 );
+CREATE TABLE IF NOT EXISTS answer_tokens (token TEXT PRIMARY KEY, call_id TEXT NOT NULL, created REAL);
 CREATE INDEX IF NOT EXISTS events_call ON events(call_id, ts_mono);
 CREATE INDEX IF NOT EXISTS turns_call ON turns(call_id, idx);
 """
@@ -83,6 +84,17 @@ class Store:
              int(is_decoy)),
         )
         return cur.lastrowid
+
+    def make_answer_token(self, call_id: str) -> str:
+        """A short random token for Telegram buttons: it stands for one call and cannot be guessed from the call id."""
+        import secrets
+        token = secrets.token_urlsafe(6)
+        self._exec("INSERT INTO answer_tokens(token, call_id, created) VALUES (?,?,?)", (token, call_id, time.time()))
+        return token
+
+    def call_for_token(self, token: str) -> str | None:
+        rows = self.query("SELECT call_id FROM answer_tokens WHERE token=?", (token,))
+        return rows[0]["call_id"] if rows else None
 
     def events(self, call_id: str) -> list[dict]:
         rows = self.query("SELECT * FROM events WHERE call_id=? ORDER BY ts_mono", (call_id,))
