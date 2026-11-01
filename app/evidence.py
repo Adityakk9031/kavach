@@ -31,6 +31,12 @@ ACCOUNT_RE = re.compile(r"\b\d(?:[\s-]?\d){8,17}\b")
 AMOUNT_RE = re.compile(r"(?:rs\.?|₹|inr)\s?[\d,]+(?:\.\d+)?|\b[\d,]{4,}\s?(?:rupees|rs)\b|\b\d+(?:\.\d+)?\s?(?:lakh|lakhs|crore)\b", re.I)
 AGENCY_RE = re.compile(r"\b(?:from|with|of|at)\s+(?:the\s+)?((?:[A-Z][A-Za-z&.-]*\s+){0,4}(?:Cell|Branch|Department|Bureau|Police|Bank|"
                        r"Customs|Office|Unit|Agency|Division|Commission|Directorate|Court|Authority|Ministry|Team))\b")
+# "This is Inspector Vikram Rathore", "I am Rathore", "my name is Sharma": the caller naming themself.
+NAME_RE = re.compile(r"\b(?i:this is|i am|i'm|my name is|name is)\s+(?:(?:Inspector|Sub-Inspector|Officer|Mr\.?|Mrs\.?|Ms\.?|Director|Agent|Sir|Mister)\s+)?"
+                     r"([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2})\b")
+NOT_NAMES = {"calling", "from", "here", "speaking", "sorry", "not", "the", "a", "an", "very", "your", "serious", "calm",
+             "sure", "afraid", "going", "trying", "just", "also", "now", "writing", "looking", "telling", "reaching"}
+UPI_LABEL = re.compile(r"^(?i:upi\s*id)[\s:]*")
 KNOWN_APPS = ["anydesk", "teamviewer", "quicksupport", "rustdesk", "ammyy", "airdroid", "phonepe", "google pay", "gpay",
               "paytm", "whatsapp", "telegram", "skype", "zoom"]
 
@@ -71,8 +77,15 @@ def regex_items(text: str) -> list[Item]:
             return
         taken.append((m.start(), m.end()))
         a = max(0, m.start() - 40)
-        items.append(Item(kind, m.group(0).strip(), text[a:m.end() + 40].strip(), "regex"))
+        value = m.group(0).strip()
+        if kind == "upi_id":
+            value = UPI_LABEL.sub("", value)  # STT can glue the spoken label on: "upiidcustoms.clear@okbank"
+        items.append(Item(kind, value, text[a:m.end() + 40].strip(), "regex"))
 
+    for m in NAME_RE.finditer(text):
+        words = m.group(1).split()
+        if words and not any(w.lower() in NOT_NAMES for w in words):
+            items.append(Item("person_name", m.group(1).strip(), text[max(0, m.start() - 20):m.end() + 40].strip(), "regex"))
     for kind, rx in (("upi_id", UPI_RE), ("email", EMAIL_RE), ("ifsc", IFSC_RE), ("url", URL_RE),
                      ("phone_number", PHONE_RE), ("bank_account", ACCOUNT_RE), ("amount", AMOUNT_RE)):
         for m in rx.finditer(text):
@@ -129,7 +142,9 @@ def plausible(item: LlmItem, listener_names: tuple[str, ...] = ()) -> bool:
     words = re.findall(r"[a-z0-9]+", v.lower())
     if item.type in ("person_name", "agency", "app_name") and all(w in TITLES for w in words):
         return False
-    if item.type == "upi_id" and "@" not in v:
+    if item.type == "upi_id" and not re.fullmatch(r"[A-Za-z0-9._-]{2,}@[A-Za-z]{2,}", v):
+        return False  # no spaces or stray words: a mashed "UPI ID x@y" must not reach a complaint
+    if item.type == "upi_id" and v.lower().startswith("upiid"):
         return False
     if item.type == "ifsc" and not IFSC_RE.fullmatch(v.upper().replace(" ", "")):
         return False
@@ -209,6 +224,9 @@ class EvidenceCollector:
                 self.room.log_event("evidence_llm_error", {"turn_idx": turn["idx"], "error": str(e)[:160]})
         elif self.llm is not None:
             self.unscanned.append(text)
+        for it in found:
+            if it.valid and it.source == "regex" and it.type in ("person_name", "agency"):
+                it.valid = plausible(LlmItem(type=it.type, value=it.value), self.listener_names)
         new = []
         for it in found:
             old = self.items.get(it.key)

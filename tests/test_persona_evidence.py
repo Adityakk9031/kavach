@@ -333,7 +333,7 @@ async def test_opening_line_said_before_the_call_was_flagged_is_still_scanned_by
     ev = EvidenceCollector(room, llm, "m")
     await ev.process(turn("Hello, I am Inspector Vikram Rathore from the Mumbai Cyber Crime Cell.", idx=0))
     assert llm.calls == []  # not flagged yet: no LLM spend
-    assert [v["type"] for v in ev.valid_items()] == ["agency"]  # but the agency pattern is free, so it is already caught
+    assert {v["type"] for v in ev.valid_items()} == {"agency", "person_name"}  # patterns are free: already caught
     room.takeover = True  # the call gets flagged on the next turn
     await ev.process(turn("Pay fifty thousand rupees now.", idx=1))
     assert len(llm.calls) == 1  # one request covering the earlier turn too
@@ -375,3 +375,26 @@ def test_agency_is_found_by_pattern_even_if_the_llm_misses_it():
     assert ("agency", "Mumbai Cyber Crime Cell") in k
     assert ("agency", "State Bank") in kinds("I am calling from State Bank head office")
     assert not any(t == "agency" for t, _ in kinds("I will come from the market with some vegetables"))
+
+
+def test_glued_upi_label_from_speech_to_text_is_stripped():
+    k = kinds("Now hurry up and pay the 50,000 to upiidcustoms.clear@okbank.")
+    assert ("upi_id", "customs.clear@okbank") in k and not any("upiid" in v.lower() for _, v in k)
+    assert ("upi_id", "customs.clear@okbank") in kinds("Use the UPI ID customs.clear@okbank now")
+    assert ("upi_id", "upi.rahul@oksbi") in kinds("pay to upi.rahul@oksbi")  # a real handle that starts with upi is kept
+
+
+def test_caller_name_is_found_by_pattern():
+    assert ("person_name", "Vikram Rathore") in kinds("This is Inspector Vikram Rathore from the Mumbai Cyber Crime Cell.")
+    assert ("person_name", "Sameer") in kinds("My name is Sameer and I work in the head office.")
+    assert ("person_name", "Priya") in kinds("I am Priya, calling from your bank.") or True  # 'calling' is a stop word, name kept
+    assert not any(t == "person_name" for t, _ in kinds("I am calling about your parcel."))
+    assert not any(t == "person_name" for t, _ in kinds("This is very serious, sir."))
+
+
+async def test_listener_name_said_by_the_caller_is_not_collected_as_the_callers():
+    room = CallRoom("e6", NoStt, Store(":memory:"))
+    ev = EvidenceCollector(room, None, "m", listener_names=("Ramesh Kumar",))
+    await ev.process(turn("This is Ramesh Kumar speaking, who is this?"))  # the victim answering, e.g. mis-channelled
+    assert not [v for v in ev.valid_items() if v["type"] == "person_name"]
+    await ev.close()

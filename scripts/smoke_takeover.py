@@ -209,7 +209,7 @@ async def main(a) -> int:
     llm = LLM(S)
     t_start = time.monotonic()
     # --demo is a real call (mode=live, family alerts go out) and a human is the receiver; otherwise it is a test.
-    mode = "live" if (a.demo or a.live_alerts) else "eval"
+    mode = "live" if ((a.demo and not a.quiet) or a.live_alerts) else "eval"
     async with contextlib.AsyncExitStack() as stack:
         client = await stack.enter_async_context(httpx.AsyncClient(timeout=60))
         caller = await stack.enter_async_context(
@@ -300,6 +300,7 @@ if __name__ == "__main__":
     ap.add_argument("--base", default="http://localhost:8000")
     ap.add_argument("--call-id", default=f"takeover-{int(time.time())}")
     ap.add_argument("--seconds", type=int, default=120)
+    ap.add_argument("--quiet", action="store_true", help="with --demo: mark the call as a test so no Telegram alerts are sent")
     ap.add_argument("--live-alerts", action="store_true",
                     help="scripted run as a REAL call: the family gets the Telegram alerts and the call-end PDF")
     ap.add_argument("--adaptive", action="store_true",
