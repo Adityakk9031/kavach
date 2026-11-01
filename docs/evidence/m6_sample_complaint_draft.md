@@ -4,24 +4,24 @@
 
 ## Incident
 
-- **Date and time:** 01 Nov 2026, 00:01:25 IST
-- **Call length:** 185 seconds
+- **Date and time:** 01 Nov 2026, 12:46:22 IST
+- **Call length:** 181 seconds
 - **Caller's number:** +919820133456
 - **Scam stages detected:** Authority, Threat, Secrecy, Urgency, Credential request, Payment request (peak risk 95/100)
-- **Family-voice warning played:** 01 Nov 2026, 00:01:53 IST
-- **Kavach took over the call:** 01 Nov 2026, 00:01:52 IST
+- **Family-voice warning played:** no
+- **Kavach took over the call:** 01 Nov 2026, 12:46:54 IST
 
 ## What the caller claimed and asked for
 
 - **Name(s) the caller gave:** Vikram Rathore
-- **Organisation / agency claimed:** none stated
+- **Organisation / agency claimed:** Mumbai Cyber Crime Cell
 - **Officer, badge or case IDs:** 4471
 - **Amounts demanded:** ₹50,000
 - **UPI IDs:** customs.clear@okbank
 - **Bank account numbers:** 50100234567891
 - **IFSC codes:** HDFC0001234
 - **Phone numbers given:** 9820133456
-- **Links:** RBI-verify.in
+- **Links:** none stated
 - **E-mail addresses:** none stated
 - **Apps the caller asked to install or use:** none stated
 
@@ -32,41 +32,32 @@
 
 ## Key quotes from the caller
 
-- `00:01:43` “Inspector Vikram Rathore from the Mumbai Cyber Crime Cell”
-- `00:01:43` “A parcel in your name was seized with illegal drugs and fake passports”
-- `00:01:53` “Please stay on the line, this is very serious”
-- `00:02:08` “do not tell anyone about this call, not even your family, or officers will be sent to arrest you today”
-- `00:02:08` “do not tell anyone about this call, not even your family”
-- `00:02:08` “officers will be sent to arrest you today”
-- `00:02:26` “To clear your name, you must pay a refundable verification deposit of ₹50,000”
-- `00:02:08` “do not tell anyone about this call”
-- `00:02:26` “pay a refundable verification deposit of ₹50,000”
-- `00:02:26` “Use the UPI ID customs.clear@okbank”
-- `00:01:43` “This is Inspector Vikram Rathore from the Mumbai Cyber Crime Cell”
-- `00:01:53` “stay on the line”
+- `12:46:54` “Please stay on the line, this is very serious”
+- `12:46:45` “This is Inspector Vikram Rathore from the Mumbai Cyber Crime Cell.”
+- `12:46:45` “A parcel in your name was seized with illegal drugs and fake passports.”
+- `12:47:14` “Do not tell anyone about this call, not even your family, or officers will be sent to arrest you today.”
+- `12:47:48` “To clear your name, you must pay a refundable verification deposit of ₹50,000. Use the UPI ID customs.clear@okbank.”
+- `12:48:50` “I am Inspector Vikram Rathore and my badge number is 4471.”
+- `12:48:23` “Or transfer to the HDFC bank account number 50100234567891, IFSC code HDFC0001234.”
+- `12:49:19` “Answer me now.”
 
 ## Call transcript
 
-- `00:01:43` **Caller:** Hello, am I speaking with Mr. Ramesh Kumar? This is Inspector Vikram Rathore from the Mumbai Cyber Crime Cell. A parcel in your name was seized with illegal drugs and fake passports.
-- `00:01:52` **Kavach decoy persona (fake details):** Hello? Ah, sorry, I was not hearing properly. Please continue, I am listening.
-- `00:01:53` **Caller:** Mr. Kumar, are you there? Please stay on the line, this is very serious.
-- `00:01:54` **Kavach decoy persona (fake details):** Um, yes sir, I am right here, but my hearing is a bit slow today. Please tell me slowly, what is this serious matter about?
-- `00:02:08` **Caller:** Listen carefully, do not tell anyone about this call, not even your family, or officers will be sent to arrest you today.
-- `00:02:09` **Kavach decoy persona (fake details):** Oh dear, what kind of bad news is this? Please tell me slowly, I am a bit confused and my glasses are not on my face.
-- `00:02:26` **Caller:** To clear your name, you must pay a refundable verification deposit of ₹50,000. Use the UPI ID customs.clear@okbank.
-- `00:02:27` **Kavach decoy persona (fake details):** Umm, fifty thousand? That is a lot of money. I am looking for my passbook to see my balance, please wait a moment.
-- `00:02:49` **Caller:** Or transfer to the HDFC bank account number 50100234567891, IFSC code HDFC0001234.
-- `00:02:50` **Kavach decoy persona (fake details):** Oh, HDFC bank? That is a very big number. I am calling my son to check the exact account number for him, please wait a moment.
-- `00:03:07` **Caller:** If the line drops, call me back on 9820133456. I am Inspector Vikram Rathore and my badge number is 4471.
-- `00:03:09` **Kavach decoy persona (fake details):** Um, Inspector Rathore, please tell me slowly, what is your badge number? I am writing it down, and my phone is a bit slow today.
-- `00:03:25` **Caller:** You can check your case file on the website www RBI-verify.in. Do it now, the arrest warrant goes out in 1 hour.
-- `00:03:26` **Kavach decoy persona (fake details):** A website? That is very confusing for me. Please spell the website name for me, letter by letter, and tell me which bank branch I should go to.
-- `00:03:37` **Caller:** Mr. Kumar, I am waiting. Confirm that you have noted the UPI ID and the account number.
-- `00:03:50` **Kavach decoy persona (fake details):** One minute please, I am looking for my glasses. Please repeat that.
-- `00:04:00` **Caller:** Do not disconnect this call. Pay the deposit immediately or I will have no choice but to proceed.
-- `00:04:08` **Kavach decoy persona (fake details):** Oh dear, I am very afraid to pay anything. Please speak slowly again, tell me who your senior officer is.
-- `00:04:22` **Caller:** Hello, Mr. Kumar, do you understand what I am saying? Answer me now.
-- `00:04:25` **Kavach decoy persona (fake details):** One minute please, I am looking for my glasses. Please repeat that.
+- `12:46:45` **Caller:** Hello, am I speaking with Mr. Ramesh Kumar? This is Inspector Vikram Rathore from the Mumbai Cyber Crime Cell. A parcel in your name was seized with illegal drugs and fake passports.
+- `12:46:54` **Kavach decoy persona (fake details):** Hello? Ah, sorry, I was not hearing properly. Please continue, I am listening.
+- `12:46:54` **Caller:** Mr. Kumar, are you there? Please stay on the line, this is very serious.
+- `12:46:56` **Kavach decoy persona (fake details):** Yes, I am here, Mr. Kumar. Please, repeat that slowly because my hearing is a bit weak. What is your full name?
+- `12:47:08` **Caller:** Listen carefully.
+- `12:47:14` **Caller:** Do not tell anyone about this call, not even your family, or officers will be sent to arrest you today.
+- `12:47:16` **Kavach decoy persona (fake details):** Oh dear, please, my eyes are not clear, can you tell me again what you are saying slowly? My phone is very slow here in Nagpur.
+- `12:47:48` **Caller:** To clear your name, you must pay a refundable verification deposit of ₹50,000. Use the UPI ID customs.clear@okbank.
+- `12:47:49` **Kavach decoy persona (fake details):** Oh no, please, I am looking for my glasses at home, my card is in another room. Can you please spell that UPI ID letter by letter for me?
+- `12:48:23` **Caller:** Or transfer to the HDFC bank account number 50100234567891, IFSC code HDFC0001234.
+- `12:48:24` **Kavach decoy persona (fake details):** Oh, my son, please, I cannot give money yet, I am looking for my passbook. Can you spell that bank name and tell me the branch name?
+- `12:48:50` **Caller:** If the line drops, call me back on 9820133456. I am Inspector Vikram Rathore and my badge number is 4471.
+- `12:48:52` **Kavach decoy persona (fake details):** Oh Inspector Vikram, please, I am writing this down slowly. Can you spell your badge number letter by letter? And please, give me a number to call if the line drops.
+- `12:49:19` **Caller:** Hello, Mr. Kumar? Do you understand what I am saying? Answer me now.
+- `12:49:20` **Kavach decoy persona (fake details):** I understand, Inspector, but my hearing is weak. Please tell me your case ID letter by letter and let me repeat it to be sure.
 
 ## What to do next
 
@@ -77,4 +68,4 @@
 5. Do not delete anything. Keep this draft, the call log and any screenshots or messages.
 
 ---
-*DRAFT — review before filing. Generated by Kavach from a recorded call. Nothing has been submitted.* Generated 01 Nov 2026, 00:04 IST.
+*DRAFT — review before filing. Generated by Kavach from a recorded call. Nothing has been submitted.* Generated 01 Nov 2026, 13:27 IST.

@@ -129,30 +129,37 @@ accents and streamed in real time through the live backend as two separate micro
 speech-to-text, the real detector, the real warning in the cloned voice. **The prompt and threshold (60) were tuned
 on the 54 train calls only and frozen before the test split was ever run.**
 
-| Test split (36 calls) | Run 1 | Run 2 (final code) |
-|---|---|---|
-| Scam recall | **18/18** | **18/18** |
-| False alarms on normal calls | 0/12 | **1/12** |
-| False alarms on hard negatives | 0/6 | 0/6 |
-| Caller's last word → warning audio, median / p90 | 1529 / 1668 ms | 1552 / 1625 ms |
-| Warning voice, time to first audio (median) | 401 ms | 398 ms |
-| Caught before the OTP/money request | 15/18 (83%) | 12/18 (67%) |
-| Decisive turn → warning, median / p90 | -11.9 s / +2.1 s | -11.5 s / +14.9 s |
+| Test split (36 calls) | Run 1 (`f549bd5`) | Run 2 (`bc5bf5a`) | **Run 3 (`69ce935`, final code)** |
+|---|---|---|---|
+| Scam recall | 18/18 | 18/18 | **18/18** |
+| False alarms on normal calls | 0/12 | 1/12 | **0/12** |
+| False alarms on hard negatives | 0/6 | 0/6 | **0/6** |
+| Caller's last word → warning audio, median / p90 | 1529 / 1668 ms | 1552 / 1625 ms | **1461 / 1571 ms** (n=11 *) |
+| Warning voice, time to first audio (median) | 401 ms | 398 ms | **401 ms** |
+| Caught before the OTP/money request | 15/18 (83%) | 12/18 (67%) | **13/18 (72%)** |
+| Decisive turn → warning, median / p90 | -11.9 s / +2.1 s | -11.5 s / +14.9 s | **-8.8 s / +6.9 s** |
+| Errors / transcription incidents / detector errors | 0 / 0 / 0 | 0 / 0 / 1 | **0 / 0 / 0** |
 
-Run 1 was on the code before an independent review; run 2 is the same frozen prompt and threshold on the final
-code. After run 2 one robustness setting changed (the detector's total time limit for one turn, 3.0 s to 4.5 s, because
-a slow LLM answer made it skip a turn); the full test split was not re-run for that.
+\* In 7 of the 18 scam calls the scripted receiver replied to the scammer so quickly that the first warning was cut off
+before any audio played and was repeated afterwards (as designed), so those calls have no "first attempt" timing; the
+warning was heard in all 18.
+
+The same frozen prompt and threshold (60) were used in all three runs; the code changed between them (an independent
+review, then a second one, fixed real problems) and **run 3 is the run on the final code**: every file under `app/`
+is identical to commit `69ce935`; nothing in `app/` has changed since.
 
 **How to read these numbers honestly**
 
 - **It is a small test.** 18 scams and 18 non-scams. Zero misses is consistent with a true recall anywhere from about
   82% to 100%; one false alarm in 18 is consistent with a true false-alarm rate from about 0.1% to 27% (zero in 18 would still allow up to about 18%). One call moves a
   rate by about 3 to 6 points.
-- **A small language model is not deterministic at the margin.** The same frozen system on the same audio gave 0/12 then
-  1/12 false alarms and 15/18 then 12/18 "caught before the ask". The false alarm in run 2 is a **genuine** bank
+- **A small language model is not deterministic at the margin.** The same frozen system on the same audio gave 0/12,
+  1/12 and 0/12 false alarms and 15/18, 12/18 and 13/18 "caught before the ask" across the three runs. The one false alarm (run 2) was a **genuine** bank
   fraud-team call that says "I am blocking your debit card immediately" after a large flagged transaction; it peaked at
-  a risk score of 54.6 in run 1 (threshold 60) and 78.2 in run 2. It is the clearest weakness: a real bank call that
-  sounds firm. Margins are thin both ways: in run 1 two scams only just crossed the threshold (60.5, 61.6); in run 2 the weakest scam peaked at 63.4 and a hard negative at 57.8, 2.2 below it.
+  a risk score of 54.6 in run 1 (threshold 60), 78.2 in run 2 and 7 in run 3. It is the clearest weakness: a real bank call that
+  sounds firm. Margins are thin both ways: in run 3 the highest-scoring non-scam calls peaked at 50.8 and 45.5, and the weakest scams
+  crossed the line at 54.6 (by the stage rule, not the score) and 61.6; in run 1 two scams only just crossed the threshold
+  (60.5, 61.6); in run 2 a hard negative peaked at 57.8, 2.2 below it.
 - **"Decisive turn" is an LLM-written label**, usually later than the point where a careful person would first worry,
   so the median is negative (the system warned before the label). The number that matters for a protected person is
   the **1.5 s** from the caller's last word to the warning audio.

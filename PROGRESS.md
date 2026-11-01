@@ -137,3 +137,27 @@ Built: `app/alerts.py` (max 3 per call, slots for takeover and call-end are neve
 - Found by the e2e run and fixed: a warning could start after the person had already handed over (now skipped); `warned_at` now means audio actually started; agency is also captured by pattern; nested duplicate quotes dropped.
 - Regression of every earlier gate on the final code and a fresh-clone install: see `docs/evidence/regression_final*/` and VERIFICATION_REPORT.md. Two scoring errors in my own scripts were found and fixed during it (a re-armed warning scored as a failure; barge-in timing when speech had already interrupted).
 - Still needs a human: real microphone test in Chrome with headphones; confirm the Telegram messages arrived; listen to the cloned voice; rehearse docs/DEMO_SCRIPT.md; submit by 2026-11-07 18:00 IST. The AssemblyAI key and bot token were pasted into chat: rotate both after the hackathon.
+
+
+## Second review round and final verification 2026-11-01
+
+Second independent review: 17 findings plus unsupported claims. Fixed (all with tests): the caller side no longer receives
+warning/takeover/persona/risk/evidence events; hang-up broadcasts at once, drops all audio, and the report arrives as its own
+`report_ready` event; `ended_at` is written first so an id cannot be reused during finalize; no warning or alert after the
+call ended; STT-restart clock offset taken at the new session's first byte (and reset on rejoin); persona may ask about UPI/IFSC
+(only address shapes are blocked); LLM budget split in three lanes with a corrected token estimate (it was counting a third of a
+character per token and starved the persona); tests are isolated from the network and the real DB; demo bot uses the fixed
+script and reads events from a listener socket; DEMO_SCRIPT timing rewritten; organisation names are not person names; echo guard
+counts from the first warning audio and a takeover click always cancels.
+
+Found while verifying (all mine, all fixed): live M2 tests failed first on my own 429 burst, then on the detector's fail-fast under
+a shared budget (tests now pace like a real call); the M5 gate failed on a take-back that was not mid-sentence and exposed the
+token-budget bug above.
+
+Final evidence: `docs/evidence/regression_final3/` (keys 5/5, 114 offline tests, M1, M3 warning, M3 barge-in), `regression_final4/`
+(M2 10/10, M5 PASS), `m4_test_run3_final_code.json`: recall 18/18, false alarms 0/12 + 0/6, warning 1.46 s after the caller stops,
+13/18 before the ask, 0 errors; `app/` identical to commit 69ce935. Screens driven in a real browser: answer, warning banner, chips,
+hand over, take back, evidence panel, report panel with the two questions, PDF link; no Telegram alerts for test calls.
+
+Still needs the user: real microphone test in Chrome with headphones; rehearse docs/DEMO_SCRIPT.md; submit by 2026-11-07 18:00 IST;
+rotate the AssemblyAI key and bot token (both were pasted in chat).
