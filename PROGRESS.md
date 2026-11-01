@@ -95,7 +95,7 @@ Built: `eval/generate_scripts.py` (90 scripts written by `gemma-4-31b`, a differ
 | Errors / STT incidents / detector errors | 0 / 0 / 0 |
 
 How to read it honestly:
-- **Small test set.** 18/18 and 0/18 are consistent with true rates anywhere from ~82% to 100% recall and 0% to ~15% false alarms (95% bounds). The margins are thin: two scams only just triggered (cumulative risk 60.5 and 61.6 vs threshold 60) and the two highest-risk negatives peaked at 54.6 and 52.5.
+- **Small test set.** 18/18 and 0/18 are consistent with true rates anywhere from ~82% to 100% recall and 0% to ~18.5% false alarms (95% bounds). The margins are thin: two scams only just triggered (cumulative risk 60.5 and 61.6 vs threshold 60) and the two highest-risk negatives peaked at 54.6 and 52.5.
 - **"Decisive turn" is an LLM label** (gemma), usually later than where a person would first worry, so the median is negative. The latency that matters is the 1.5 s from the caller's last word to warning audio.
 - **One warning never played** (`scam_digital_arrest_07`): triggered at turn 3, but the scripted receiver's reply began 0.4 s later and cancelled the warning before any audio (barge-in worked as specified), and the trigger fires once, so it was lost. 14 of 18 scam warnings were talked over by the scripted receiver at some point. Fix: a warning cut off before 3 s were heard is repeated when the person stops talking (max 3); `tests/test_tts_warner.py`.
 - Because the code changed substantially afterwards (review fixes, re-arm), **the final published numbers will be a second full run on the final code** (decision #20).

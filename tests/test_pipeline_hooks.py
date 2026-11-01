@@ -54,3 +54,21 @@ async def test_slow_hook_does_not_block_other_hooks_or_next_detection():
     await asyncio.sleep(1.6)
     assert done == ["alert", "warning"]
     await pipe.close()
+
+
+async def test_a_turn_analysed_after_the_call_ended_triggers_no_warning_or_alert():
+    room = CallRoom("h2", NoStt, Store(":memory:"))
+    pipe = CallPipeline(room, StubDetector())
+    fired = []
+
+    async def hook(p, d, info):
+        fired.append("hook")
+
+    pipe.on_trigger.append(hook)
+    room.ended = True  # the last turn's analysis finishes during finalize
+    await pipe.on_final(room, turn(0))
+    await asyncio.wait_for(pipe.queue.join(), 2)
+    await asyncio.sleep(0.05)
+    assert fired == [] and pipe.triggered is False
+    assert any(e["type"] == "detect" for e in room.store.events("h2"))  # still recorded for the report
+    await pipe.close()

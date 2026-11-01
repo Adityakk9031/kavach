@@ -49,7 +49,9 @@ Hard rules:
 Output only what you say aloud."""
 
 
-ADDRESS_WORDS = re.compile(r"\b(at the rate|at sign|dot\s*(com|in|org|net|co|app)|upi|gmail|yahoo|ifsc|www)\b", re.I)
+# Only address SHAPES are blocked. The persona must be free to ASK "which UPI ID?" or "what is the IFSC code?": that is
+# how it draws the details out. It may not say an address itself ("ramesh at gmail", "at the rate okaxis", "dot com").
+ADDRESS_WORDS = re.compile(r"\b(at the rate|at sign|dot\s*(com|in|org|net|co|app)|at\s+(gmail|yahoo|outlook|hotmail|okaxis|oksbi|okhdfcbank|okicici|ybl|paytm|upi))\b", re.I)
 
 
 def number_runs(text: str) -> int:
@@ -204,7 +206,8 @@ class CallPersona:
                 try:
                     msgs = [{"role": "system", "content": system_prompt(self.s)}] + self.history[-12:]
                     raw, llm_ms = await self.persona.llm.chat(
-                        self.s.persona_model, msgs, max_tokens=120, temperature=0.7, timeout=6)
+                        self.s.persona_model, msgs, max_tokens=120, temperature=0.7, timeout=6,
+                        lane="persona", max_wait=3.0)  # never go silent waiting for budget: fall back to a stall
                     text, replaced = guard(raw, self.s.decoy.phone)
                 except LLMError as e:
                     log.warning("persona LLM failed: %s", e)

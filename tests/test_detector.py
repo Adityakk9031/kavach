@@ -10,6 +10,8 @@ from app.detector import Decision, Detection, Detector, RiskTracker, format_wind
 from app.llm import LLM, extract_json
 from tests.fixtures.transcripts import LEGIT, SCAMS
 
+SHARED_LIMITERS: dict = {}  # all live tests share one budget, like the real account does (no self-inflicted 429s)
+
 
 def det(risk, stages=()):
     return Detection(stages=list(stages), risk=risk)
@@ -97,7 +99,7 @@ async def run_call(detector: Detector, turns):
 @live
 @pytest.mark.parametrize("name", list(SCAMS))
 async def test_scam_transcripts_trigger(name):
-    llm = LLM(get_settings())
+    llm = LLM(get_settings(), limiters=SHARED_LIMITERS)
     try:
         log = await run_call(Detector(get_settings(), llm), SCAMS[name])
     finally:
@@ -110,7 +112,7 @@ async def test_scam_transcripts_trigger(name):
 @live
 @pytest.mark.parametrize("name", list(LEGIT))
 async def test_legit_transcripts_do_not_trigger(name):
-    llm = LLM(get_settings())
+    llm = LLM(get_settings(), limiters=SHARED_LIMITERS)
     try:
         log = await run_call(Detector(get_settings(), llm), LEGIT[name])
     finally:

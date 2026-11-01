@@ -132,8 +132,7 @@ class CallAlerts:
 
     async def on_trigger(self, pipeline, decision, info: dict) -> None:
         self.last_stages = decision.stages_all
-        warned = "warning is playing" if self.room.warning is not None and "receiver" in self.room.parties else "no warning could be played"
-        await self._send("warning", self._body(f"🚨 Kavach: possible scam call ({warned})",
+        await self._send("warning", self._body("🚨 Kavach: possible scam call detected",
                                                decision.risk_cum, decision.stages_all), decision.stages_all)
 
     async def on_new_stage(self, pipeline, decision, info: dict) -> None:
@@ -154,6 +153,9 @@ class CallAlerts:
         room = self.room
         if room.mode == "eval":
             room.log_event("alert_skipped", {"kind": kind, "reason": "eval call"})
+            return
+        if room.ended and kind != "call_end":
+            room.log_event("alert_suppressed", {"kind": kind, "reason": "call already ended"})
             return
         if not self.alerter.enabled:
             room.log_event("alert_skipped", {"kind": kind, "reason": "telegram not configured"})

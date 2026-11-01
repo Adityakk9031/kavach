@@ -100,14 +100,15 @@ class RateLimiter:
 # (requests per window, reserved tokens per window), kept under this account's observed limits (30 req/min and
 # 20k tokens/min on qwen, 30 req/min and 200k tokens/min on gemma). Each model's budget is split into lanes so the
 # detector (the call path) cannot be starved by persona/evidence calls during a takeover.
-MODEL_LIMITS = {"qwen3.5-4b-32k-fast": {"detector": (14, 8000), "other": (11, 6500)},
-                "gemma-4-31b": {"detector": (12, 60000), "other": (12, 80000)}}
-DEFAULT_LIMITS = {"detector": (12, 6000), "other": (12, 6000)}
+MODEL_LIMITS = {"qwen3.5-4b-32k-fast": {"detector": (12, 7500), "persona": (10, 5500), "other": (6, 3000)},
+                "gemma-4-31b": {"detector": (8, 50000), "persona": (8, 50000), "other": (12, 80000)}}
+DEFAULT_LIMITS = {"detector": (8, 5000), "persona": (8, 5000), "other": (8, 5000)}
 
 
 class LLM:
-    def __init__(self, settings: Settings):
-        self.limiters: dict[tuple[str, str], RateLimiter] = {}
+    def __init__(self, settings: Settings, limiters: dict | None = None):
+        # Pass one dict to several LLM objects (e.g. tests) so they share a budget, as the real account does.
+        self.limiters: dict[tuple[str, str], RateLimiter] = limiters if limiters is not None else {}
         self.settings = settings
         self._client = httpx.AsyncClient(
             base_url=settings.llm_gateway_url,

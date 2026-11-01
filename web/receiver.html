@@ -71,6 +71,19 @@
     let call, player, mic;
     const seenEvidence = new Set();
 
+    // Hang up (or the other side ending the call): stop every sound and control at once; the report comes later.
+    function endCallUi() {
+      $('status').textContent = 'Call ended. Preparing your complaint draft if the call was flagged…';
+      if (player) [SOURCE.PEER, SOURCE.WARNING, SOURCE.PERSONA].forEach((src) => player.flush(src));
+      if (mic) mic.stop();
+      for (const id of ['end', 'handover', 'takeback']) $(id).disabled = true;
+    }
+    function rejectedUi(reason) {
+      $('status').textContent = reason + ' Open a new call from the start page.';
+      if (mic) mic.stop();
+      for (const id of ['end', 'handover', 'takeback']) $(id).disabled = true;
+    }
+
     function showReport(report) {
       $('reportBox').hidden = false;
       $('reportPdf').href = report.pdf;
@@ -149,7 +162,9 @@
           else if (ev.type === 'takeover') showTakeover(ev.state === 'on');
           else if (ev.type === 'persona' && ev.text) { $('personaBox').hidden = false; $('personaText').textContent = 'Kavach says: ' + ev.text; }
           else if (ev.type === 'evidence') addEvidence(ev.items);
-          else if (ev.type === 'call_ended') { $('status').textContent = 'Call ended.'; if (ev.report) showReport(ev.report); }
+          else if (ev.type === 'call_ended') endCallUi();
+          else if (ev.type === 'report_ready') showReport(ev.report);
+          else if (ev.type === 'call_rejected') rejectedUi(ev.reason);
         },
         onAudio(source, pcm) { player.play(source, pcm); },
       });

@@ -57,6 +57,7 @@ class Warner:
         room.on_speech_started_hooks.append(w.on_speech_started)
         room.on_final_hooks.append(w.on_receiver_final)
         room.control_handlers["barge_in"] = w.on_browser_barge_in
+        room.on_end_hooks.append(w.close)
         room.warning = w
         return w
 
@@ -99,6 +100,8 @@ class CallWarning:
 
     async def speak(self, text: str, stage: str, trigger_at: float, turn_end_at: float | None) -> None:
         room = self.room
+        if room.ended:
+            return
         if room.takeover:  # the person already handed the call to Kavach: a warning would talk over the persona
             room.log_event("warn_skipped", {"reason": "takeover in progress"})
             return
@@ -115,6 +118,8 @@ class CallWarning:
 
         async def on_audio(pcm: bytes) -> None:
             nonlocal first
+            if room.ended:
+                return
             now = time.monotonic()
             self.play_until = max(self.play_until, now) + len(pcm) / 2 / self.warner.settings.sample_rate
             if first:
@@ -151,7 +156,10 @@ class CallWarning:
     async def barge_in(self, source: str) -> None:
         if not self.active or self.session is None or self.interrupted:
             return
-        if time.monotonic() - (self.started_at or 0) < Warner.ECHO_GUARD_S:
+        # The echo guard only makes sense once warning audio is actually playing (speaker leak into the mic). Before the
+        # first audio nothing can have leaked, and a takeover click is a deliberate act, never an echo.
+        if (source != "takeover" and self.first_audio_at is not None
+                and time.monotonic() - self.first_audio_at < Warner.ECHO_GUARD_S):
             self.room.log_event("barge_in_ignored", {"source": source, "reason": "echo guard"})
             return
         t0 = time.monotonic()
@@ -167,6 +175,13 @@ class CallWarning:
                                          "tts_still_generating": sent is not None,
                                          "warning_playing_ms": round((t0 - (self.started_at or t0)) * 1000)}, t0)
         await self.room.broadcast({"type": "warning", "state": "interrupted", "source": source})
+
+    async def close(self) -> None:
+        """Call ended: stop any warning still being generated."""
+        self.interrupted = True
+        self.rearm = None
+        if self.session is not None and self.delivering:
+            await self.session.cancel()
 
     async def on_receiver_final(self, room: CallRoom, turn: dict) -> None:
         """The person finished a sentence. If their speech cut the warning off before they heard it, repeat it now."""

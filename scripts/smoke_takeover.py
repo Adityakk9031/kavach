@@ -134,6 +134,7 @@ class State:
 
 
 async def caller_reader(ws, st: State):
+    """The Caller side is the scammer's phone: it receives audio only (and presence), never Kavach's internals."""
     async for raw in ws:
         if isinstance(raw, bytes):
             if raw[0] == SOURCE_PERSONA:
@@ -142,7 +143,11 @@ async def caller_reader(ws, st: State):
                     st.frames_after_takeback += 1
             elif raw[0] == 0 and "takeback_sent" in st.marks:
                 st.peer_frames_after_takeback += 1
-            continue
+
+
+async def events_reader(ws, st: State):
+    """Kavach's events (persona text, takeover state) come from a read-only listener socket, as the dashboard gets them."""
+    async for raw in ws:
         ev = json.loads(raw)
         if ev["type"] == "persona":
             if ev.get("text"):
@@ -188,7 +193,7 @@ async def scammer_loop(a, caller, receiver, client, llm, st: State) -> int:
                     break
             heard = st.persona_texts[-1] if st.persona_texts else "(silence)"
         history.append({"role": "user", "content": heard})
-        if a.demo or a.adaptive:
+        if a.adaptive:
             line, _ = await llm.chat(S.script_gen_model, [{"role": "system", "content": SYSTEM}] + history[-14:],
                                      max_tokens=120, temperature=0.8, timeout=40)
             line = line.strip().strip('"')
@@ -214,9 +219,12 @@ async def main(a) -> int:
         client = await stack.enter_async_context(httpx.AsyncClient(timeout=60))
         caller = await stack.enter_async_context(
             websockets.connect(f"{ws_base}/ws/call/{a.call_id}/caller?mode={mode}&caller_number=%2B919820133456"))
+        listener = await stack.enter_async_context(websockets.connect(f"{ws_base}/ws/events/{a.call_id}"))
         receiver = None if a.demo else await stack.enter_async_context(
             websockets.connect(f"{ws_base}/ws/call/{a.call_id}/receiver?mode={mode}"))
-        tasks = [asyncio.create_task(caller_reader(caller, st))] + ([asyncio.create_task(drain(receiver))] if receiver else [])
+        tasks = [asyncio.create_task(caller_reader(caller, st)), asyncio.create_task(events_reader(listener, st))]
+        if receiver:
+            tasks.append(asyncio.create_task(drain(receiver)))
         await asyncio.sleep(2.5)
         turns = await scammer_loop(a, caller, receiver, client, llm, st)
         if a.demo:
@@ -307,5 +315,6 @@ if __name__ == "__main__":
                     help="LLM-driven scammer instead of the fixed script (variable; informational, not the gate)")
     ap.add_argument("--demo", action="store_true",
                     help="caller only: a human plays the protected person in the Receiver tab (same --call-id) and "
-                         "clicks Hand over / Take back; real call, so family alerts are sent")
+                         "clicks Hand over / Take back; real call, so family alerts are sent. Uses the fixed script "
+                         "(reliable); add --adaptive for an LLM scammer")
     sys.exit(asyncio.run(main(ap.parse_args())))

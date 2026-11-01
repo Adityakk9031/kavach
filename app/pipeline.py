@@ -80,6 +80,8 @@ class CallPipeline:
         room.store.update_call(room.call_id, max_risk=self.max_risk)
         await room.broadcast({"type": "detection", **payload, "quotes": info["evidence_quotes"],
                               "rationale": info["rationale"]})
+        if room.ended:  # a turn analysed during finalize: record it, but do not warn or alert after hang-up
+            return
         if decision.trigger and not self.triggered:
             self.triggered = True
             trig = {**payload, "turn_end_at": turn_end_at}

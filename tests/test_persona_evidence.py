@@ -398,3 +398,16 @@ async def test_listener_name_said_by_the_caller_is_not_collected_as_the_callers(
     await ev.process(turn("This is Ramesh Kumar speaking, who is this?"))  # the victim answering, e.g. mis-channelled
     assert not [v for v in ev.valid_items() if v["type"] == "person_name"]
     await ev.close()
+
+
+def test_the_persona_may_ask_about_upi_and_ifsc_but_not_say_an_address():
+    for q in ("Which UPI ID should I use? Please say it slowly.", "Sorry, what is the IFSC code of the branch?",
+              "Can you spell the website, is it a www address?"):
+        assert guard(q, DECOY) == (q, None), q
+    for bad in ("My UPI is ramesh at okaxis", "Write to ramesh at gmail", "It is ramesh dot com"):
+        assert guard(bad, DECOY)[1] == "address-like", bad
+
+
+def test_organisations_are_not_collected_as_the_callers_name():
+    for text in ("This is Mumbai Police calling you.", "This is State Bank head office.", "I am from the Cyber Crime Cell"):
+        assert not any(t == "person_name" for t, _ in kinds(text)), text

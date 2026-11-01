@@ -146,13 +146,13 @@ a slow LLM answer made it skip a turn); the full test split was not re-run for t
 **How to read these numbers honestly**
 
 - **It is a small test.** 18 scams and 18 non-scams. Zero misses is consistent with a true recall anywhere from about
-  82% to 100%; one false alarm in 18 is consistent with a true false-alarm rate from about 0.1% to 27%. One call moves a
+  82% to 100%; one false alarm in 18 is consistent with a true false-alarm rate from about 0.1% to 27% (zero in 18 would still allow up to about 18%). One call moves a
   rate by about 3 to 6 points.
 - **A small language model is not deterministic at the margin.** The same frozen system on the same audio gave 0/12 then
   1/12 false alarms and 15/18 then 12/18 "caught before the ask". The false alarm in run 2 is a **genuine** bank
   fraud-team call that says "I am blocking your debit card immediately" after a large flagged transaction; it peaked at
   a risk score of 54.6 in run 1 (threshold 60) and 78.2 in run 2. It is the clearest weakness: a real bank call that
-  sounds firm. Two scams also only just crossed the threshold (60.5, 61.6).
+  sounds firm. Margins are thin both ways: in run 1 two scams only just crossed the threshold (60.5, 61.6); in run 2 the weakest scam peaked at 63.4 and a hard negative at 57.8, 2.2 below it.
 - **"Decisive turn" is an LLM-written label**, usually later than the point where a careful person would first worry,
   so the median is negative (the system warned before the label). The number that matters for a protected person is
   the **1.5 s** from the caller's last word to the warning audio.
@@ -168,7 +168,7 @@ a slow LLM answer made it skip a turn); the full test split was not re-run for t
 |---|---|
 | Family-voice warning after the caller's last word | 1.3 to 1.9 s over 8 live runs (target 3 s); it starts 0.4 s after the trigger |
 | Barge-in: person speaks, playback stops | stop command reaches the receiver in about 1 ms, including audio already delivered |
-| Takeover: details captured from a scripted scammer in 2.5 minutes | 6 of 6 planted details (UPI ID, account, IFSC, callback number, name, link) |
+| Takeover: details captured from a scripted scammer in about 3 minutes | 6 of 6 planted details (UPI ID, account, IFSC, callback number, name, link) |
 | Persona reply after the scammer stops | about 2.2 to 3.2 s (includes a 0.7 s wait to let the caller finish) |
 | Take back while the persona is mid-sentence | cancelled in 0 ms, zero stray frames, caller hears the user again |
 | Family alerts | 3 real Telegram messages (warning, takeover, call end with the PDF) in one call |

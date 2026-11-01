@@ -229,3 +229,70 @@ def test_ended_call_id_cannot_be_reused_and_a_viewer_does_not_create_a_call(monk
         with client.websocket_connect(f"/ws/events/never-started-{cid}") as viewer:
             pass
         assert not main.store.query("SELECT 1 FROM calls WHERE id=?", (f"never-started-{cid}",))
+
+
+async def test_the_caller_side_never_learns_what_kavach_is_doing(room):
+    caller, receiver = FakeWs(), FakeWs()
+    await room.join("caller", caller)
+    await room.join("receiver", receiver)
+    for ev in ({"type": "warning", "state": "speaking", "text": "Papa, stop"}, {"type": "takeover", "state": "on"},
+               {"type": "persona", "state": "speaking", "text": "Ah, hello", "decoy": True},
+               {"type": "detection", "risk_cum": 91}, {"type": "evidence", "items": [{"type": "upi_id"}]},
+               {"type": "speech_started", "channel": "receiver"},
+               {"type": "transcript", "channel": "receiver", "text": "my pin is secret", "final": True},
+               {"type": "transcript", "channel": "caller", "text": "pay now", "final": True}, {"type": "call_ended"}):
+        await room.broadcast(ev)
+    seen = [e["type"] + ":" + e.get("channel", "") for e in caller.text if e["type"] not in ("presence", "stt_status")]
+    assert seen == ["transcript:caller", "call_ended:"]  # its own words and the end of the call, nothing else
+    assert {"warning", "takeover", "persona", "detection", "evidence"} <= {e["type"] for e in receiver.text}
+
+
+async def test_ending_a_call_announces_it_first_and_blocks_id_reuse_before_the_slow_work(room):
+    receiver = FakeWs()
+    await room.join("receiver", receiver)
+    order = []
+
+    async def slow_finalize():
+        order.append(("finalize_started", room.store.query("SELECT ended_at FROM calls WHERE id='t1'")[0]["ended_at"] is not None,
+                      [e["type"] for e in receiver.text if e["type"] in ("call_ended", "report_ready")]))
+        return {"report": {"md": "/m", "pdf": "/p"}}
+
+    room.finalize_hooks.append(slow_finalize)
+    await room.end()
+    assert order == [("finalize_started", True, ["call_ended"])]  # ended_at written and UIs told BEFORE finalizing
+    assert [e["type"] for e in receiver.text if e["type"] in ("call_ended", "report_ready")] == ["call_ended", "report_ready"]
+
+
+async def test_no_audio_flows_after_the_call_has_ended(room):
+    caller, receiver = FakeWs(), FakeWs()
+    await room.join("caller", caller)
+    await room.join("receiver", receiver)
+    await room.end()
+    await room.on_audio("caller", chunk())
+    await room.send_audio("receiver", 1, chunk())
+    assert receiver.binary == [] and caller.binary == []
+    assert FakeStt.instances["caller"].audio == bytearray()  # and the STT tap is closed too
+
+
+async def test_stt_restart_offset_is_set_when_the_new_session_takes_its_first_byte_and_reset_on_rejoin(room):
+    await room.join("caller", FakeWs())
+    for _ in range(10):  # 500 ms of audio before the drop
+        await room.on_audio("caller", chunk())
+    await FakeStt.instances["caller"].on_event({"type": "closed", "code": 1006, "reason": "", "clean": False})
+    new = FakeStt.instances["caller"]
+    new.accepting = False  # still connecting: audio must not move the offset yet
+    await room.on_audio("caller", chunk())
+    assert "caller" not in room.stt_offset_ms
+    new.accepting = True
+    await room.on_audio("caller", chunk())  # first byte the new session receives: 11 chunks (550 ms) came before it
+    assert room.stt_offset_ms["caller"] == pytest.approx(550)
+    seen = []
+
+    async def hook(r, t):
+        seen.append(t)
+
+    room.on_final_hooks.append(hook)
+    await new.on_event({"type": "final", "text": "hello there", "turn_order": 0, "audio_start_ms": 100, "audio_end_ms": 900})
+    assert room.store.turns("t1")[0]["audio_end_ms"] == 1450  # 900 on the new session = 1450 on the channel clock
+    await room.join("caller", FakeWs())  # the tab reloads: new clock, so the old offset must go
+    assert "caller" not in room.stt_offset_ms and "caller" not in room.stt_restarts

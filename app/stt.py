@@ -113,6 +113,11 @@ class SttSession:
             self._terminated.set()
             await self.on_event({"type": "closed", **self._close_info, "clean": clean})
 
+    @property
+    def accepting(self) -> bool:
+        """True once audio is being forwarded to AssemblyAI (the session's own timeline starts at that first byte)."""
+        return self._ws is not None and not self._terminated.is_set()
+
     async def send_audio(self, pcm: bytes) -> None:
         if self._ws is None or self._terminated.is_set():
             return

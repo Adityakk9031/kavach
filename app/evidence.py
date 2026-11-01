@@ -34,6 +34,8 @@ AGENCY_RE = re.compile(r"\b(?:from|with|of|at)\s+(?:the\s+)?((?:[A-Z][A-Za-z&.-]
 # "This is Inspector Vikram Rathore", "I am Rathore", "my name is Sharma": the caller naming themself.
 NAME_RE = re.compile(r"\b(?i:this is|i am|i'm|my name is|name is)\s+(?:(?:Inspector|Sub-Inspector|Officer|Mr\.?|Mrs\.?|Ms\.?|Director|Agent|Sir|Mister)\s+)?"
                      r"([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2})\b")
+ORG_WORDS = {"police", "bank", "cell", "department", "branch", "bureau", "office", "customs", "court", "agency", "division",
+             "commission", "directorate", "authority", "ministry", "team", "crime", "cyber", "head", "reserve", "india"}
 NOT_NAMES = {"calling", "from", "here", "speaking", "sorry", "not", "the", "a", "an", "very", "your", "serious", "calm",
              "sure", "afraid", "going", "trying", "just", "also", "now", "writing", "looking", "telling", "reaching"}
 UPI_LABEL = re.compile(r"^(?i:upi\s*id)[\s:]*")
@@ -84,7 +86,7 @@ def regex_items(text: str) -> list[Item]:
 
     for m in NAME_RE.finditer(text):
         words = m.group(1).split()
-        if words and not any(w.lower() in NOT_NAMES for w in words):
+        if words and not any(w.lower() in NOT_NAMES or w.lower() in ORG_WORDS for w in words):
             items.append(Item("person_name", m.group(1).strip(), text[max(0, m.start() - 20):m.end() + 40].strip(), "regex"))
     for kind, rx in (("upi_id", UPI_RE), ("email", EMAIL_RE), ("ifsc", IFSC_RE), ("url", URL_RE),
                      ("phone_number", PHONE_RE), ("bank_account", ACCOUNT_RE), ("amount", AMOUNT_RE)):
@@ -150,6 +152,8 @@ def plausible(item: LlmItem, listener_names: tuple[str, ...] = ()) -> bool:
         return False
     if item.type in ("phone_number", "bank_account") and len(digits(v)) < (10 if item.type == "phone_number" else 8):
         return False
+    if item.type == "person_name" and any(w in ORG_WORDS for w in words):
+        return False  # "Mumbai Police" is an organisation, not a person
     if item.type == "person_name":
         mine = {w for n in listener_names for w in re.findall(r"[a-z]+", n.lower())} - TITLES
         theirs = {w for w in words if w not in TITLES}
@@ -216,7 +220,7 @@ class EvidenceCollector:
             try:
                 out, _, _ = await self.llm.chat_json(
                     LlmOut, [{"role": "system", "content": PROMPT}, {"role": "user", "content": llm_text}],
-                    model=self.model, max_tokens=250, timeout=8, temperature=0.0)
+                    model=self.model, max_tokens=250, timeout=8, temperature=0.0, lane="other", max_wait=5.0)
                 for e in out.entities:
                     found.append(Item(e.type, e.value, e.quote or llm_text[:80], "llm",
                                       supported_by_text(e, llm_text) and plausible(e, self.listener_names)))

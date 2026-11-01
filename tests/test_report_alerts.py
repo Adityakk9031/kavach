@@ -106,7 +106,7 @@ async def test_alert_flow_respects_rate_limit_and_message_content():
     texts = [json.loads(r.content)["text"] for r in reqs]
     assert len(texts) == 3 and "taken over" in texts[1] and texts[2] == "call ended"
     first = texts[0]
-    assert "no warning could be played" in first  # honest: no warner/receiver in this test
+    assert "possible scam call detected" in first  # it makes no claim about whether a warning played
     assert "Risk 87/100" in first and "Authority, Threat, Secrecy" in first
     assert "+91 98765 43210" in first and "Transfer the money" in first and "IST" in first
     types = [e["type"] for e in room.store.events("a1")]
@@ -220,3 +220,14 @@ def test_report_drops_quotes_nested_inside_a_longer_quote_from_the_same_turn():
              "VALUES ('r1', 3, '[\"S6\"]', '[\"Pay fifty thousand rupees to pay.now@okbank\", \"Pay fifty thousand rupees\"]', 90, 90, '', 1, 700, 'q')")
     quotes = [q["quote"] for q in report.build(st, "r1").key_quotes]
     assert "Pay fifty thousand rupees" not in quotes and "Pay fifty thousand rupees to pay.now@okbank" in quotes
+
+
+async def test_nothing_but_the_call_end_message_goes_out_after_the_call_has_ended():
+    reqs = []
+    room, ca, pipeline, persona = make_call_alerts(reqs)
+    room.ended = True
+    await pipeline.on_trigger[0](pipeline, decision(["S1", "S2"]), {})  # a late trigger from the last turn
+    await persona.on_takeover_hooks[0](persona)
+    await ca.call_ended("call ended", None)
+    await ca.drain()
+    assert [json.loads(r.content)["text"] for r in reqs] == ["call ended"]

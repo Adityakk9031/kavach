@@ -19,6 +19,13 @@ from app.store import Store
 log = logging.getLogger("kavach.room")
 
 ROLES = ("caller", "receiver")
+# The Caller side stands in for the scammer's phone. It must learn nothing about what Kavach is doing (warning,
+# takeover, decoy, risk, evidence): only call presence, STT status, and the transcript of its OWN speech.
+CALLER_EVENTS = {"presence", "stt_status", "call_ended", "call_rejected"}
+
+
+def caller_may_see(event: dict) -> bool:
+    return event.get("type") in CALLER_EVENTS or (event.get("type") == "transcript" and event.get("channel") == "caller")
 SOURCE_PEER, SOURCE_WARNING, SOURCE_PERSONA = 0, 1, 2
 
 
@@ -97,6 +104,7 @@ class CallRoom:
         self.turn_idx = 0
         self.stt_restarts: dict[str, int] = {}
         self.stt_offset_ms: dict[str, float] = {}  # audio already sent before the current STT session started
+        self._offset_pending: set[str] = set()
         self.ended = False
         # Hooks later milestones attach to (detector, warner, persona). Each is an async callable.
         self.on_final_hooks: list[Callable] = []
@@ -123,6 +131,9 @@ class CallRoom:
             await self.leave(role)
         self.parties[role] = Peer(ws)
         self.clocks[role] = AudioClock(self.sample_rate)
+        self.stt_offset_ms.pop(role, None)  # a rejoining tab starts a new audio clock: forget the old session's offset
+        self.stt_restarts.pop(role, None)
+        self._offset_pending.discard(role)
         if caller_number:
             self.store.update_call(self.call_id, caller_number=caller_number)
         self.log_event("joined", {"role": role})
@@ -147,7 +158,9 @@ class CallRoom:
         if self.ended:
             return
         self.ended = True
-        for role in list(self.stt):  # close STT first so the last finals still reach the workers below
+        self.store.update_call(self.call_id, ended_at=time.time())  # first: the id can no longer be reused
+        await self.broadcast({"type": "call_ended"})  # tabs stop audio and controls at once; the report follows
+        for role in list(self.stt):  # close STT so the last finals still reach the workers below
             stt = self.stt.pop(role)
             await stt.close()
         extra: dict = {}
@@ -158,19 +171,26 @@ class CallRoom:
                 log.exception("finalize hook failed")
         for hook in self.on_end_hooks:
             await hook()
-        self.store.update_call(self.call_id, ended_at=time.time())
         self.log_event("call_end", {})
-        await self.broadcast({"type": "call_ended", **extra})
+        if extra:
+            await self.broadcast({"type": "report_ready", **extra})
 
     # ---- audio -----------------------------------------------------------------------------------
 
     async def on_audio(self, role: str, pcm: bytes) -> None:
         """Audio from one party: tap to its STT channel, relay to the other party (unless muted)."""
-        if role not in self.parties:
+        if role not in self.parties or self.ended:
             return
-        self.clocks[role].add(len(pcm), time.monotonic())
+        clock = self.clocks[role]
+        before_ms = clock.audio_ms
+        clock.add(len(pcm), time.monotonic())
         stt = self.stt.get(role)
         if stt:
+            if role in self._offset_pending and getattr(stt, "accepting", True):
+                # The restarted session's timeline begins at the first byte it receives (during its handshake, not
+                # after it): everything before this chunk is the offset.
+                self.stt_offset_ms[role] = before_ms
+                self._offset_pending.discard(role)
             await stt.send_audio(pcm)
         other = "receiver" if role == "caller" else "caller"
         if role == "receiver" and self.takeover:
@@ -178,6 +198,8 @@ class CallRoom:
         await self.send_audio(other, SOURCE_PEER, pcm)
 
     async def send_audio(self, role: str, source: int, pcm: bytes) -> None:
+        if self.ended:
+            return
         peer = self.parties.get(role)
         if peer:
             await peer.send_bytes(bytes([source]) + pcm)
@@ -195,7 +217,8 @@ class CallRoom:
 
     async def broadcast(self, event: dict) -> None:
         text = json.dumps({**event, "call_id": self.call_id})
-        targets = list(self.parties.values()) + list(self.listeners)
+        targets = [peer for role, peer in self.parties.items() if role != "caller" or caller_may_see(event)]
+        targets += list(self.listeners)
         results = await asyncio.gather(*(p.send_text(text) for p in targets))
         for peer, ok in zip(targets, results):
             if not ok and peer in self.listeners:
@@ -266,12 +289,10 @@ class CallRoom:
         self.stt_restarts[channel] = restarts + 1
         stt = self.stt_factory(channel, lambda e, r=channel: self._on_stt_event(r, e))
         self.stt[channel] = stt
+        self._offset_pending.add(channel)  # the offset is fixed when the new session takes its first audio byte
         try:
             await stt.start()
-            # Audio sent while the new session was connecting was dropped; its timeline starts from here.
-            self.stt_offset_ms[channel] = self.clocks[channel].audio_ms if channel in self.clocks else 0.0
-            self.log_event("stt_restarted", {"channel": channel, "attempt": restarts + 1,
-                                             "offset_ms": round(self.stt_offset_ms[channel])})
+            self.log_event("stt_restarted", {"channel": channel, "attempt": restarts + 1})
         except Exception as e:
             self.log_event("stt_error", {"channel": channel, "error": f"restart failed: {e}"})
             await self.broadcast({"type": "stt_status", "channel": channel, "ok": False, "error": str(e)})

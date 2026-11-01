@@ -3,6 +3,8 @@
 import asyncio
 import base64
 import json
+import time
+from types import SimpleNamespace
 
 import pytest
 import websockets
@@ -223,9 +225,9 @@ async def test_barge_in_inside_echo_guard_is_ignored(server):
     await room.join("receiver", FakeWs())
     w = CallWarning(Warner(settings_for(server), FakePool(s)), room)
     task = asyncio.create_task(w.speak("Papa, stop.", "S2", trigger_at=0.0, turn_end_at=None))
-    while not w.active:
+    while w.first_audio_at is None:  # the guard protects against the warning leaking into the mic: audio must be playing
         await asyncio.sleep(0.005)
-    await w.barge_in("browser_vad")  # immediately: likely the warning leaking into the mic
+    await w.barge_in("browser_vad")  # immediately after audio started: likely the warning leaking into the mic
     assert any(e["type"] == "barge_in_ignored" for e in room.store.events("w2"))
     assert w.interrupted is False and w.active  # the warning was not cut off
     await asyncio.sleep(Warner.ECHO_GUARD_S)
@@ -350,4 +352,45 @@ async def test_no_warning_is_spoken_over_the_persona_and_warned_at_means_audio_s
     await asyncio.sleep(Warner.ECHO_GUARD_S)
     await w.barge_in("takeover")
     await asyncio.wait_for(task, 3)
+    await s.close()
+
+
+async def test_speech_before_any_warning_audio_cancels_it_and_a_takeover_click_always_does(server):
+    s = TtsSession(settings_for(server), "v")
+    await s.start()
+    room = CallRoom("wc", NoStt, Store(":memory:"))
+    await room.join("receiver", FakeWs())
+    w = CallWarning(Warner(settings_for(server), FakePool(s)), room)
+    w.session, w.started_at, w.count = s, time.monotonic(), 1
+    w.request = SimpleNamespace(done=asyncio.Event())  # generating, nothing played yet
+    await w.barge_in("stt_speech_started")  # no audio yet: nothing can have leaked, so the person's reply counts
+    assert w.interrupted
+    w.interrupted, w.first_audio_at = False, time.monotonic()  # audio just started: echo guard applies...
+    await w.barge_in("browser_vad")
+    assert not w.interrupted
+    await w.barge_in("takeover")  # ...but a deliberate hand-over is never an echo
+    assert w.interrupted
+    await s.close()
+
+
+async def test_warning_is_not_spoken_after_the_call_ended_and_close_cancels_generation(server):
+    s = TtsSession(settings_for(server), "v")
+    await s.start()
+    room = CallRoom("we", NoStt, Store(":memory:"))
+    receiver = FakeWs()
+    await room.join("receiver", receiver)
+    w = CallWarning(Warner(settings_for(server), FakePool(s)), room)
+    room.ended = True
+    await w.speak("Papa, stop.", "S2", trigger_at=0.0, turn_end_at=None)
+    assert receiver.binary == []
+    room.ended = False
+    task = asyncio.create_task(w.speak("Papa, stop.", "S2", trigger_at=0.0, turn_end_at=None))
+    while w.first_audio_at is None:
+        await asyncio.sleep(0.01)
+    room.ended = True
+    await w.close()
+    await asyncio.wait_for(task, 3)
+    n = len(receiver.binary)
+    await asyncio.sleep(0.3)
+    assert len(receiver.binary) == n  # nothing more reaches the receiver once the call is over
     await s.close()
