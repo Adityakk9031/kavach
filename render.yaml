@@ -1,0 +1,21 @@
+# Render Blueprint: Render reads this when you create a "Blueprint" from the GitHub repo.
+# Secrets are not stored here; Render asks for them (sync: false) when you create the service.
+services:
+  - type: web
+    name: kavach
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: ASSEMBLYAI_API_KEY
+        sync: false
+      - key: KAVACH_WARNING_VOICE_ID
+        sync: false
+      - key: PERSONA_VOICE_ID
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: KAVACH_ACCESS_KEY
+        sync: false

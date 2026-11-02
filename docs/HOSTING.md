@@ -20,6 +20,15 @@ Any host that runs a Dockerfile gives you an https address automatically (Render
 4. In the phone app, Setup: server = that address, access code = `KAVACH_ACCESS_KEY`.
 The database is a file; on free hosts it resets on redeploy, which is fine for a demo.
 
+### Render, step by step
+1. Put the repo on GitHub (a private repo is fine).
+2. On render.com: **New → Blueprint**, pick the repo. It reads `render.yaml` and asks for the six secret values
+   (the same names as in your `.env`; `KAVACH_ACCESS_KEY` is the access code, see `data/PHONE_SETUP.txt`).
+3. Wait for the build to go green, then open `https://<name>.onrender.com/health`: it must say `"ready": true`.
+4. In the phone app, Setup: server address = that `https://…onrender.com`, access code = `KAVACH_ACCESS_KEY`.
+The free plan sleeps after idle time, so open `/health` a minute before the demo to wake it. Calls are one long
+WebSocket each; the free plan allows that.
+
 ## Option 2: your laptop with a tunnel
 Run `uv run uvicorn app.main:app --port 8000`, then expose it with a tunnel that gives an https address
 (for example `cloudflared tunnel --url http://localhost:8000`). The laptop must stay on and awake during the demo.
