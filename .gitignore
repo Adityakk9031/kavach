@@ -8,3 +8,5 @@ eval/audio/
 *.pcm
 .DS_Store
 data/**/*.wav
+mobile/node_modules/
+.expo/

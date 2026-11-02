@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kavach audio bridge</title>
+</head>
+<body style="margin:0;background:#000">
+<!--
+  Hidden page loaded by the Kavach phone app (React Native) in a WebView. It owns the microphone, the speaker and the
+  WebSocket to the Kavach server, using the same audio code as the other pages. The app draws everything you see.
+
+  App -> page:  window.kavach.cmd({type: 'takeover' | 'takeback' | 'end_call' | 'barge_in' | 'sample' | 'stop'})
+  Page -> app:  ReactNativeWebView.postMessage(JSON): every server event, plus {type:'bridge', state:...} and
+                {type:'mic_error', name, message}
+  URL: bridge.html?call=<id>&role=receiver|caller&key=<access key>&mode=live|eval&caller_number=<number>
+-->
+<script type="module">
+  import { connectCall, startMic, fileToPcm16, streamPcm, Player, SOURCE, callIdFromUrl, withKey } from './audio.js';
+
+  const params = new URLSearchParams(location.search);
+  const role = params.get('role') === 'caller' ? 'caller' : 'receiver';
+  const mode = params.get('mode') === 'eval' ? 'eval' : 'live';
+  const callId = callIdFromUrl();
+  const post = (obj) => {
+    const text = JSON.stringify(obj);
+    if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(text);
+    else (window.__kavachMessages ||= []).push(obj); // for testing in a normal browser
+  };
+  const dbg = (window.kavachDebug = { sent: 0, chunksIn: 0 });
+
+  let call, player, mic, sample, loud = 0, ended = false;
+
+  function vad(pcm) { // receiver: the person speaks over the warning -> stop it here first, then tell the server
+    if (role !== 'receiver' || !player.isPlaying(SOURCE.WARNING)) { loud = 0; return; }
+    let peak = 0;
+    for (let i = 0; i < pcm.length; i++) peak = Math.max(peak, Math.abs(pcm[i]));
+    loud = peak > 2500 ? loud + 1 : 0;
+    if (loud >= 3) {
+      loud = 0;
+      player.flush(SOURCE.WARNING);
+      call.send({ type: 'barge_in' });
+      post({ type: 'bridge', state: 'barge_in_local' });
+    }
+  }
+  function level(pcm) {
+    let peak = 0;
+    for (let i = 0; i < pcm.length; i++) peak = Math.max(peak, Math.abs(pcm[i]));
+    return peak / 32767;
+  }
+  let lastLevelPost = 0;
+  function feed(buf) {
+    const pcm = new Int16Array(buf);
+    vad(pcm);
+    dbg.sent++;
+    call.sendAudio(buf);
+    const now = performance.now();
+    if (now - lastLevelPost > 150) { lastLevelPost = now; post({ type: 'bridge', state: 'level', level: +level(pcm).toFixed(3) }); }
+  }
+  function stopAudio() {
+    ended = true;
+    if (player) [SOURCE.PEER, SOURCE.WARNING, SOURCE.PERSONA].forEach((s) => player.flush(s));
+    if (mic) mic.stop();
+    if (sample) sample.stop();
+  }
+
+  async function start() {
+    player = new Player();
+    await player.resume();
+    call = connectCall(callId, role, {
+      onEvent(ev) {
+        if (ev.type === 'flush_playback') player.flush(ev.source);
+        if (ev.type === 'call_ended') stopAudio();
+        post(ev);
+      },
+      onAudio(source, pcm) { dbg.chunksIn++; player.play(source, pcm); },
+    }, role === 'caller' ? { mode, caller_number: params.get('caller_number') || '' } : { mode });
+    call.ws.onopen = async () => {
+      post({ type: 'bridge', state: 'connected', role, call_id: callId });
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          throw Object.assign(new Error('The microphone needs a secure (https) address.'), { name: 'InsecureContext' });
+        }
+        mic = await startMic(feed);
+        post({ type: 'bridge', state: 'mic_on' });
+      } catch (e) {
+        post({ type: 'mic_error', name: e.name, message: e.message });
+      }
+    };
+    call.ws.onclose = (e) => post({ type: 'bridge', state: 'closed', code: e.code, reason: e.reason });
+    call.ws.onerror = () => post({ type: 'bridge', state: 'socket_error' });
+  }
+
+  window.kavach = {
+    async cmd(c) {
+      if (!call) return;
+      if (c.type === 'takeback' && player) player.flush(SOURCE.PERSONA);
+      if (c.type === 'barge_in' && player) player.flush(SOURCE.WARNING);
+      if (c.type === 'sample') {
+        const wav = await (await fetch('demo/scammer_digital_arrest.wav')).blob();
+        const pcm = await fileToPcm16(wav);
+        sample = streamPcm(pcm, feed, () => post({ type: 'bridge', state: 'sample_done' }));
+        post({ type: 'bridge', state: 'sample_started' });
+      } else if (c.type === 'stop') {
+        stopAudio();
+        call.ws.close();
+      } else {
+        call.send(c);
+      }
+    },
+  };
+
+  start().catch((e) => post({ type: 'bridge', state: 'start_failed', message: String(e) }));
+</script>
+</body>
+</html>
