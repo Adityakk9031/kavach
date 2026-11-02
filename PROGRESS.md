@@ -187,3 +187,9 @@ Server: the scam alert and takeover alert carry a "☎️ End the call" button (
 App: after the warning a red card floats over the screen, "Let Kavach take over".
 Added `Dockerfile`, `.dockerignore`, `docs/HOSTING.md` (not built or deployed here: Docker is not installed on this machine, no host account used).
 Checked: offline suite 146 passed; app `tsc` 0 errors, 7 app tests pass. NOT checked: End button and voice note pressed on a real phone; the floating card on a real phone; Papa's clone (needs his recording, consent and the dashboard); a cloud-hosted server.
+
+## Voice samples recorded in the app 2026-11-02
+
+New "My voice" screen: Papa and the son each enter a name, agree to the consent text, and record 10–30 s while reading a calm paragraph. A hidden page (`web/voicerec.html`) records and uploads the PCM to `POST /api/voices/{papa|son}` with the consent header; the server (`app/voices.py`) refuses missing consent, <10 s, >35 s, near-silence, and stores `data/voices/<person>.wav` + a JSON consent record (git-ignored). `GET /api/voices` lists, `/api/voices/<person>.wav` downloads, `DELETE` removes (all behind the access key).
+AssemblyAI creates clones only in its dashboard (re-checked in its docs; no create endpoint), so the server cannot upload the sample itself: the owner downloads the WAV, makes the clone in the dashboard, then sends `/setvoice <id>` to the Telegram bot.
+Checked: 8 new server tests; recorder page driven in a browser against a real server with a simulated microphone (11.6 s recorded, uploaded, 369,644-byte WAV stored with consent record; test files deleted); app `tsc` clean. NOT checked: recording with a real microphone on a phone; the Voice screen on a phone.

@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 from importlib.metadata import version
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, RedirectResponse
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
@@ -26,6 +26,7 @@ from app.finalize import handle_answer_callback, make_finalize
 from app.persona import Persona
 from app.pipeline import CallPipeline
 from app.store import Store
+from app import voices as voices_mod
 from app.stt import NullStt, SttSession
 from app.tts import TtsPool
 from app.warner import Warner
@@ -162,6 +163,40 @@ def health() -> dict:
         "detector_model": s.detector_model,
         "assemblyai_sdk": version("assemblyai"),
     }
+
+
+@app.get("/api/voices")
+def voice_samples() -> dict:
+    """Which people have a consented voice sample on the server, and the consent wording the app shows."""
+    s = get_settings()
+    return {"samples": voices_mod.list_samples(s.voices_dir), "consent_text": voices_mod.CONSENT_TEXT,
+            "min_seconds": voices_mod.MIN_SECONDS, "max_seconds": voices_mod.MAX_SECONDS,
+            "persona_voice_id": s.persona_voice_id}
+
+
+@app.post("/api/voices/{person}")
+async def upload_voice_sample(person: str, request: Request, name: str = "") -> dict:
+    """Body: raw 16 kHz mono signed 16-bit PCM. Header `x-kavach-consent: yes` records the speaker's consent."""
+    s = get_settings()
+    consent = request.headers.get("x-kavach-consent", "").lower() == "yes"
+    body = await request.body()
+    try:
+        return voices_mod.save_sample(s.voices_dir, person, name, body, s.sample_rate, consent)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/voices/{person}.wav")
+def download_voice_sample(person: str) -> FileResponse:
+    path = Path(get_settings().voices_dir) / f"{person}.wav"
+    if person not in voices_mod.PEOPLE or not path.exists():
+        raise HTTPException(status_code=404, detail="no sample")
+    return FileResponse(path, media_type="audio/wav", filename=f"kavach-{person}-voice-sample.wav")
+
+
+@app.delete("/api/voices/{person}")
+def delete_voice_sample(person: str) -> dict:
+    return {"deleted": voices_mod.delete_sample(get_settings().voices_dir, person)}
 
 
 @app.get("/api/config")

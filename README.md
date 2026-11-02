@@ -99,7 +99,7 @@ them through the live server (about 40 minutes, real time):
 ## Family controls (Telegram) and hosting
 The family's Telegram chat gets the alerts with an **End the call** button, and a **voice note** sent to the bot plays on
 Papa's phone through the Kavach app, even after the call was cut. `/setvoice <id>` sets the voice used when Kavach
-takes over. See `docs/HOSTING.md` to put the server on the internet for the phone app.
+takes over. In the app, "My voice" lets Papa and the son record a consented 10–30 s sample (AssemblyAI makes clones only in its dashboard, so the owner uploads that file there). See `docs/HOSTING.md` to put the server on the internet for the phone app.
 
 ## Safety and ethics
 

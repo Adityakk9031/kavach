@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kavach voice recorder</title>
+</head>
+<body style="margin:0;background:#000">
+<!--
+  Hidden page loaded by the Kavach phone app in a WebView. It records the speaker's voice (10-30 s) and uploads it
+  to the server together with the speaker's consent (the app only enables recording after the person agrees).
+  App -> page:  window.kavach.cmd({type: 'rec_start'}) | {type: 'rec_stop'} | {type: 'rec_cancel'}
+  Page -> app:  postMessage {type:'rec', state:'ready'|'recording'|'uploaded'|'error', seconds?, message?}
+  URL: voicerec.html?person=papa|son&name=<speaker name>&key=<access key>
+-->
+<script type="module">
+  import { startMic, withKey } from './audio.js';
+
+  const params = new URLSearchParams(location.search);
+  const person = params.get('person') === 'son' ? 'son' : 'papa';
+  const speaker = params.get('name') || '';
+  const RATE = 16000, MAX_S = 30;
+  const post = (obj) => {
+    const text = JSON.stringify({ type: 'rec', ...obj });
+    if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(text);
+    else (window.__kavachMessages ||= []).push(obj);
+  };
+
+  let mic = null, chunks = [], samples = 0, timer = null;
+
+  async function begin() {
+    chunks = []; samples = 0;
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('The microphone needs a secure (https) server address.');
+      mic = await startMic((buf) => {
+        chunks.push(new Int16Array(buf.slice ? buf.slice(0) : buf));
+        samples += chunks[chunks.length - 1].length;
+        if (samples >= MAX_S * RATE) finish();
+      });
+    } catch (e) { post({ state: 'error', message: e.message || String(e) }); return; }
+    timer = setInterval(() => post({ state: 'recording', seconds: +(samples / RATE).toFixed(1) }), 250);
+    post({ state: 'recording', seconds: 0 });
+  }
+
+  function stopMic() { clearInterval(timer); timer = null; if (mic) { mic.stop(); mic = null; } }
+
+  async function finish() {
+    if (!mic) return;
+    stopMic();
+    const all = new Int16Array(samples);
+    let at = 0;
+    for (const c of chunks) { all.set(c, at); at += c.length; }
+    const seconds = samples / RATE;
+    post({ state: 'uploading', seconds: +seconds.toFixed(1) });
+    try {
+      const r = await fetch(withKey(`/api/voices/${person}?name=${encodeURIComponent(speaker)}`), {
+        method: 'POST', headers: { 'x-kavach-consent': 'yes', 'content-type': 'application/octet-stream' }, body: all.buffer,
+      });
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) post({ state: 'error', message: body.detail || `The server refused it (${r.status}).` });
+      else post({ state: 'uploaded', seconds: body.seconds });
+    } catch (e) { post({ state: 'error', message: 'Could not reach the server: ' + e.message }); }
+  }
+
+  window.kavach = {
+    cmd(c) {
+      if (c.type === 'rec_start' && !mic) begin();
+      else if (c.type === 'rec_stop') finish();
+      else if (c.type === 'rec_cancel') { stopMic(); post({ state: 'ready' }); }
+    },
+  };
+  post({ state: 'ready' });
+</script>
+</body>
+</html>

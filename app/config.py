@@ -73,6 +73,7 @@ class Settings(BaseSettings):
     # --- storage ---
     db_path: str = "data/kavach.db"
     reports_dir: str = "data/reports"
+    voices_dir: str = "data/voices"
 
     decoy: DecoyIdentity = Field(default_factory=DecoyIdentity)
 

@@ -4,10 +4,11 @@ import { Btn, C, Panel, T } from './ui';
 
 const rand = () => Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('');
 
-export function HomeScreen({ onProtect, onCaller, onSettings }: {
+export function HomeScreen({ onProtect, onCaller, onSettings, onVoice }: {
   onProtect: (code: string, rehearsal: boolean) => void;
   onCaller: (code: string, rehearsal: boolean) => void;
   onSettings: () => void;
+  onVoice: () => void;
 }) {
   const [code, setCode] = useState(rand());
   const [rehearsal, setRehearsal] = useState(true);
@@ -37,6 +38,7 @@ export function HomeScreen({ onProtect, onCaller, onSettings }: {
 
       <Btn label="I am being called (protect me)" kind="primary" onPress={() => onProtect(code, rehearsal)} />
       <Btn label="I am the test caller (friend's phone)" onPress={() => onCaller(code, rehearsal)} />
+      <Btn label="My voice (for Kavach to speak as me)" onPress={onVoice} />
       <Btn label="Settings" onPress={onSettings} />
       <Text style={[T.muted, { marginTop: 12 }]}>
         Kavach carries the call itself, between the two phones, so it can whisper the warning and mute the person. It does not
