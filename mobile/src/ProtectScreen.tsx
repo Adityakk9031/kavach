@@ -27,8 +27,12 @@ export function ProtectScreen({ settings, code, rehearsal, onBack }: {
     : !s.connected ? 'Connecting…' : s.sttOk.caller ? 'Listening' : 'Connected, starting speech recognition…';
   const riskColor = s.risk >= 60 ? C.danger : s.risk >= 40 ? C.warn : C.accent;
 
+  // After the warning, a big card floats over everything so a scared person can hand the call over with one tap
+  const offerTakeover = s.triggered && !s.takeover && !s.ended;
+
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: C.bg }} contentContainerStyle={{ padding: 14, paddingTop: 50 }}>
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 14, paddingTop: 50, paddingBottom: offerTakeover ? 190 : 14 }}>
       {ready && (
         <AudioBridge ref={bridge} onMessage={dispatch}
           uri={bridgeUrl(settings, { call: callId, role: 'receiver', mode: rehearsal ? 'eval' : 'live' })} />
@@ -117,5 +121,16 @@ export function ProtectScreen({ settings, code, rehearsal, onBack }: {
         {s.transcript.length === 0 ? <Text style={T.muted}>Nothing yet.</Text> : null}
       </Panel>
     </ScrollView>
+    {offerTakeover && (
+      <View style={{ position: 'absolute', left: 12, right: 12, bottom: 24, padding: 14, borderRadius: 16,
+                     backgroundColor: C.danger, elevation: 10, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 10 }}>
+        <Text style={[T.h2, { color: '#fff' }]}>This looks like a scam</Text>
+        <Text style={{ color: '#fff', marginTop: 4, marginBottom: 8 }}>
+          Scared? Let Kavach talk to the caller for you. The caller cannot hear you.
+        </Text>
+        <Btn label="Let Kavach take over" kind="primary" onPress={() => bridge.current?.send({ type: 'takeover' })} />
+      </View>
+    )}
+    </View>
   );
 }
