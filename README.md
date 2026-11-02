@@ -89,7 +89,10 @@ uv run uvicorn app.main:app --port 8000   # open http://localhost:8000
 ```
 
 Open the Caller and Receiver tabs from the start page with the same call id (use headphones on the Receiver). The
-demo, step by step, is in [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md). To replay the eval, first render the test calls (about 10 minutes, ~$0.60 of TTS, audio is not stored in git), then run
+demo, step by step, is in [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md). A **real phone call** can be tried too: put the call on speaker next to the laptop and open the Listener page; see
+[docs/REAL_PHONE_DEMO.md](docs/REAL_PHONE_DEMO.md) (honest limits included).
+
+To replay the eval, first render the test calls (about 10 minutes, ~$0.60 of TTS, audio is not stored in git), then run
 them through the live server (about 40 minutes, real time):
 `uv run python -m eval.render_audio --split test` then `uv run python -m eval.run_eval --split test`.
 

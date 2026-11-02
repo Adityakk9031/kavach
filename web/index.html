@@ -18,6 +18,7 @@
         <li><a id="caller" target="_blank">Caller tab</a> (the scammer)</li>
         <li><a id="receiver" target="_blank">Receiver tab</a> (the person being protected)</li>
       </ul>
+      <p><b>Real phone call:</b> <a id="listener" target="_blank">Listener page</a> (call on speaker, the laptop listens)</p>
       <p>Also: <a href="dashboard.html">Dashboard</a> (watch a call live) · <a href="scoreboard.html">Scoreboard</a> (eval results)</p>
     </section>
   </main>
@@ -27,6 +28,7 @@
     const sync = () => {
       for (const role of ['caller', 'receiver'])
         document.getElementById(role).href = `${role}.html?call=${encodeURIComponent(input.value)}`;
+      document.getElementById('listener').href = `speaker.html?call=${encodeURIComponent(input.value)}`;
     };
     input.oninput = sync;
     sync();

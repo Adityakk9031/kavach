@@ -1,0 +1,35 @@
+SCAM CALL SCRIPT FOR YOUR FRIEND (for a rehearsal with a real phone call)
+
+Who this is for: the friend who plays the scammer on a normal phone call to you.
+This is a made-up script. Nothing here is real: the officer, the cell, the UPI ID and the numbers are all fake.
+Both of you must agree to the call being listened to by the laptop. Do not use anyone's real details.
+
+HOW TO PLAY IT
+- Read each line slowly and clearly, like a pushy officer. Pause 2 to 3 seconds after each paragraph, because
+  Kavach decides what to do when you stop talking.
+- Do not rush through the whole thing: the warning should arrive in the YOU-side headphones after paragraph 2 or 3.
+- If you are interrupted, just carry on from the same paragraph.
+
+PARAGRAPH 1 (opening)
+"Hello, am I speaking with Mister Kumar? This is Inspector Vikram Rathore from the Mumbai Cyber Crime Cell. A parcel
+booked in your name was seized at customs, with illegal drugs and fake passports inside."
+
+PARAGRAPH 2 (fear and secrecy)
+"Your Aadhaar card was used. This is now a criminal case. You must stay on this call and you must not tell anyone,
+not even your family, or we will send officers to arrest you today."
+
+PARAGRAPH 3 (urgency and payment)
+"To clear your name you must pay a refundable verification deposit of fifty thousand rupees. Use the UPI ID
+customs dot clear at okbank. Do it immediately, within one hour."
+
+IF THE PERSON HANDS OVER TO KAVACH (the old confused man answers)
+Keep going and answer his questions patiently. Give him these fake details when he asks:
+  - Your name: Inspector Vikram Rathore. Cell: Mumbai Cyber Crime Cell. Badge number: four four seven one.
+  - Bank account: five zero one zero zero two three four five six seven eight nine one, IFSC code H D F C zero zero
+    zero one two three four.
+  - Callback number: nine eight two zero one three three four five six.
+  - Website: w w w dot r b i dash verify dot in.
+He will ask you to repeat and to spell things. Do it. This is how Kavach collects the evidence.
+
+END
+"Mister Kumar, I am waiting. Pay now or the warrant goes out in one hour."

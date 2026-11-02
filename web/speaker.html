@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kavach · Listener</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Kavach listener</h1>
+    <span class="role" style="color: var(--receiver)">A real phone call, on speaker, next to this laptop</span>
+    <span class="muted" id="callLabel"></span>
+  </header>
+  <main>
+    <section class="panel">
+      <p><b>How it works.</b> Put the phone call on speaker next to the laptop. The laptop's microphone hears the caller
+        and Kavach checks it for a scam. If it is one, the warning plays in <b>your headphones</b>. If you hand over, the
+        decoy voice plays from the laptop speaker, and the phone's microphone carries it to the caller.</p>
+      <div class="row">
+        <label>Caller's number <input type="text" id="number" placeholder="optional, for the report" size="22"></label>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <label>Warning plays in (use headphones) <select id="warnOut"><option value="">Default output</option></select></label>
+        <label>Decoy voice plays from (the speaker next to the phone) <select id="personaOut"><option value="">Default output</option></select></label>
+      </div>
+      <p class="muted" id="sinkNote"></p>
+      <div class="row">
+        <button class="primary" id="start">Start listening</button>
+        <button class="danger" id="end" disabled>End call</button>
+        <button id="handover" disabled title="Kavach talks to the caller for you">Hand over to Kavach</button>
+        <button id="takeback" disabled hidden>Take back</button>
+        <button id="stopWarn" disabled>Stop warning</button>
+        <div class="meter"><div id="level"></div></div>
+      </div>
+      <p class="status" id="status">Not started.</p>
+      <p class="status" id="micError" style="color: var(--danger)"></p>
+      <div class="row">
+        <button id="sample" disabled>Test without a phone: play a sample scammer call</button>
+        <span class="muted" id="sampleNote"></span>
+      </div>
+      <p class="muted">Listening is half-duplex: while Kavach's own voice plays out loud, the microphone is muted
+        (<span id="mutedCount">0</span> chunks muted so far), so Kavach never hears and answers itself.</p>
+    </section>
+
+    <section class="panel" id="reportBox" hidden>
+      <strong>Complaint draft ready</strong>
+      <p class="muted">This is a draft for you to review. Kavach never submits anything: file it yourself at cybercrime.gov.in or call 1930.</p>
+      <div class="row">
+        <label>Did you send any money? <select id="moneyShared"><option value="">Not answered yet</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>Did you share an OTP, PIN or card details? <select id="otpShared"><option value="">Not answered yet</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+      </div>
+      <p><label>Anything to add (optional)<br><input type="text" id="reportNotes" style="width:100%" maxlength="500"></label></p>
+      <div class="row">
+        <button class="primary" id="saveReport">Save answers and update draft</button>
+        <a id="reportPdf" target="_blank">Open PDF</a>
+        <a id="reportMd" target="_blank">Open Markdown</a>
+      </div>
+      <p class="muted" id="reportMissing"></p>
+    </section>
+    <section class="panel" id="warningBox" hidden>
+      <strong id="warnTitle"></strong>
+      <p id="warnText" class="muted"></p>
+    </section>
+    <section class="panel" id="personaBox" hidden>
+      <strong id="personaTitle">Kavach is on the call</strong>
+      <p id="personaText" class="muted"></p>
+    </section>
+    <section class="panel" id="detection"></section>
+    <section class="panel" id="evidenceBox" hidden>
+      <strong>Evidence collected</strong>
+      <table id="evidence" style="width:100%; font-size:14px; border-collapse:collapse"></table>
+    </section>
+    <section class="panel">
+      <div id="transcript"></div>
+    </section>
+  </main>
+  <script type="module">
+    import { connectCall, startMic, fileToPcm16, streamPcm, Player, callIdFromUrl, SOURCE } from './audio.js';
+    import { transcriptView, statusView, levelMeter, detectionView } from './ui.js';
+    import { MicGate, silenceLike } from './speakerlink.js';
+
+    const $ = (id) => document.getElementById(id);
+    const params = new URLSearchParams(location.search);
+    const callId = callIdFromUrl();
+    const mode = params.get('mode') === 'eval' ? 'eval' : 'live'; // ?mode=eval: a rehearsal, no Telegram alerts
+    $('callLabel').textContent = `call: ${callId}${mode === 'eval' ? ' (rehearsal)' : ''}`;
+    const tv = transcriptView($('transcript'));
+    const sv = statusView($('status'));
+    const meter = levelMeter($('level'));
+    const dv = detectionView($('detection'));
+    const gate = new MicGate(400);
+    const dbg = (window.kavachDebug = { muted: 0, sent: 0, personaChunks: 0, warningChunks: 0, events: [] });
+    let caller, receiver, warnPlayer, personaPlayer, mic, sample, ended = false;
+    const seenEvidence = new Set();
+
+    // ---- output devices -----------------------------------------------------------------------------------
+    async function listOutputs() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+      const devs = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === 'audiooutput');
+      for (const id of ['warnOut', 'personaOut']) {
+        const sel = $(id), keep = sel.value;
+        sel.innerHTML = '<option value="">Default output</option>' +
+          devs.map((d) => `<option value="${d.deviceId}">${(d.label || 'Output ' + d.deviceId.slice(0, 6)).replace(/</g, '')}</option>`).join('');
+        sel.value = keep;
+      }
+    }
+    async function applySink(player, deviceId) {
+      if (player.ctx.setSinkId) { try { await player.ctx.setSinkId(deviceId || ''); return true; } catch (e) { return false; } }
+      return !deviceId; // no setSinkId (e.g. Safari): only the default output is possible
+    }
+    const sameSpeaker = () => $('warnOut').value === $('personaOut').value;
+    function sinkNote() {
+      $('sinkNote').textContent = sameSpeaker()
+        ? 'Both sounds use the same output, so the microphone is also muted while the warning plays, and the caller can hear it through the phone. Use headphones for the warning.'
+        : '';
+    }
+    $('warnOut').onchange = $('personaOut').onchange = async () => {
+      sinkNote();
+      if (warnPlayer) await applySink(warnPlayer, $('warnOut').value);
+      if (personaPlayer) await applySink(personaPlayer, $('personaOut').value);
+    };
+    listOutputs().then(sinkNote);
+
+    // ---- panels (same as the Receiver page) ---------------------------------------------------------------
+    function showWarning(ev) {
+      $('warningBox').hidden = false;
+      const titles = { speaking: 'Kavach is speaking', done: 'Warning finished', interrupted: 'Warning stopped', error: 'Warning failed' };
+      $('warnTitle').textContent = titles[ev.state] || ev.state;
+      if (ev.text) $('warnText').textContent = ev.text + (ev.cloned === false ? '  (fallback voice, not the cloned voice)' : '');
+      if (ev.error) $('warnText').textContent = ev.error;
+    }
+    function showTakeover(on) {
+      $('handover').hidden = on;
+      $('takeback').hidden = !on;
+      $('takeback').disabled = !on || ended;
+      $('personaBox').hidden = !on && $('personaText').textContent === '';
+      $('personaTitle').textContent = on ? 'Kavach is on the call (the caller hears the decoy, not you)' : 'You are back on the call';
+    }
+    function addEvidence(items) {
+      $('evidenceBox').hidden = false;
+      for (const it of items) {
+        const key = it.type + '|' + it.normalized;
+        if (seenEvidence.has(key)) continue;
+        seenEvidence.add(key);
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td style="padding:4px 8px; color:var(--muted)"></td><td style="padding:4px 8px"><b></b></td><td style="padding:4px 8px; color:var(--muted)"></td>';
+        const [a, b, c] = tr.children;
+        a.textContent = it.type.replaceAll('_', ' ');
+        b.firstChild.textContent = it.value;
+        c.textContent = '"' + it.quote + '"';
+        $('evidence').appendChild(tr);
+      }
+    }
+    function showReport(report) {
+      $('reportBox').hidden = false;
+      $('reportPdf').href = report.pdf;
+      $('reportMd').href = report.md;
+      $('saveReport').onclick = async () => {
+        const yn = (id) => ({ yes: true, no: false }[$(id).value] ?? null);
+        const r = await fetch(report.md.replace('/report.md', '/report'), {
+          method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ money_shared: yn('moneyShared'), otp_shared: yn('otpShared'), notes: $('reportNotes').value }),
+        });
+        const d = await r.json();
+        $('reportMissing').textContent = r.ok ? 'Draft updated. ' + (d.missing || []).join(' ') : 'Could not update the draft.';
+      };
+    }
+    function stopEverything() {
+      for (const p of [warnPlayer, personaPlayer]) if (p) [SOURCE.PEER, SOURCE.WARNING, SOURCE.PERSONA].forEach((s) => p.flush(s));
+      if (mic) mic.stop();
+      if (sample) sample.stop();
+      for (const id of ['end', 'handover', 'takeback', 'stopWarn', 'sample']) $(id).disabled = true;
+    }
+    function endCallUi() {
+      ended = true;
+      $('status').textContent = 'Call ended. Preparing your complaint draft if the call was flagged…';
+      stopEverything();
+    }
+    function rejectedUi(reason) {
+      ended = true;
+      $('status').textContent = reason + ' Open a new call id (change ?call= in the address).';
+      stopEverything();
+      $('start').disabled = true;
+    }
+
+    // ---- the call -----------------------------------------------------------------------------------------
+    // One tab, two sockets: "caller" carries the microphone (the phone's speaker = the scammer) and gets the decoy
+    // voice back; "receiver" carries every event and the warning. No microphone audio goes on the receiver socket.
+    function feed(buf) {
+      const pcm = new Int16Array(buf);
+      meter(pcm);
+      const muteNow = gate.shouldMute({
+        personaPlaying: personaPlayer.isPlaying(SOURCE.PERSONA),
+        warningPlaying: warnPlayer.isPlaying(SOURCE.WARNING),
+        warningOnSameSpeaker: sameSpeaker(),
+      }, performance.now());
+      if (muteNow) { dbg.muted++; $('mutedCount').textContent = dbg.muted; buf = silenceLike(buf); }
+      dbg.sent++;
+      caller.sendAudio(buf);
+    }
+
+    $('start').onclick = async () => {
+      $('start').disabled = true;
+      warnPlayer = new Player();
+      personaPlayer = new Player();
+      await Promise.all([warnPlayer.resume(), personaPlayer.resume()]);
+      await applySink(warnPlayer, $('warnOut').value);
+      await applySink(personaPlayer, $('personaOut').value);
+      const qs = { mode };
+      caller = connectCall(callId, 'caller', {
+        onEvent(ev) {
+          if (ev.type === 'call_rejected') rejectedUi(ev.reason);
+          else if (ev.type === 'flush_playback') personaPlayer.flush(ev.source);
+        },
+        onAudio(source, pcm) {
+          if (source === SOURCE.PERSONA) { dbg.personaChunks++; personaPlayer.play(source, pcm); } // out loud, into the phone
+        },
+      }, { ...qs, caller_number: $('number').value });
+      receiver = connectCall(callId, 'receiver', {
+        onEvent(ev) {
+          dbg.events.push(ev.type);
+          if (sv.handle(ev) || dv.handle(ev)) return;
+          if (ev.type === 'transcript') tv.show(ev);
+          else if (ev.type === 'flush_playback') { warnPlayer.flush(ev.source); personaPlayer.flush(ev.source); }
+          else if (ev.type === 'warning') showWarning(ev);
+          else if (ev.type === 'takeover') showTakeover(ev.state === 'on');
+          else if (ev.type === 'persona' && ev.text) { $('personaBox').hidden = false; $('personaText').textContent = 'Kavach says: ' + ev.text; }
+          else if (ev.type === 'evidence') addEvidence(ev.items);
+          else if (ev.type === 'call_ended') endCallUi();
+          else if (ev.type === 'report_ready') showReport(ev.report);
+          else if (ev.type === 'call_rejected') rejectedUi(ev.reason);
+        },
+        onAudio(source, pcm) {
+          if (source === SOURCE.WARNING) { dbg.warningChunks++; warnPlayer.play(source, pcm); } // the persona's monitor copy is ignored
+        },
+      }, qs);
+      receiver.ws.onopen = async () => {
+        for (const id of ['end', 'handover', 'stopWarn', 'sample']) $(id).disabled = false;
+        try {
+          mic = await startMic(feed);
+          await listOutputs(); // device names are only visible after the microphone permission
+          sinkNote();
+        } catch (e) {
+          $('micError').textContent = `Microphone unavailable (${e.name}). Allow it for this page, or use the sample call below.`;
+        }
+      };
+    };
+    $('end').onclick = () => receiver.send({ type: 'end_call' });
+    $('handover').onclick = () => receiver.send({ type: 'takeover' });
+    $('takeback').onclick = () => {
+      [SOURCE.PERSONA].forEach((s) => personaPlayer.flush(s));
+      receiver.send({ type: 'takeback' });
+    };
+    $('stopWarn').onclick = () => { warnPlayer.flush(SOURCE.WARNING); receiver.send({ type: 'barge_in' }); };
+    $('sample').onclick = async () => {
+      $('sample').disabled = true;
+      $('sampleNote').textContent = 'Playing a recorded scammer through the same path as the microphone (about 94 s)…';
+      const wav = await (await fetch('demo/scammer_digital_arrest.wav')).blob();
+      const pcm = await fileToPcm16(wav);
+      sample = streamPcm(pcm, feed, () => { $('sampleNote').textContent = 'Sample call finished. Click End call.'; });
+    };
+  </script>
+</body>
+</html>

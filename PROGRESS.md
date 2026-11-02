@@ -161,3 +161,12 @@ hand over, take back, evidence panel, report panel with the two questions, PDF l
 
 Still needs the user: real microphone test in Chrome with headphones; rehearse docs/DEMO_SCRIPT.md; submit by 2026-11-07 18:00 IST;
 rotate the AssemblyAI key and bot token (both were pasted in chat).
+
+## Option A: real phone call on speaker (Listener page) 2026-11-02
+
+Built: `web/speaker.html` (one tab, two sockets: `caller` carries the laptop microphone = the phone's speaker, `receiver` carries events and the warning), `web/speakerlink.js` (half-duplex `MicGate`: the microphone stream is replaced by silence while Kavach's own voice plays out loud, plus a 400 ms echo tail, so Kavach never hears and answers itself; the warning only mutes the mic when it shares the speaker with the decoy), output-device pickers (warning to headphones, decoy to speakers), `web/demo/scammer_digital_arrest.wav` (94 s scammer-only sample), `docs/REAL_PHONE_DEMO.md`, `docs/demo/scam_call_script.txt`.
+
+Verified in a real browser (microphone blocked in that browser, so the sample call stands in for it, through the same `feed()` path): both sockets connect, speech recognition up, risk 77 and Authority/Threat/Secrecy chips, warning in the cloned voice 1.56 s after the scammer's turn (104 chunks received), 46 mic chunks muted while it played on the shared output; hand over: decoy text, 313 audio chunks on the caller socket, 350 mic chunks muted while it spoke, evidence panel filled; take back and end call; report panel with PDF link (HTTP 200); no Telegram alerts (rehearsal mode). Offline: 3 Node tests for `MicGate`; suite 126 passed twice in a row (one earlier run had a single timing flake in `test_warning_cut_off_before_it_was_heard…`, which passes alone 3/3).
+
+NOT verified: a real microphone and a real phone call (needs the user); the Telegram answer buttons pressed on a real phone (message with buttons was sent for call `btn-2`, nobody pressed them); that the laptop microphone picks up a phone speaker clearly enough, and the acoustic path of the decoy voice into the phone's microphone.
+Limits (also in the guide): half-duplex (caller is not heard while the decoy speaks); one microphone hears the whole room, so the user's own voice counts as the caller's; no automatic barge-in (a Stop warning button instead); the takeover works through the air, not inside the call.
