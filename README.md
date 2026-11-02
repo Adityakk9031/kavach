@@ -96,6 +96,11 @@ To replay the eval, first render the test calls (about 10 minutes, ~$0.60 of TTS
 them through the live server (about 40 minutes, real time):
 `uv run python -m eval.render_audio --split test` then `uv run python -m eval.run_eval --split test`.
 
+## Family controls (Telegram) and hosting
+The family's Telegram chat gets the alerts with an **End the call** button, and a **voice note** sent to the bot plays on
+Papa's phone through the Kavach app, even after the call was cut. `/setvoice <id>` sets the voice used when Kavach
+takes over. See `docs/HOSTING.md` to put the server on the internet for the phone app.
+
 ## Safety and ethics
 
 - **Consented cloning only.** The warning voice is the user's own, cloned from their own recording.

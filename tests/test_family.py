@@ -261,3 +261,22 @@ async def test_warning_and_takeover_alerts_carry_the_end_button_with_one_token_p
     assert room.store.call_for_token(tokens.pop()) == "ctl1"
     assert "voice note" in sent[0]["text"]
     assert control_keyboard("abc")["inline_keyboard"][0][0]["callback_data"] == "c:abc:e"
+
+
+# ---- /setvoice: Papa's cloned voice for the takeover ---------------------------------------------------------
+
+async def test_setvoice_changes_the_takeover_voice_only_for_the_family_chat_and_only_for_a_sane_id():
+    desk, alerter, _ = desk_for(FakeRoom())
+
+    def text(t, chat=999):
+        return {"update_id": 9, "message": {"chat": {"id": chat}, "text": t}}
+
+    await desk.handle_message(text("/setvoice papa-clone-1"))
+    assert desk.settings.persona_voice_id == "papa-clone-1" and "papa-clone-1" in alerter.said[-1]
+    await desk.handle_message(text("/setvoice", ))
+    assert "papa-clone-1" in alerter.said[-1]
+    await desk.handle_message(text("/setvoice bad id; rm -rf"))
+    assert desk.settings.persona_voice_id == "papa-clone-1" and "does not look like" in alerter.said[-1]
+    said = len(alerter.said)
+    await desk.handle_message(text("/setvoice stranger-voice", chat=4242))
+    assert desk.settings.persona_voice_id == "papa-clone-1" and len(alerter.said) == said

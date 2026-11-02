@@ -18,7 +18,8 @@ from app.call_room import CallRoom, RoomRegistry
 
 log = logging.getLogger("kavach.family")
 MAX_SECONDS = 120
-CONTROL_RE = re.compile(r"c:([\w-]{4,16}):e")
+VOICE_ID_RE = re.compile(r"[\w.-]{3,64}")
+CONTROL_RE =re.compile(r"c:([\w-]{4,16}):e")
 
 
 def decode_voice_note(data: bytes, rate: int = 16000, max_seconds: int = MAX_SECONDS) -> bytes:
@@ -60,12 +61,33 @@ class FamilyDesk:
         except Exception:
             log.exception("could not reply in Telegram")
 
+    # ---- Papa's cloned voice for the takeover ----------------------------------------------------------------------
+
+    async def _set_voice(self, text: str) -> None:
+        """`/setvoice <voice id>`: the takeover persona speaks in this voice from the next takeover on (until a restart;
+        put PERSONA_VOICE_ID in .env to keep it). The clone itself is made in the AssemblyAI dashboard."""
+        parts = text.split()
+        if len(parts) == 1:
+            await self._say(f"The takeover voice is now: {self.settings.persona_voice_id}\n"
+                            "To change it: /setvoice <voice id from the AssemblyAI dashboard>")
+        elif len(parts) == 2 and VOICE_ID_RE.fullmatch(parts[1]):
+            self.settings.persona_voice_id = parts[1]
+            await self._say(f"Done. Kavach will speak in voice {parts[1]} when it takes over a call.")
+        else:
+            await self._say("That does not look like a voice id. Copy it exactly from the AssemblyAI dashboard.")
+
     # ---- a voice note -----------------------------------------------------------------------------------------
 
     async def handle_message(self, update: dict) -> None:
         msg = update.get("message") or {}
         voice = msg.get("voice")
-        if not voice or not self._authorized((msg.get("chat") or {}).get("id")):
+        if not self._authorized((msg.get("chat") or {}).get("id")):
+            return
+        text = (msg.get("text") or "").strip()
+        if text.startswith("/setvoice"):
+            await self._set_voice(text)
+            return
+        if not voice:
             return
         room = self.rooms.family_target()
         if room is None:
