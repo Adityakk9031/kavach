@@ -26,7 +26,7 @@ CALLER_EVENTS = {"presence", "stt_status", "call_ended", "call_rejected"}
 
 def caller_may_see(event: dict) -> bool:
     return event.get("type") in CALLER_EVENTS or (event.get("type") == "transcript" and event.get("channel") == "caller")
-SOURCE_PEER, SOURCE_WARNING, SOURCE_PERSONA = 0, 1, 2
+SOURCE_PEER, SOURCE_WARNING, SOURCE_PERSONA, SOURCE_FAMILY = 0, 1, 2, 3
 
 
 class Sendable(Protocol):
@@ -112,6 +112,8 @@ class CallRoom:
         self.on_end_hooks: list[Callable] = []  # stop workers (run last)
         self.finalize_hooks: list[Callable] = []  # build report / send alerts; may return a dict for the UI (run first)
         self.mode = "live"
+        self.family_until = 0.0  # monotonic time until which the son's voice note is playing in Papa's phone
+        self.started_wall, self.ended_wall = time.time(), None
         self.control_handlers: dict[str, Callable] = {}  # JSON control message type -> async (room, role, msg)
         self.pipeline = None
         self.warning = None
@@ -158,7 +160,8 @@ class CallRoom:
         if self.ended:
             return
         self.ended = True
-        self.store.update_call(self.call_id, ended_at=time.time())  # first: the id can no longer be reused
+        self.ended_wall = time.time()
+        self.store.update_call(self.call_id, ended_at=self.ended_wall)  # first: the id can no longer be reused
         await self.broadcast({"type": "call_ended"})  # tabs stop audio and controls at once; the report follows
         for role in list(self.stt):  # close STT so the last finals still reach the workers below
             stt = self.stt.pop(role)
@@ -193,7 +196,8 @@ class CallRoom:
                 self._offset_pending.discard(role)
             await stt.send_audio(pcm)
         other = "receiver" if role == "caller" else "caller"
-        if role == "receiver" and (self.takeover or (self.warning is not None and self.warning.active)):
+        if role == "receiver" and (self.takeover or (self.warning is not None and self.warning.active)
+                                   or time.monotonic() < self.family_until):
             # Takeover, or the family-voice warning is playing: the caller must not hear the person. (Their audio
             # still goes to speech recognition above, so speaking over the warning still interrupts it.)
             return
@@ -205,6 +209,24 @@ class CallRoom:
         peer = self.parties.get(role)
         if peer:
             await peer.send_bytes(bytes([source]) + pcm)
+
+    async def play_family(self, pcm: bytes) -> bool:
+        """The family's voice note, to the protected person's phone only. Works after the call has ended too (the person's
+        app is still open on its report screen), which is when a son whose father's line was busy needs it most. While it
+        plays, the person's microphone does not reach the caller. Returns False if the person's app is not connected."""
+        peer = self.parties.get("receiver")
+        if peer is None:
+            return False
+        seconds = len(pcm) / 2 / self.sample_rate
+        self.family_until = max(self.family_until, time.monotonic()) + seconds
+        self.log_event("family_voice", {"seconds": round(seconds, 1), "call_ended": self.ended})
+        await peer.send_text(json.dumps({"type": "family", "state": "playing", "seconds": round(seconds, 1),
+                                         "call_id": self.call_id}))
+        step = self.sample_rate * 2  # one second per frame
+        for i in range(0, len(pcm), step):
+            if not await peer.send_bytes(bytes([SOURCE_FAMILY]) + pcm[i:i + step]):
+                return False
+        return True
 
     async def flush_playback(self, role: str, source: int) -> None:
         """Tell a tab to drop queued audio of one source immediately (barge-in, take back)."""
@@ -309,6 +331,15 @@ class RoomRegistry:
         self.stt_factory = stt_factory
         self.store = store
         self.sample_rate = sample_rate
+
+    def family_target(self, grace_s: float = 900.0) -> "CallRoom | None":
+        """The call a family message goes to: a running call whose person's app is connected, else (the 'cut the call, then
+        speak to Papa' case) the most recently ended call whose app is still connected within `grace_s` seconds."""
+        now = time.time()
+        connected = [r for r in self.rooms.values() if "receiver" in r.parties]
+        running = [r for r in connected if not r.ended]
+        pool = running or [r for r in connected if r.ended and r.ended_wall and now - r.ended_wall <= grace_s]
+        return max(pool, key=lambda r: r.started_wall, default=None)
 
     def get(self, call_id: str) -> CallRoom:
         room = self.rooms.get(call_id)

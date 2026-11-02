@@ -37,4 +37,13 @@ out.afterFlush = peer().slice(-2);
 out.beforeOtherFlush = peer().length;
 p.flush(SOURCE.PERSONA);                                 // flushing another source must not touch the peer's volume
 out.afterOtherFlush = peer().length;
+// the family's voice note: every other voice goes down while it plays, and comes back when it ends or is flushed
+const q = new Player();
+q.ctx.currentTime = 20;
+q.play(SOURCE.FAMILY, new Int16Array(32000));            // 2 s
+out.familyOthers = [SOURCE.PEER, SOURCE.WARNING, SOURCE.PERSONA].map((src) => q.gain(src).gain.calls.filter((c) => c[0] === 'target').map((c) => [c[1], c[2]]));
+out.familyEnds = +q.next[SOURCE.FAMILY].toFixed(3);
+q.ctx.currentTime = 21;
+q.flush(SOURCE.FAMILY);
+out.familyAfterFlush = [SOURCE.PEER, SOURCE.WARNING, SOURCE.PERSONA].map((src) => q.gain(src).gain.calls.slice(-1)[0].slice(0, 3));
 console.log(JSON.stringify(out));

@@ -52,6 +52,11 @@ def answer_keyboard(token: str, money: bool | None = None, otp: bool | None = No
         [btn("OTP/PIN shared: Yes", "o", True, otp), btn("OTP/PIN shared: No", "o", False, otp)]]}
 
 
+def control_keyboard(token: str) -> dict:
+    """Under the warning / takeover alerts: the family can end the call from Telegram."""
+    return {"inline_keyboard": [[{"text": "☎️ End the call", "callback_data": f"c:{token}:e"}]]}
+
+
 class AlertPolicy:
     """Decides whether an alert may go out. Pure, so it is easy to test."""
 
@@ -102,6 +107,16 @@ class Alerter:
             raise RuntimeError(body.get("description", f"HTTP {r.status_code}"))
         return body
 
+    async def download_file(self, file_id: str) -> bytes:
+        """A file the family sent to the bot (a voice note). The bot token is part of the download URL: never log it."""
+        r = await self.client.post(f"{self.base}/getFile", json={"file_id": file_id})
+        body = r.json()
+        if not body.get("ok"):
+            raise RuntimeError(body.get("description", f"HTTP {r.status_code}"))
+        f = await self.client.get(f"https://api.telegram.org/file/bot{self.settings.telegram_bot_token}/{body['result']['file_path']}")
+        f.raise_for_status()
+        return f.content
+
     async def answer_callback(self, callback_id: str, text: str) -> None:
         """Stops the spinner on the pressed button and shows a short confirmation."""
         await self.client.post(f"{self.base}/answerCallbackQuery", json={"callback_query_id": callback_id, "text": text})
@@ -116,7 +131,7 @@ class Alerter:
         offset = None
         while True:
             try:
-                params = {"timeout": long_poll_s, "allowed_updates": json.dumps(["callback_query"])}
+                params = {"timeout": long_poll_s, "allowed_updates": json.dumps(["callback_query", "message"])}
                 if offset is not None:
                     params["offset"] = offset
                 r = await self.client.get(f"{self.base}/getUpdates", params=params, timeout=long_poll_s + 15)
@@ -191,7 +206,9 @@ class CallAlerts:
     async def on_trigger(self, pipeline, decision, info: dict) -> None:
         self.last_stages = decision.stages_all
         await self._send("warning", self._body("🚨 Kavach: possible scam call detected",
-                                               decision.risk_cum, decision.stages_all), decision.stages_all)
+                                               decision.risk_cum, decision.stages_all) +
+                         "\nTap below to end the call, or send a voice note and it will play on Papa's phone.",
+                         decision.stages_all, control=True)
 
     async def on_new_stage(self, pipeline, decision, info: dict) -> None:
         self.last_stages = decision.stages_all
@@ -202,13 +219,13 @@ class CallAlerts:
 
     async def on_takeover(self, persona) -> None:
         await self._send("takeover", self._body("🛡️ Kavach has taken over the call (decoy persona is talking)",
-                                                self.pipeline.max_risk, self.last_stages), None)
+                                                self.pipeline.max_risk, self.last_stages), None, control=True)
 
     async def call_ended(self, report_text: str, pdf_path: Path | None) -> None:
         await self._send("call_end", report_text, None, document=pdf_path, keyboard=True)
 
     async def _send(self, kind: str, text: str, stages: list[str] | None, document: Path | None = None,
-                    keyboard: bool = False) -> None:
+                    keyboard: bool = False, control: bool = False) -> None:
         room = self.room
         if room.mode == "eval":
             room.log_event("alert_skipped", {"kind": kind, "reason": "eval call"})
@@ -226,7 +243,8 @@ class CallAlerts:
 
         async def go():
             try:
-                markup = answer_keyboard(self.token()) if keyboard else None
+                markup = (answer_keyboard(self.token()) if keyboard
+                          else control_keyboard(self.token()) if control else None)
                 body = await self.alerter.send_message(text, markup)
                 if document is not None and document.exists():
                     await self.alerter.send_document(document, "1930 complaint draft (review before filing)")

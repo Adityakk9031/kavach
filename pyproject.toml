@@ -14,6 +14,7 @@ dependencies = [
     "pydantic-settings>=2.6",
     "reportlab>=4.2",
     "numpy>=2.0",
+    "av>=19.0.2",
 ]
 
 [dependency-groups]

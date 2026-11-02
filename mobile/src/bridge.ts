@@ -37,12 +37,13 @@ export type CallState = {
   rejected: string | null;
   report: { md: string; pdf: string } | null;
   closed: string | null;
+  family: { seconds: number; at: number } | null;
 };
 
 export const initialState: CallState = {
   connected: false, micOn: false, micError: null, sttOk: {}, level: 0, risk: 0, stages: [], stagesNow: [], rationale: '',
   triggered: false, warning: null, takeover: false, personaText: '', evidence: [], transcript: [], ended: false,
-  rejected: null, report: null, closed: null,
+  rejected: null, report: null, closed: null, family: null,
 };
 
 // One reducer for every message from the page. Pure, so it is easy to test.
@@ -82,6 +83,8 @@ export function reduce(s: CallState, m: any): CallState {
       const fresh = (m.items as Evidence[]).filter((e) => !have.has(`${e.type}|${e.normalized ?? e.value}`));
       return fresh.length ? { ...s, evidence: [...s.evidence, ...fresh] } : s;
     }
+    case 'family':
+      return { ...s, family: { seconds: m.seconds ?? 0, at: Date.now() } };
     case 'call_ended':
       return { ...s, ended: true, level: 0 };
     case 'report_ready':

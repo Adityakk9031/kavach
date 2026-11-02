@@ -39,6 +39,13 @@ export function ProtectScreen({ settings, code, rehearsal, onBack }: {
 
       {s.micError ? <Panel style={{ borderColor: C.danger }}><Text style={{ color: C.danger }}>{s.micError}</Text></Panel> : null}
 
+      {s.family && (
+        <Panel style={{ backgroundColor: C.accent, borderColor: C.accent }}>
+          <Text style={[T.h2, { color: '#fff' }]}>A message from your family is playing</Text>
+          <Text style={{ color: '#fff', marginTop: 4 }}>{s.family.seconds} seconds. Listen to it now.</Text>
+        </Panel>
+      )}
+
       {speaking && (
         <Panel style={{ backgroundColor: C.danger, borderColor: C.danger }}>
           <Text style={[T.h2, { color: '#fff' }]}>Kavach is speaking to you</Text>

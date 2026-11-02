@@ -70,3 +70,11 @@ test('failures are explained in plain words', () => {
   assert.match(run([{ type: 'bridge', state: 'socket_error' }]).closed!, /Could not connect/);
   assert.equal(reduce(initialState, { type: 'something_new' }), initialState); // unknown messages are ignored
 });
+
+
+test('a voice note from the family is shown, and still shown after the call has ended', () => {
+  let s = run([{ type: 'call_ended' }, { type: 'family', state: 'playing', seconds: 12.4 }]);
+  assert.equal(s.ended, true);
+  assert.equal(s.family?.seconds, 12.4);
+  assert.equal(reduce(initialState, { type: 'family', state: 'playing' }).family?.seconds, 0);
+});

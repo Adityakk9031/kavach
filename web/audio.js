@@ -16,7 +16,7 @@ export function withKey(path) {
 
 export const SAMPLE_RATE = 16000;
 export const CHUNK_SAMPLES = 800; // 50 ms
-export const SOURCE = { PEER: 0, WARNING: 1, PERSONA: 2 };
+export const SOURCE = { PEER: 0, WARNING: 1, PERSONA: 2, FAMILY: 3 };
 export const DUCK_LEVEL = 0.25; // the other party's volume while the family-voice warning plays
 
 // AudioWorklet that downsamples the mic to 16 kHz Int16 and posts 50 ms chunks.
@@ -145,6 +145,7 @@ export class Player {
     (this.nodes[source] ||= new Set()).add(node);
     node.onended = () => this.nodes[source].delete(node);
     if (source === SOURCE.WARNING) this.duckPeer(this.next[source]);
+    if (source === SOURCE.FAMILY) this.duckOthers(this.next[source]);
     if (idle && this.onFirstAudio) this.onFirstAudio(source, (start - now) * 1000);
   }
   flush(source) {
@@ -152,6 +153,7 @@ export class Player {
     this.nodes[source] = new Set();
     this.next[source] = 0;
     if (source === SOURCE.WARNING) this.unduckPeer();
+    if (source === SOURCE.FAMILY) this.unduckOthers();
   }
   // While the warning plays, turn the other party's voice down so the person can hear the family voice clearly;
   // restore it a moment after the warning's scheduled audio ends (or at once if the warning is flushed).
@@ -160,6 +162,22 @@ export class Player {
     g.cancelScheduledValues(now);
     g.setTargetAtTime(DUCK_LEVEL, now, 0.05);
     g.setTargetAtTime(1.0, endTime + 0.1, 0.15);
+  }
+  // The family's voice note comes first: turn the caller, the warning and the decoy down while it plays.
+  duckOthers(endTime) {
+    for (const src of [SOURCE.PEER, SOURCE.WARNING, SOURCE.PERSONA]) {
+      const g = this.gain(src).gain, now = this.ctx.currentTime;
+      g.cancelScheduledValues(now);
+      g.setTargetAtTime(0.12, now, 0.05);
+      g.setTargetAtTime(1.0, endTime + 0.1, 0.15);
+    }
+  }
+  unduckOthers() {
+    for (const src of [SOURCE.PEER, SOURCE.WARNING, SOURCE.PERSONA]) {
+      const g = this.gain(src).gain, now = this.ctx.currentTime;
+      g.cancelScheduledValues(now);
+      g.setTargetAtTime(1.0, now, 0.05);
+    }
   }
   unduckPeer() {
     const g = this.gain(SOURCE.PEER).gain, now = this.ctx.currentTime;

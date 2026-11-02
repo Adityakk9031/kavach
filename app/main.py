@@ -21,6 +21,7 @@ from app.llm import LLM
 from app import report as report_mod
 from app.alerts import Alerter, CallAlerts
 from app.evidence import EvidenceCollector
+from app.family import FamilyDesk
 from app.finalize import handle_answer_callback, make_finalize
 from app.persona import Persona
 from app.pipeline import CallPipeline
@@ -82,6 +83,20 @@ async def loop_lag_monitor(threshold_ms: int = 300) -> None:
                     room.log_event("loop_lag", {"ms": round(lag)})
 
 
+desk = FamilyDesk(alerter, store, rooms, settings)
+
+
+async def telegram_update(update: dict) -> None:
+    """Whatever the family sends the bot: a button press (end the call / answer a question) or a voice note."""
+    data = (update.get("callback_query") or {}).get("data", "")
+    if data.startswith("c:"):
+        await desk.handle_control(update)
+    elif data.startswith("a:"):
+        await handle_answer_callback(update, alerter, store, settings)
+    elif "message" in update:
+        await desk.handle_message(update)
+
+
 @asynccontextmanager
 async def lifespan(_app):
     task = asyncio.create_task(loop_lag_monitor())
@@ -95,7 +110,7 @@ async def lifespan(_app):
         asyncio.create_task(warm())
     poller = None
     if alerter.enabled:  # listen for the family's button presses (money / OTP answers)
-        poller = asyncio.create_task(alerter.poll(lambda u: handle_answer_callback(u, alerter, store, settings)))
+        poller = asyncio.create_task(alerter.poll(telegram_update))
     yield
     task.cancel()
     if poller:

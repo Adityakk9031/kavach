@@ -158,14 +158,14 @@ class CallWarning:
             return
         # The echo guard only makes sense once warning audio is actually playing (speaker leak into the mic). Before the
         # first audio nothing can have leaked, and a takeover click is a deliberate act, never an echo.
-        if (source != "takeover" and self.first_audio_at is not None
+        if (source not in ("takeover", "family") and self.first_audio_at is not None
                 and time.monotonic() - self.first_audio_at < Warner.ECHO_GUARD_S):
             self.room.log_event("barge_in_ignored", {"source": source, "reason": "echo guard"})
             return
         t0 = time.monotonic()
         heard_s = (t0 - self.first_audio_at) if self.first_audio_at else 0.0
         self.interrupted = True
-        if heard_s < Warner.HEARD_ENOUGH_S and self.count < Warner.MAX_WARNINGS and source != "takeover":
+        if heard_s < Warner.HEARD_ENOUGH_S and self.count < Warner.MAX_WARNINGS and source not in ("takeover", "family"):
             self.rearm = (self.last_stage, self.last_text)  # the person did not hear it: say it again when they finish
         sent = await self.session.cancel() if self.delivering else None  # None: already fully delivered
         self.play_until = 0.0

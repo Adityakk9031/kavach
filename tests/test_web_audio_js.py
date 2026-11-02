@@ -38,3 +38,12 @@ def test_stopping_the_warning_restores_the_other_voice_immediately_and_only_for_
     assert r["afterFlush"][-1][:2] == ["target", 1.0] and r["afterFlush"][-1][2] == pytest.approx(11.0)
     assert len(r["afterFlush"]) == 2
     assert r["afterOtherFlush"] == r["beforeOtherFlush"]  # flushing the persona's source left the peer's volume alone
+
+
+def test_the_family_voice_note_turns_every_other_voice_down_and_restores_them():
+    r = run_player_script()
+    for per_source in r["familyOthers"]:  # caller, warning, decoy
+        assert per_source[0] == [0.12, pytest.approx(20.0)]  # down as the voice note starts
+        assert per_source[1] == [1.0, pytest.approx(r["familyEnds"] + 0.1)]  # back up after it ends
+    for last in r["familyAfterFlush"]:  # the person tapped it away: everything back at once
+        assert last[:2] == ["target", 1.0] and last[2] == pytest.approx(21.0)
