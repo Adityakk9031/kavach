@@ -1,6 +1,19 @@
 // Shared audio helpers for the Caller and Receiver tabs.
 // Wire format (see app/call_room.py): binary frame = 1 source byte + PCM s16le mono at 16 kHz.
 
+// The access key arrives once, in the link (?key=...); the page keeps it and attaches it to every request.
+export function accessKey() {
+  try {
+    const fromUrl = new URLSearchParams(location.search).get('key');
+    if (fromUrl) { localStorage.setItem('kavachKey', fromUrl); return fromUrl; }
+    return localStorage.getItem('kavachKey') || '';
+  } catch (_) { return ''; }
+}
+export function withKey(path) {
+  const k = accessKey();
+  return k ? path + (path.includes('?') ? '&' : '?') + 'key=' + encodeURIComponent(k) : path;
+}
+
 export const SAMPLE_RATE = 16000;
 export const CHUNK_SAMPLES = 800; // 50 ms
 export const SOURCE = { PEER: 0, WARNING: 1, PERSONA: 2 };
@@ -161,7 +174,8 @@ export class Player {
 // Connect a tab to the call. handlers: {onEvent(json), onAudio(source, Int16Array)}
 export function connectCall(callId, role, handlers, params = {}) {
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-  const qs = new URLSearchParams(params).toString();
+  const k = accessKey();
+  const qs = new URLSearchParams(k ? { ...params, key: k } : params).toString();
   const ws = new WebSocket(`${proto}://${location.host}/ws/call/${encodeURIComponent(callId)}/${role}${qs ? '?' + qs : ''}`);
   ws.binaryType = 'arraybuffer';
   ws.addEventListener('close', (e) => {

@@ -39,3 +39,17 @@ a { color: var(--accent); }
 .chip { padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); font-size: 13px; }
 .chip.on { background: var(--warn); border-color: var(--warn); color: #fff; }
 .chip.now { outline: 2px solid var(--danger); outline-offset: 1px; }
+
+/* Phone layout: full-width controls, comfortable touch targets, safe areas for notches */
+body { padding-bottom: env(safe-area-inset-bottom); -webkit-text-size-adjust: 100%; }
+@media (max-width: 560px) {
+  header { padding: 12px 14px; }
+  main { padding: 12px 14px; gap: 12px; }
+  .row { flex-direction: column; align-items: stretch; }
+  .row > button, .row > a, .row > label, .row > input, .row select { width: 100%; }
+  button { min-height: 46px; font-size: 16px; }
+  input[type=text], select { min-height: 44px; font-size: 16px; }
+  .meter { width: 100%; }
+  #transcript { max-height: 40vh; }
+  table { font-size: 13px; }
+}

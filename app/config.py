@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     assemblyai_api_key: str = ""
     telegram_bot_token: str = ""
     telegram_chat_id: str = ""
+    # When set, every /api/*, /eval-audio/* and /ws/* request must carry it (?key=... or the x-kavach-key header). Turn
+    # it on whenever the server is reachable from the internet (a tunnel for the phone app). Empty = open (local only).
+    kavach_access_key: str = ""
 
     # --- language (English only in v1; Hindi planned once TTS-1 ships it) ---
     language: str = "english"  # TTS `language` takes the full name

@@ -158,6 +158,7 @@ class CallAlerts:
         self.alerter, self.room, self.pipeline = alerter, room, pipeline
         self.policy = AlertPolicy(max_per_call)
         self.tasks: set[asyncio.Task] = set()
+        self._token: str | None = None
         self.last_caller_text = ""
         self.last_stages: list[str] = []
         pipeline.on_trigger.append(self.on_trigger)
@@ -180,6 +181,12 @@ class CallAlerts:
                 f"Caller: {self._caller()}\n"
                 f"“{snippet(self.last_caller_text)}”\n"
                 f"{ist_now()}")
+
+    def token(self) -> str:
+        """One short token per call, shared by every button we put in Telegram for it."""
+        if self._token is None:
+            self._token = self.room.store.make_answer_token(self.room.call_id)
+        return self._token
 
     async def on_trigger(self, pipeline, decision, info: dict) -> None:
         self.last_stages = decision.stages_all
@@ -219,7 +226,7 @@ class CallAlerts:
 
         async def go():
             try:
-                markup = answer_keyboard(room.store.make_answer_token(room.call_id)) if keyboard else None
+                markup = answer_keyboard(self.token()) if keyboard else None
                 body = await self.alerter.send_message(text, markup)
                 if document is not None and document.exists():
                     await self.alerter.send_document(document, "1930 complaint draft (review before filing)")

@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Kavach · Listener</title>
+  <meta name="theme-color" content="#1f6f5c">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -80,7 +82,7 @@
     </section>
   </main>
   <script type="module">
-    import { connectCall, startMic, fileToPcm16, streamPcm, Player, callIdFromUrl, SOURCE } from './audio.js';
+    import { connectCall, startMic, fileToPcm16, streamPcm, Player, callIdFromUrl, SOURCE, withKey } from './audio.js';
     import { transcriptView, statusView, levelMeter, detectionView } from './ui.js';
     import { MicGate, silenceLike } from './speakerlink.js';
 
@@ -159,11 +161,11 @@
     }
     function showReport(report) {
       $('reportBox').hidden = false;
-      $('reportPdf').href = report.pdf;
-      $('reportMd').href = report.md;
+      $('reportPdf').href = withKey(report.pdf);
+      $('reportMd').href = withKey(report.md);
       $('saveReport').onclick = async () => {
         const yn = (id) => ({ yes: true, no: false }[$(id).value] ?? null);
-        const r = await fetch(report.md.replace('/report.md', '/report'), {
+        const r = await fetch(withKey(report.md.replace('/report.md', '/report')), {
           method: 'POST', headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ money_shared: yn('moneyShared'), otp_shared: yn('otpShared'), notes: $('reportNotes').value }),
         });

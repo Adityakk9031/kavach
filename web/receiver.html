@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Kavach · Receiver</title>
+  <meta name="theme-color" content="#1f6f5c">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -59,7 +61,7 @@
     </section>
   </main>
   <script type="module">
-    import { connectCall, startMic, Player, callIdFromUrl, SOURCE } from './audio.js';
+    import { connectCall, startMic, Player, callIdFromUrl, SOURCE, withKey } from './audio.js';
     import { transcriptView, statusView, levelMeter, detectionView } from './ui.js';
 
     const callId = callIdFromUrl();
@@ -87,11 +89,11 @@
 
     function showReport(report) {
       $('reportBox').hidden = false;
-      $('reportPdf').href = report.pdf;
-      $('reportMd').href = report.md;
+      $('reportPdf').href = withKey(report.pdf);
+      $('reportMd').href = withKey(report.md);
       $('saveReport').onclick = async () => {
         const yn = (id) => ({ yes: true, no: false }[$(id).value] ?? null);
-        const r = await fetch(report.md.replace('/report.md', '/report'), {
+        const r = await fetch(withKey(report.md.replace('/report.md', '/report')), {
           method: 'POST', headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ money_shared: yn('moneyShared'), otp_shared: yn('otpShared'), notes: $('reportNotes').value }),
         });
@@ -151,7 +153,11 @@
       }
     }
 
+    // keep the screen awake while a call is on (phones dim and suspend audio otherwise)
+    let wake = null;
+    const keepAwake = async () => { try { wake = await navigator.wakeLock.request('screen'); } catch (_) {} };
     $('answer').onclick = async () => {
+      keepAwake();
       player = new Player((source, leadMs) => call.clientEvent('playback_started', { source, lead_ms: leadMs }));
       await player.resume();
       call = connectCall(callId, 'receiver', {
@@ -189,7 +195,7 @@
     if (new URLSearchParams(location.search).get('watch')) {
       $('answer').disabled = true;
       const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-      const ws = new WebSocket(`${proto}://${location.host}/ws/events/${encodeURIComponent(callId)}`);
+      const ws = new WebSocket(`${proto}://${location.host}` + withKey(`/ws/events/${encodeURIComponent(callId)}`));
       ws.onmessage = (e) => {
         const ev = JSON.parse(e.data);
         if (sv.handle(ev) || dv.handle(ev)) return;

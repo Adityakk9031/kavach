@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Kavach · Caller</title>
+  <meta name="theme-color" content="#1f6f5c">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -48,7 +50,11 @@
     let call, player, mic, stream;
 
     const $ = (id) => document.getElementById(id);
+    // keep the screen awake while a call is on (phones dim and suspend audio otherwise)
+    let wake = null;
+    const keepAwake = async () => { try { wake = await navigator.wakeLock.request('screen'); } catch (_) {} };
     $('connect').onclick = async () => {
+      keepAwake();
       player = new Player();
       await player.resume();
       call = connectCall(callId, 'caller', {

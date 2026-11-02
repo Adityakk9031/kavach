@@ -3,13 +3,14 @@
 import asyncio
 import json
 import logging
+import secrets
 import time
 from contextlib import asynccontextmanager
 from importlib.metadata import version
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse, PlainTextResponse, RedirectResponse
+from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, RedirectResponse
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
 
@@ -105,6 +106,22 @@ async def lifespan(_app):
 
 
 app = FastAPI(title="Kavach", version="0.1.0", lifespan=lifespan)
+
+
+def key_ok(supplied: str | None) -> bool:
+    """True if no access key is configured, or the supplied one matches (constant-time compare)."""
+    required = settings.kavach_access_key
+    return not required or secrets.compare_digest((supplied or "").encode(), required.encode())
+
+
+@app.middleware("http")
+async def require_access_key(request, call_next):
+    """The pages themselves are public (they hold no data); everything that returns or changes data needs the key."""
+    path = request.url.path
+    if (path.startswith("/api/") or path.startswith("/eval-audio/")) and not key_ok(
+            request.query_params.get("key") or request.headers.get("x-kavach-key")):
+        return JSONResponse({"error": "access key required"}, status_code=401)
+    return await call_next(request)
 WEB = Path(__file__).resolve().parent.parent / "web"
 app.mount("/web", StaticFiles(directory=WEB, html=True), name="web")
 (Path(__file__).resolve().parent.parent / "eval" / "audio").mkdir(parents=True, exist_ok=True)
@@ -211,6 +228,9 @@ def call_turns(call_id: str) -> list[dict]:
 @app.websocket("/ws/call/{call_id}/{role}")
 async def call_socket(ws: WebSocket, call_id: str, role: str, caller_number: str | None = None, mode: str | None = None):
     """One tab of the call. Binary in = PCM from the mic; text in = JSON control messages."""
+    if not key_ok(ws.query_params.get("key")):
+        await ws.close(code=4403)  # refused before the handshake completes
+        return
     if role not in ROLES:
         await ws.close(code=1008, reason="role must be caller or receiver")
         return
@@ -255,6 +275,9 @@ async def handle_control(room, role: str, msg: dict) -> None:
 @app.websocket("/ws/events/{call_id}")
 async def events_socket(ws: WebSocket, call_id: str):
     """Read-only event stream for the dashboard."""
+    if not key_ok(ws.query_params.get("key")):
+        await ws.close(code=4403)
+        return
     await ws.accept()
     peer = Peer(ws)
     room = rooms.rooms.get(call_id)  # a viewer never creates a call (no workers, no DB row)
