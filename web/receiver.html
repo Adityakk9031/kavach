@@ -28,6 +28,7 @@
     <section class="panel" id="warningBox" hidden>
       <strong id="warnTitle"></strong>
       <p id="warnText" class="muted"></p>
+      <p id="warnMute" class="muted" style="color: var(--danger)" hidden>Your microphone is muted to the caller while this plays. Speak to stop it.</p>
     </section>
     <section class="panel" id="reportBox" hidden>
       <strong>Complaint draft ready</strong>
@@ -131,6 +132,7 @@
       $('warnTitle').textContent = titles[ev.state] || ev.state;
       if (ev.text) $('warnText').textContent = ev.text + (ev.cloned === false ? '  (fallback voice, not the cloned voice)' : '');
       if (ev.error) $('warnText').textContent = ev.error;
+      $('warnMute').hidden = ev.state !== 'speaking';
     }
 
     // Local voice detection: 3 consecutive loud 50 ms chunks while the warning plays = barge-in. Stop playback

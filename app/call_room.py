@@ -193,8 +193,10 @@ class CallRoom:
                 self._offset_pending.discard(role)
             await stt.send_audio(pcm)
         other = "receiver" if role == "caller" else "caller"
-        if role == "receiver" and self.takeover:
-            return  # takeover: the scammer must not hear the receiver
+        if role == "receiver" and (self.takeover or (self.warning is not None and self.warning.active)):
+            # Takeover, or the family-voice warning is playing: the caller must not hear the person. (Their audio
+            # still goes to speech recognition above, so speaking over the warning still interrupts it.)
+            return
         await self.send_audio(other, SOURCE_PEER, pcm)
 
     async def send_audio(self, role: str, source: int, pcm: bytes) -> None:

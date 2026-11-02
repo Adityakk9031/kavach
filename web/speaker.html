@@ -43,6 +43,10 @@
         (<span id="mutedCount">0</span> chunks muted so far), so Kavach never hears and answers itself.</p>
     </section>
 
+    <section class="panel" id="muteCue" hidden style="background: var(--danger); color: #fff; border-color: var(--danger)">
+      <strong style="font-size: 20px">Warning playing: press MUTE on your phone now</strong>
+      <p style="margin:6px 0 0">So the caller cannot hear you while you listen. Un-mute when the warning ends.</p>
+    </section>
     <section class="panel" id="reportBox" hidden>
       <strong>Complaint draft ready</strong>
       <p class="muted">This is a draft for you to review. Kavach never submits anything: file it yourself at cybercrime.gov.in or call 1930.</p>
@@ -129,6 +133,7 @@
       $('warnTitle').textContent = titles[ev.state] || ev.state;
       if (ev.text) $('warnText').textContent = ev.text + (ev.cloned === false ? '  (fallback voice, not the cloned voice)' : '');
       if (ev.error) $('warnText').textContent = ev.error;
+      $('muteCue').hidden = ev.state !== 'speaking';
     }
     function showTakeover(on) {
       $('handover').hidden = on;
@@ -171,6 +176,7 @@
       if (mic) mic.stop();
       if (sample) sample.stop();
       for (const id of ['end', 'handover', 'takeback', 'stopWarn', 'sample']) $(id).disabled = true;
+      $('muteCue').hidden = true;
     }
     function endCallUi() {
       ended = true;

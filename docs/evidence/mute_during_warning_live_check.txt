@@ -1,0 +1,18 @@
+ok
+{"status":"ok","ready":true,"missing_secrets":[],"
+{
+ "warning_audible_s": 9.04,
+ "ended_by": "played out",
+ "frames_from_person_reaching_caller": {
+  "before_warning": 416,
+  "DURING_warning": 0,
+  "after_warning": 344
+ },
+ "states": [
+  "speaking",
+  "done"
+ ]
+}
+PASS: the caller hears nothing from the person while the warning plays, and hears them again afterwards
+
+[exited with code 0]

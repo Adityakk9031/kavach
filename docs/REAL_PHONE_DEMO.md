@@ -34,7 +34,9 @@ Kavach** to see the decoy talk, then **Take back** and **End call**. (`mode=eval
 5. Your friend calls your phone. Answer, put it on **speaker**, and put the phone **next to the laptop microphone**.
 6. Your friend reads the script, pausing after each paragraph.
 7. After paragraph 2 or 3 you should hear **your cloned voice in the headphones**: "Papa, stop… …". The page shows
-   the risk meter, the lit stages and the warning banner. Your phone on the table is not affected.
+   the risk meter, the lit stages and the warning banner, and a **red "press MUTE on your phone now" message**. Do it:
+   Kavach runs on the laptop and cannot reach into the phone's own microphone, so the caller can only be kept from
+   hearing you if you mute the phone. Un-mute when the warning ends.
 8. To make Kavach take over: click **Hand over to Kavach**. The old man now speaks **from the laptop speaker**; the
    phone's microphone carries it to your friend, who hears him and answers his questions. The evidence panel fills in.
 9. Click **Take back** to stop the decoy. Then hang up the phone call and click **End call**.
@@ -51,6 +53,8 @@ Kavach** to see the decoy talk, then **Take back** and **End call**. (`mode=eval
   not stop the warning. Click **Stop warning** if you want to cut it off.
 - **The takeover is crude here.** It works by sound through the air. In a real deployment (a Kavach phone number), the
   decoy would be sent straight into the call and your voice muted.
+- **Kavach cannot mute your phone's microphone.** In the Listener setup it can only ask you to (the red message). In the
+  two-tab simulator the server does it for you: your microphone does not reach the caller while the warning plays.
 - **Echo.** Keep the headphones on for the warning. If the warning plays from the laptop speaker, the phone's
   microphone can carry it to the caller.
 

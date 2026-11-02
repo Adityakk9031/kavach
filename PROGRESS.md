@@ -170,3 +170,8 @@ Verified in a real browser (microphone blocked in that browser, so the sample ca
 
 NOT verified: a real microphone and a real phone call (needs the user); the Telegram answer buttons pressed on a real phone (message with buttons was sent for call `btn-2`, nobody pressed them); that the laptop microphone picks up a phone speaker clearly enough, and the acoustic path of the decoy voice into the phone's microphone.
 Limits (also in the guide): half-duplex (caller is not heard while the decoy speaks); one microphone hears the whole room, so the user's own voice counts as the caller's; no automatic barge-in (a Stop warning button instead); the takeover works through the air, not inside the call.
+
+## Person's microphone muted toward the caller while the warning plays 2026-11-02
+
+The warning already reached only the person's earpiece; now the person's microphone also does not reach the caller while it is audible (server: `CallRoom.on_audio`; speech recognition still hears the person, so speaking over the warning still interrupts it, and the call is two-way again at once). Receiver page tells the person ("Your microphone is muted to the caller while this plays"). Listener page (real phone on speaker): Kavach cannot mute the phone's own microphone, so it shows a red "press MUTE on your phone now" message and the guide says so.
+Live check (`scripts/check_warning_mute.py`, evidence `docs/evidence/mute_during_warning_live_check.txt`): during a 9.04 s warning, frames from the person reaching the caller: before 416, DURING 0, after 344. Offline suite: 128 passed.

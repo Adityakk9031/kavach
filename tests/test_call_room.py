@@ -296,3 +296,32 @@ async def test_stt_restart_offset_is_set_when_the_new_session_takes_its_first_by
     assert room.store.turns("t1")[0]["audio_end_ms"] == 1450  # 900 on the new session = 1450 on the channel clock
     await room.join("caller", FakeWs())  # the tab reloads: new clock, so the old offset must go
     assert "caller" not in room.stt_offset_ms and "caller" not in room.stt_restarts
+
+
+async def test_the_persons_microphone_is_muted_toward_the_caller_while_the_warning_plays(room):
+    from types import SimpleNamespace
+
+    caller, receiver = FakeWs(), FakeWs()
+    await room.join("caller", caller)
+    await room.join("receiver", receiver)
+    room.warning = SimpleNamespace(active=True)  # the family-voice warning is playing in the person's earpiece
+
+    await room.on_audio("receiver", chunk(value=9))
+    assert caller.binary == []  # the scammer hears nothing from the person
+    assert bytes(FakeStt.instances["receiver"].audio) == chunk(value=9)  # but speech recognition still hears them,
+    # so speaking over the warning can still interrupt it
+
+    await room.on_audio("caller", chunk(value=7))
+    assert len(receiver.binary) == 1  # the person still hears the caller (under the warning)
+
+    room.warning.active = False  # warning finished or the person interrupted it
+    await room.on_audio("receiver", chunk(value=9))
+    assert len(caller.binary) == 1 and caller.binary[0][1:] == chunk(value=9)  # the call is two-way again
+
+
+async def test_warning_object_missing_or_inactive_does_not_mute(room):
+    caller = FakeWs()
+    await room.join("caller", caller)
+    await room.join("receiver", FakeWs())
+    await room.on_audio("receiver", chunk())  # no warning object at all
+    assert len(caller.binary) == 1
