@@ -15,13 +15,14 @@ const HOW = [
   ['Prepares your complaint', 'A draft for 1930 for you to check and file yourself.'],
 ];
 
-export function HomeScreen({ role, settings, onProtect, onCaller, onSettings, onVoice, onReset }: {
+export function HomeScreen({ role, settings, onProtect, onCaller, onSettings, onVoice, onReset, onSwitch }: {
   role: Role; settings: Settings;
   onProtect: (code: string, rehearsal: boolean) => void;
   onCaller: (code: string, rehearsal: boolean) => void;
   onSettings: () => void;
   onVoice: () => void;
   onReset: () => void;
+  onSwitch: () => void;
 }) {
   const [code, setCode] = useState(rand());
   const [rehearsal, setRehearsal] = useState(true);
@@ -55,6 +56,9 @@ export function HomeScreen({ role, settings, onProtect, onCaller, onSettings, on
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
         <Logo size={36} />
         <Text style={[T.h2, { marginLeft: 12, flex: 1 }]}>Kavach</Text>
+        <Pressable onPress={onSwitch} hitSlop={12} accessibilityRole="button" style={{ marginRight: 16 }}>
+          <Text style={{ color: C.accent, fontWeight: '600' }}>{role === 'papa' ? 'Protected ▾' : 'Family ▾'}</Text>
+        </Pressable>
         <Pressable onPress={onSettings} hitSlop={12}><Text style={{ color: C.muted }}>Settings</Text></Pressable>
       </View>
 

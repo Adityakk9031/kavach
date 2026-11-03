@@ -3,7 +3,7 @@ import { Text, TextInput, View } from 'react-native';
 import { Btn, C, Logo, Panel, Screen, T, input } from './ui';
 import { Settings, saveSettings, testConnection } from './config';
 
-export function SetupScreen({ initial, onSaved }: { initial: Settings | null; onSaved: (s: Settings) => void }) {
+export function SetupScreen({ initial, onSaved, onBack }: { initial: Settings | null; onSaved: (s: Settings) => void; onBack?: () => void }) {
   const [url, setUrl] = useState(initial?.serverUrl ?? '');
   const [key, setKey] = useState(initial?.accessKey ?? '');
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
@@ -39,6 +39,7 @@ export function SetupScreen({ initial, onSaved }: { initial: Settings | null; on
       <Btn label={busy ? 'Testing…' : 'Test connection'} onPress={test} disabled={busy || !url} />
       {result && <Text style={{ color: result.ok ? C.accent : C.danger, marginBottom: 10 }}>{result.message}</Text>}
       <Btn label="Save" kind="primary" onPress={save} disabled={!url} />
+      {onBack ? <Btn label="Back" onPress={onBack} /> : null}
     </Screen>
   );
 }

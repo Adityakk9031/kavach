@@ -10,8 +10,8 @@ const PAGES = [
   { n: '3', title: 'Your family is told at once', body: 'Your family gets a message straight away. They can end the call, or send you a voice note that plays on your phone. Kavach also prepares the complaint for 1930, for you to check and file.' },
 ];
 
-export function Onboarding({ onDone }: { onDone: (role: Role) => void }) {
-  const [i, setI] = useState(0);
+export function Onboarding({ onDone, startAtRoles = false, onCancel }: { onDone: (role: Role) => void; startAtRoles?: boolean; onCancel?: () => void }) {
+  const [i, setI] = useState(startAtRoles ? PAGES.length : 0);
   const last = i === PAGES.length;
 
   return (
@@ -30,12 +30,16 @@ export function Onboarding({ onDone }: { onDone: (role: Role) => void }) {
             ))}
           </View>
           <Btn label="Next" kind="primary" onPress={() => setI(i + 1)} />
-          <Pressable onPress={() => setI(PAGES.length)} style={{ padding: 12 }}>
-            <Text style={[T.muted, { textAlign: 'center' }]}>Skip</Text>
-          </Pressable>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            {i > 0 ? <Pressable onPress={() => setI(i - 1)} style={{ padding: 12 }}><Text style={T.muted}>‹ Back</Text></Pressable> : <View />}
+            <Pressable onPress={() => setI(PAGES.length)} style={{ padding: 12 }}><Text style={T.muted}>Skip</Text></Pressable>
+          </View>
         </View>
       ) : (
         <View>
+          <Pressable onPress={() => (onCancel ? onCancel() : setI(PAGES.length - 1))} style={{ paddingBottom: 18 }} hitSlop={12}>
+            <Text style={{ color: C.accent, fontSize: 16, fontWeight: '600' }}>‹ {onCancel ? 'Cancel' : 'Back'}</Text>
+          </Pressable>
           <Text style={T.h1}>Who will use this phone?</Text>
           <Text style={[T.muted, { marginTop: 8, marginBottom: 22 }]}>We will show you only what you need.</Text>
           <Pressable onPress={() => onDone('papa')} accessibilityRole="button">

@@ -1,6 +1,6 @@
 // The protected person's screen: warning in the earpiece, risk, hand over / take back, evidence, complaint.
 import React, { useEffect, useReducer, useRef, useState } from 'react';
-import { PermissionsAndroid, Platform, Text, View } from 'react-native';
+import { PermissionsAndroid, Platform, Pressable, Text, View } from 'react-native';
 import { useKeepAwake } from 'expo-keep-awake';
 import { AudioBridge, BridgeHandle } from './AudioBridge';
 import { STAGE_LABELS, bridgeUrl, initialState, reduce } from './bridge';
@@ -33,6 +33,11 @@ export function ProtectScreen({ settings, code, rehearsal, onBack }: {
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
     <Screen bottom={offerTakeover ? 220 : 32}>
+      {!s.ended && (
+        <Pressable onPress={() => { bridge.current?.send({ type: 'stop' }); onBack(); }} hitSlop={12} style={{ paddingBottom: 14 }}>
+          <Text style={{ color: C.accent, fontSize: 16, fontWeight: '600' }}>‹ Home</Text>
+        </Pressable>
+      )}
       {ready && (
         <AudioBridge ref={bridge} onMessage={dispatch}
           uri={bridgeUrl(settings, { call: callId, role: 'receiver', mode: rehearsal ? 'eval' : 'live' })} />
