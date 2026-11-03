@@ -10,8 +10,8 @@ import httpx
 import numpy as np
 import pytest
 
-from app.config import Settings
-from app.twilio_call import FRAME, OPENING, TwilioDesk, TwilioError, mulaw8k_to_pcm16k, pcm16k_to_mulaw8k
+from scambot.config import BotSettings
+from scambot.call import FRAME, OPENING, TwilioDesk, TwilioError, mulaw8k_to_pcm16k, pcm16k_to_mulaw8k
 
 
 def tone(seconds=1.0, rate=16000):
@@ -23,7 +23,7 @@ def settings(**kw):
     base = dict(_env_file=None, twilio_account_sid="ACtest", twilio_auth_token="tok", twilio_from_number="+15550001111",
                 twilio_target_number="+919800000000", scammer_voice_id="aai-michael")
     base.update(kw)
-    return Settings(**base)
+    return BotSettings(**base)
 
 
 def test_audio_converts_between_twilio_and_speech_formats():
@@ -195,3 +195,26 @@ async def test_a_wrong_or_reused_token_and_a_second_call_are_turned_away():
     assert second.closed == 4401  # only one demo call at a time
     first.feed({"event": "stop"})
     await asyncio.wait_for(t, 3)
+
+
+# ---- the server around it ---------------------------------------------------------------------------------------
+
+def test_the_scammer_server_only_takes_orders_from_this_machine():
+    from fastapi.testclient import TestClient
+
+    from scambot import server
+
+    server.local_only  # the guard exists
+    with TestClient(server.app, client=("127.0.0.1", 5000)) as local:
+        assert local.get("/status").status_code == 200
+        assert local.get("/status", headers={"x-forwarded-for": "8.8.8.8"}).status_code == 403
+        assert local.post("/call", headers={"cf-connecting-ip": "8.8.8.8"}).status_code == 403
+    with TestClient(server.app, client=("8.8.8.8", 5000)) as remote:
+        assert remote.post("/call").status_code == 403
+
+
+def test_kavach_knows_nothing_about_twilio():
+    from pathlib import Path
+
+    for f in [*Path("app").glob("*.py"), Path("render.yaml")]:
+        assert "twilio" not in f.read_text().lower(), f

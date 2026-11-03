@@ -27,13 +27,6 @@ class Settings(BaseSettings):
     # When set, every /api/*, /eval-audio/* and /ws/* request must carry it (?key=... or the x-kavach-key header). Turn
     # it on whenever the server is reachable from the internet (a tunnel for the phone app). Empty = open (local only).
     kavach_access_key: str = ""
-    # Twilio demo call: Kavach rings ONLY `twilio_target_number` (the owner's own phone), never any other number.
-    twilio_account_sid: str = ""
-    twilio_auth_token: str = ""
-    twilio_from_number: str = ""
-    twilio_target_number: str = ""
-    public_base_url: str = ""  # e.g. https://kavach-yvtn.onrender.com; derived from the request when empty
-    scammer_voice_id: str = "aai-michael"
 
     # --- language (English only in v1; Hindi planned once TTS-1 ships it) ---
     language: str = "english"  # TTS `language` takes the full name

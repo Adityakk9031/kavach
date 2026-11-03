@@ -218,3 +218,7 @@ Checked: tsc 0; welcome, role choice and Papa Home screenshotted in a browser at
 ## Back navigation 2026-11-03
 
 User got stuck after choosing a role. Now: "Protected ▾ / Family ▾" at the top of Home reopens "Who will use this phone?" (with Cancel), role choice has "‹ Back" to the welcome pages, welcome pages have Back, Protect has "‹ Home" mid-call, Setup has Back, Android's hardware back button returns to Home (or cancels the switch) instead of closing the app. Checked in a browser: Papa Home → switch → Family Home → switch → Papa Home. NOT checked: Android hardware back on a phone.
+
+## Demo scammer moved out of Kavach 2026-11-03
+
+The user pointed out that ringing a phone has nothing to do with Kavach. `scambot/` is now its own small server (`uv run uvicorn scambot.server:app --port 8100`), run on the Mac; Kavach (`app/`, `render.yaml`, the Docker image) has no Twilio code or settings, and a test checks that. `/call` and `/status` answer only requests from this machine, so the public tunnel cannot be used to ring anyone, and the server can only ring TWILIO_TARGET_NUMBER. Twilio needs a public https address for the audio stream: the user opens that tunnel. 162 tests pass. NOT checked: a real Twilio call.

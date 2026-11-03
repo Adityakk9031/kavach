@@ -17,8 +17,8 @@ import time
 
 import httpx
 
-from app.config import Settings
 from app.llm import LLM, LLMError
+from scambot.config import BotSettings
 
 log = logging.getLogger("kavach.twilio")
 MAX_CALL_S = 240
@@ -69,7 +69,7 @@ def pcm16k_to_mulaw8k(pcm: bytes, state=None):
 class TwilioDesk:
     """Places the call and runs the conversation for it."""
 
-    def __init__(self, settings: Settings, llm: LLM, tts_pool, stt_factory, http: httpx.AsyncClient | None = None):
+    def __init__(self, settings: BotSettings, llm: LLM, tts_pool, stt_factory, http: httpx.AsyncClient | None = None):
         self.s, self.llm, self.tts_pool, self.stt_factory = settings, llm, tts_pool, stt_factory
         self.http = http or httpx.AsyncClient(timeout=15)
         self.pending: dict[str, float] = {}
