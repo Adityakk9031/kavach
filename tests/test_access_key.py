@@ -50,3 +50,13 @@ def test_no_key_configured_means_open_as_before(monkeypatch):
     monkeypatch.setattr(main.settings, "kavach_access_key", "")
     with TestClient(main.app) as client:
         assert client.get("/api/config").status_code == 200
+
+
+def test_a_browser_app_on_another_origin_can_ask_but_still_needs_the_key(locked):
+    pre = locked.options("/api/voices", headers={"Origin": "http://localhost:8081", "Access-Control-Request-Method": "GET",
+                                                 "Access-Control-Request-Headers": "x-kavach-key"})
+    assert pre.status_code == 200 and pre.headers["access-control-allow-origin"] == "*"
+    r = locked.get("/api/voices", headers={"Origin": "http://localhost:8081"})
+    assert r.status_code == 401
+    ok = locked.get("/api/voices", headers={"Origin": "http://localhost:8081", "x-kavach-key": "s3cret-key"})
+    assert ok.status_code == 200 and ok.headers["access-control-allow-origin"] == "*"

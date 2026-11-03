@@ -10,6 +10,7 @@ from importlib.metadata import version
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, RedirectResponse
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
@@ -138,6 +139,9 @@ async def require_access_key(request, call_next):
             request.query_params.get("key") or request.headers.get("x-kavach-key")):
         return JSONResponse({"error": "access key required"}, status_code=401)
     return await call_next(request)
+# The Kavach web app (a Mac browser) runs on another origin. Access is by the key header, not cookies, so any origin may
+# ask; without the key the answer is still 401. Added last, so it is outermost and answers the browser's preflight first.
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 WEB = Path(__file__).resolve().parent.parent / "web"
 app.mount("/web", StaticFiles(directory=WEB, html=True), name="web")
 (Path(__file__).resolve().parent.parent / "eval" / "audio").mkdir(parents=True, exist_ok=True)

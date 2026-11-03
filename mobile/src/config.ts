@@ -7,12 +7,18 @@ const KEY = 'kavach.settings.v1';
 
 export const normalizeUrl = (u: string) => u.trim().replace(/\/+$/, '');
 
+// Built-in defaults (EXPO_PUBLIC_* values from mobile/.env at bundle time) so a demo user opens straight onto Home.
+// A server and code saved in "Server and access code" take priority over the defaults.
+const DEFAULTS: Settings | null = process.env.EXPO_PUBLIC_KAVACH_SERVER
+  ? { serverUrl: normalizeUrl(process.env.EXPO_PUBLIC_KAVACH_SERVER), accessKey: (process.env.EXPO_PUBLIC_KAVACH_KEY ?? '').trim() }
+  : null;
+
 export async function loadSettings(): Promise<Settings | null> {
   try {
     const raw = await AsyncStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as Settings) : null;
+    return raw ? (JSON.parse(raw) as Settings) : DEFAULTS;
   } catch {
-    return null;
+    return DEFAULTS;
   }
 }
 
