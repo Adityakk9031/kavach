@@ -37,10 +37,16 @@ export function ProtectScreen({ settings, code, rehearsal, onBack }: {
         <AudioBridge ref={bridge} onMessage={dispatch}
           uri={bridgeUrl(settings, { call: callId, role: 'receiver', mode: rehearsal ? 'eval' : 'live' })} />
       )}
-      <Title title="Protected call" subtitle={`Code ${code}${rehearsal ? ' · rehearsal, no Telegram alerts' : ''}`}
+      <Title title="Protecting your call" subtitle={rehearsal ? `Test code ${code} · no Telegram alerts` : 'Kavach is listening'}
         right={<Pill label={s.takeover ? 'Kavach on the call' : s.triggered ? 'Scam warning' : status}
           tone={s.takeover ? 'good' : s.triggered ? 'bad' : s.sttOk.caller ? 'good' : 'neutral'} />} />
 
+      {s.connected && !s.ended && s.transcript.length === 0 && !s.triggered && (
+        <Panel>
+          <Text style={T.h2}>Kavach is ready</Text>
+          <Text style={T.muted}>Waiting for the call. When someone talks, you will see the words here and the scam meter will move.</Text>
+        </Panel>
+      )}
       {s.micError ? <Panel style={{ borderColor: C.danger }}><Text style={{ color: C.danger }}>{s.micError}</Text></Panel> : null}
 
       {s.family && (

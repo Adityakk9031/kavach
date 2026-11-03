@@ -1,91 +1,115 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Text, View } from 'react-native';
+// Home, for the two kinds of user: the person being protected, and the family member looking after them.
+import React, { useEffect, useState } from 'react';
+import { Pressable, Text, View } from 'react-native';
 import { Btn, C, Logo, Panel, Pill, Screen, SectionLabel, T, Toggle } from './ui';
 import { api, type Settings } from './config';
+import type { Role } from './prefs';
 
 const rand = () => Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('');
-type Line = { who: string; text: string };
 
-export function HomeScreen({ settings, onProtect, onCaller, onSettings, onVoice }: {
-  settings: Settings;
+const HOW = [
+  ['Listens', 'Kavach hears the call and spots pressure about money, police or your bank.'],
+  ['Warns you privately', 'A trusted voice speaks only to you. The caller hears nothing.'],
+  ['Takes over if you are scared', 'One tap, and Kavach talks to the caller in your voice and keeps the evidence.'],
+  ['Tells your family', 'They get a message, can end the call, or send you a voice note.'],
+  ['Prepares your complaint', 'A draft for 1930 for you to check and file yourself.'],
+];
+
+export function HomeScreen({ role, settings, onProtect, onCaller, onSettings, onVoice, onReset }: {
+  role: Role; settings: Settings;
   onProtect: (code: string, rehearsal: boolean) => void;
   onCaller: (code: string, rehearsal: boolean) => void;
   onSettings: () => void;
   onVoice: () => void;
+  onReset: () => void;
 }) {
   const [code, setCode] = useState(rand());
   const [rehearsal, setRehearsal] = useState(true);
   const [tools, setTools] = useState(false);
-  const [calling, setCalling] = useState<'idle' | 'ringing' | 'live' | 'error'>('idle');
-  const [note, setNote] = useState('');
-  const [lines, setLines] = useState<Line[]>([]);
-  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const { base, headers } = api(settings);
+  const [voice, setVoice] = useState<'unknown' | 'yes' | 'no'>('unknown');
+  const person = role === 'papa' ? 'papa' : 'son';
 
-  useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
+  useEffect(() => {
+    const { base, headers } = api(settings);
+    fetch(`${base}/api/voices`, { headers }).then((r) => r.json())
+      .then((d) => setVoice(d.samples?.[person] ? 'yes' : 'no')).catch(() => setVoice('unknown'));
+  }, [settings, person]);
 
-  function watch() {
-    if (timer.current) clearInterval(timer.current);
-    let waited = 0;
-    timer.current = setInterval(async () => {
-      try {
-        const st = await (await fetch(`${base}/api/twilio/status`, { headers })).json();
-        setLines(st.in_call ? st.live : st.last?.transcript?.slice(-6) ?? []);
-        if (st.in_call) setCalling('live');
-        else if (waited > 6 || st.last?.transcript?.length) { setCalling('idle'); setNote('The call has ended.'); if (timer.current) clearInterval(timer.current); }
-      } catch { /* try again on the next tick */ }
-      waited += 1;
-    }, 2000);
-  }
-
-  async function callMe() {
-    setCalling('ringing'); setNote('Calling your phone…'); setLines([]);
-    try {
-      const r = await fetch(`${base}/api/twilio/call`, { method: 'POST', headers });
-      const d = await r.json();
-      if (!r.ok) { setCalling('error'); setNote(d.detail ?? 'The call could not be started.'); return; }
-      setNote('Your phone is ringing. Pick up and talk to the caller.');
-      watch();
-    } catch { setCalling('error'); setNote('Could not reach the Kavach server.'); }
-  }
+  const voiceCard = (
+    <Panel>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+        <Text style={[T.h2, { flex: 1 }]}>{role === 'papa' ? 'Your voice' : 'Your voice for Papa'}</Text>
+        {voice === 'yes' ? <Pill label="Recorded" tone="good" /> : voice === 'no' ? <Pill label="Not yet" tone="warn" /> : null}
+      </View>
+      <Text style={[T.muted, { marginBottom: 12 }]}>
+        {role === 'papa'
+          ? 'Record 20 seconds so Kavach can sound like you when it talks to a caller for you.'
+          : 'Record 20 seconds. Kavach can use your voice for the warning Papa hears, so it sounds like you.'}
+      </Text>
+      <Btn label={voice === 'yes' ? 'Record again' : 'Record my voice'} kind={voice === 'yes' ? 'plain' : 'primary'} onPress={onVoice} />
+    </Panel>
+  );
 
   return (
     <Screen>
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 18 }}>
-        <Logo size={40} />
-        <View style={{ marginLeft: 14, flex: 1 }}>
-          <Text style={T.h1}>Kavach</Text>
-          <Text style={T.muted}>A shield for the people we love</Text>
-        </View>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+        <Logo size={36} />
+        <Text style={[T.h2, { marginLeft: 12, flex: 1 }]}>Kavach</Text>
+        <Pressable onPress={onSettings} hitSlop={12}><Text style={{ color: C.muted }}>Settings</Text></Pressable>
       </View>
 
-      <SectionLabel>Try it</SectionLabel>
-      <Panel>
-        <Text style={T.h2}>Experience a scam call, safely</Text>
-        <Text style={[T.muted, { marginTop: 6, marginBottom: 14 }]}>
-          Kavach rings your phone and plays a pretend scammer. Talk to it like you would to a real caller.
-          Nothing is real: every name and number is made up.
-        </Text>
-        <Btn label={calling === 'ringing' || calling === 'live' ? 'Call in progress…' : 'Call my phone'} kind="primary"
-          onPress={callMe} disabled={calling === 'ringing' || calling === 'live'} />
-        {note ? <Text style={[T.muted, { color: calling === 'error' ? C.danger : C.muted }]}>{note}</Text> : null}
-        {lines.length > 0 && (
-          <View style={{ marginTop: 10 }}>
-            {lines.map((l, i) => (
-              <Text key={i} style={{ marginTop: 6, color: l.who === 'scammer' ? C.caller : C.receiver }}>
-                {l.who === 'scammer' ? 'Caller' : 'You'}: <Text style={{ color: C.ink }}>{l.text}</Text>
-              </Text>
-            ))}
+      {role === 'papa' ? (
+        <View>
+          <View style={{ backgroundColor: C.accentDeep, borderRadius: 22, padding: 22, marginBottom: 16 }}>
+            <Text style={{ color: '#fff', fontSize: 28, fontWeight: '800' }}>You are protected</Text>
+            <Text style={{ color: '#d6f5ec', marginTop: 8, fontSize: 16, lineHeight: 22 }}>
+              When a call worries you, open Kavach and tap the button below. It listens and warns you if it sounds like a scam.
+            </Text>
           </View>
-        )}
-      </Panel>
+          <Btn label="Protect my call" sub="Open this when a call comes in" kind="primary" onPress={() => onProtect(code, false)} />
+          {voiceCard}
+          <SectionLabel>How Kavach helps</SectionLabel>
+          <Panel>
+            {HOW.map(([t, b], k) => (
+              <View key={t} style={{ flexDirection: 'row', marginTop: k ? 14 : 0 }}>
+                <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: C.accent + '22', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+                  <Text style={{ color: C.accent, fontWeight: '800' }}>{k + 1}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={T.body}>{t}</Text>
+                  <Text style={T.muted}>{b}</Text>
+                </View>
+              </View>
+            ))}
+          </Panel>
+        </View>
+      ) : (
+        <View>
+          <View style={{ backgroundColor: C.accentDeep, borderRadius: 22, padding: 22, marginBottom: 16 }}>
+            <Text style={{ color: '#fff', fontSize: 28, fontWeight: '800' }}>You look after Papa</Text>
+            <Text style={{ color: '#d6f5ec', marginTop: 8, fontSize: 16, lineHeight: 22 }}>
+              If a call to Papa looks like a scam, you get a message on Telegram within seconds.
+            </Text>
+          </View>
+          {voiceCard}
+          <SectionLabel>What you can do from Telegram</SectionLabel>
+          <Panel>
+            {[['End the call', 'Tap the button in the alert and the call is cut.'],
+              ['Send a voice note', 'Record one in the bot chat. It plays on Papa\'s phone at once, even after the call ended.'],
+              ['Answer two questions', 'Did money or an OTP go out? That fills in the complaint draft.'],
+              ['Get the complaint', 'A PDF draft for 1930 arrives after the call.']].map(([t, b], k) => (
+              <View key={t} style={{ marginTop: k ? 14 : 0 }}>
+                <Text style={T.body}>{t}</Text>
+                <Text style={T.muted}>{b}</Text>
+              </View>
+            ))}
+          </Panel>
+        </View>
+      )}
 
-      <SectionLabel>Protection</SectionLabel>
-      <Btn label="Protect my call" sub="Kavach listens and warns you" onPress={() => onProtect(code, rehearsal)} />
-      <Btn label="My voice" sub="Record a consented sample so Kavach can speak as you" onPress={onVoice} />
-
-      <View style={{ height: 8 }} />
-      <Btn label={tools ? 'Hide developer tools' : 'Developer tools'} onPress={() => setTools(!tools)} />
+      <Pressable onPress={() => setTools(!tools)} style={{ padding: 14 }}>
+        <Text style={[T.muted, { textAlign: 'center' }]}>{tools ? 'Hide tester tools' : 'Tester tools'}</Text>
+      </Pressable>
       {tools && (
         <Panel>
           <Text style={T.muted}>Two-phone test code (both phones use the same one)</Text>
@@ -105,9 +129,9 @@ export function HomeScreen({ settings, onProtect, onCaller, onSettings, onVoice 
             </View>
             <Toggle value={rehearsal} onChange={setRehearsal} />
           </View>
+          <Btn label="Protect with this code" onPress={() => onProtect(code, rehearsal)} />
           <Btn label="Be the test caller" onPress={() => onCaller(code, rehearsal)} />
-          <Btn label="Server and access code" onPress={onSettings} />
-          <Pill label={rehearsal ? 'Rehearsal' : 'Live alerts on'} tone={rehearsal ? 'neutral' : 'warn'} />
+          <Btn label="Show the welcome again" onPress={onReset} />
         </Panel>
       )}
     </Screen>
