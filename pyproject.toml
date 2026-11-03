@@ -31,7 +31,7 @@ package = false
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
-filterwarnings = ["ignore::DeprecationWarning:fastapi.testclient", "ignore:Using `httpx` with `starlette.testclient`"]
+filterwarnings = ["ignore:.audioop. is deprecated:DeprecationWarning", "ignore::DeprecationWarning:fastapi.testclient", "ignore:Using `httpx` with `starlette.testclient`"]
 asyncio_mode = "auto"
 timeout = 30
 asyncio_default_fixture_loop_scope = "function"

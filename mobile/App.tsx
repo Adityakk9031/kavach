@@ -33,7 +33,7 @@ export default function App() {
   } else if (screen.name === 'caller') {
     body = <CallerScreen key={screen.code} settings={settings} code={screen.code} rehearsal={screen.rehearsal} onBack={home} />;
   } else {
-    body = <HomeScreen onProtect={(code, rehearsal) => setScreen({ name: 'protect', code, rehearsal })}
+    body = <HomeScreen settings={settings} onProtect={(code, rehearsal) => setScreen({ name: 'protect', code, rehearsal })}
       onCaller={(code, rehearsal) => setScreen({ name: 'caller', code, rehearsal })} onSettings={() => setScreen({ name: 'setup' })}
       onVoice={() => setScreen({ name: 'voice' })} />;
   }

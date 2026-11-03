@@ -77,6 +77,15 @@ export function Btn({ label, onPress, kind = 'plain', disabled, sub }: {
   );
 }
 
+export function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <Pressable onPress={() => onChange(!value)} accessibilityRole="switch" accessibilityState={{ checked: value }} hitSlop={10}
+      style={{ width: 54, height: 32, borderRadius: 16, backgroundColor: value ? C.accent : C.line, justifyContent: 'center', paddingHorizontal: 3 }}>
+      <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: '#fff', alignSelf: value ? 'flex-end' : 'flex-start' }} />
+    </Pressable>
+  );
+}
+
 export function Chip({ label, on, now }: { label: string; on: boolean; now?: boolean }) {
   return (
     <View style={[s.chip, on && { backgroundColor: C.warn + '33', borderColor: C.warn }, now && { backgroundColor: C.danger + '33', borderColor: C.danger }]}>

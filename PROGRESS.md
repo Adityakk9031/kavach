@@ -202,3 +202,9 @@ Checked: tsc 0 errors; 7 app tests; native (iOS+Android) and web exports exit 0;
 ## No setup screen for demo users 2026-11-03
 
 The app now opens straight on Home. Server address and access code are built in from `mobile/.env` (`EXPO_PUBLIC_KAVACH_SERVER`, `EXPO_PUBLIC_KAVACH_KEY`; git-ignored, template in `mobile/.env.example`); a server saved under "Server and access code" still wins. Anyone holding the app can extract the code: fine for a selected-members demo, replace with sign-in before public use. Server: CORS added so the Mac web app can call the API (still needs the key). Checked: web build opens on Home with no setup; tsc 0; 155 server tests pass. NOT checked: on an Android phone.
+
+## Twilio demo call and simpler Home 2026-11-03
+
+`app/twilio_call.py`: `POST /api/twilio/call` rings only `TWILIO_TARGET_NUMBER` (the owner's phone) through Twilio's REST API with a `<Connect><Stream>` back to `wss://<server>/twilio/stream/<one-time token>`; the stream handler converts 8 kHz mu-law to 16 kHz for AssemblyAI STT, answers in character with the LLM, speaks with TTS (voice `SCAMMER_VOICE_ID`, default aai-michael), sends mu-law frames back, clears the line when the person talks over it, hangs up after 240 s, one call at a time. `GET /api/twilio/status`. Steps in `docs/TWILIO_SETUP.md`.
+App Home now: "Call my phone" (plus live transcript), "Protect my call", "My voice", and the old test items moved under "Developer tools"; the rehearsal Switch replaced by a plain toggle.
+Checked: 5 new tests with a fake Twilio, STT, TTS and LLM (opening, listening at 16 kHz, reply to what was said, barge-in clear, one-time token, only one call, refusal cases); 160 server tests pass; tsc 0; Home screenshotted in a browser. NOT checked: a real Twilio call (no keys on the server yet), audio quality over a phone line, Indian-number calling rules. NOT built: Kavach protection (risk, warning, takeover) on this same call.

@@ -27,6 +27,7 @@ from app.finalize import handle_answer_callback, make_finalize
 from app.persona import Persona
 from app.pipeline import CallPipeline
 from app.store import Store
+from app.twilio_call import TwilioDesk, TwilioError
 from app import voices as voices_mod
 from app.stt import NullStt, SttSession
 from app.tts import TtsPool
@@ -86,6 +87,7 @@ async def loop_lag_monitor(threshold_ms: int = 300) -> None:
 
 
 desk = FamilyDesk(alerter, store, rooms, settings)
+twilio_desk = TwilioDesk(settings, llm, tts_pool, stt_factory)
 
 
 async def telegram_update(update: dict) -> None:
@@ -167,6 +169,29 @@ def health() -> dict:
         "detector_model": s.detector_model,
         "assemblyai_sdk": version("assemblyai"),
     }
+
+
+@app.post("/api/twilio/call")
+async def twilio_call(request: Request) -> dict:
+    """Ring the owner's own phone (the number set on the server) for a live demo scam call."""
+    proto = request.headers.get("x-forwarded-proto", request.url.scheme)
+    host = request.headers.get("x-forwarded-host", request.headers.get("host", ""))
+    try:
+        return await twilio_desk.start_call(f"{proto}://{host}")
+    except TwilioError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/twilio/status")
+def twilio_status() -> dict:
+    return {"configured": twilio_desk.configured, "in_call": twilio_desk.active is not None,
+            "live": twilio_desk.active.transcript[-8:] if twilio_desk.active else [], "last": twilio_desk.last}
+
+
+@app.websocket("/twilio/stream/{token}")
+async def twilio_stream(ws: WebSocket, token: str) -> None:
+    """Twilio's media stream. Not under /api: Twilio cannot send our key, so a one-time token in the address guards it."""
+    await twilio_desk.run(ws, token)
 
 
 @app.get("/api/voices")
