@@ -25,6 +25,7 @@
   const post = (obj) => {
     const text = JSON.stringify(obj);
     if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(text);
+    else if (window.parent !== window) window.parent.postMessage(text, '*'); // the web / Mac app embeds this page
     else (window.__kavachMessages ||= []).push(obj); // for testing in a normal browser
   };
   const dbg = (window.kavachDebug = { sent: 0, chunksIn: 0 });
@@ -111,6 +112,7 @@
   };
 
   start().catch((e) => post({ type: 'bridge', state: 'start_failed', message: String(e) }));
+  window.addEventListener('message', (e) => { if (e.data && e.data.kavachCmd && window.kavach) window.kavach.cmd(e.data.kavachCmd); });
 </script>
 </body>
 </html>

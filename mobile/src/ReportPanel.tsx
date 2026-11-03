@@ -1,7 +1,7 @@
 // After a flagged call: the complaint draft, plus the two questions only the person can answer.
 import React, { useState } from 'react';
 import { Linking, Text, TextInput, View } from 'react-native';
-import { Btn, C, Panel, T } from './ui';
+import { Btn, C, Panel, T, input } from './ui';
 import { Settings, api } from './config';
 
 type Ans = boolean | null;
@@ -49,7 +49,7 @@ export function ReportPanel({ settings, callId, report }: { settings: Settings; 
       <Choice label="Did you send any money?" value={money} onChange={setMoney} />
       <Choice label="Did you share an OTP, PIN or card details?" value={otp} onChange={setOtp} />
       <TextInput value={notes} onChangeText={setNotes} placeholder="Anything to add (optional)" placeholderTextColor={C.muted}
-        style={{ color: C.ink, borderColor: C.line, borderWidth: 1, borderRadius: 8, padding: 10, marginBottom: 8 }} />
+        style={[input, { marginBottom: 12 }]} />
       <Btn label="Save answers and update draft" kind="primary" onPress={save} />
       <Btn label="Open the PDF" onPress={() => open(report.pdf)} />
       {msg ? <Text style={T.muted}>{msg}</Text> : null}

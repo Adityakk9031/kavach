@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ScrollView, Text, TextInput, View } from 'react-native';
-import { Btn, C, Panel, T } from './ui';
+import { Text, TextInput, View } from 'react-native';
+import { Btn, C, Logo, Panel, Screen, T, input } from './ui';
 import { Settings, saveSettings, testConnection } from './config';
 
 export function SetupScreen({ initial, onSaved }: { initial: Settings | null; onSaved: (s: Settings) => void }) {
@@ -8,7 +8,6 @@ export function SetupScreen({ initial, onSaved }: { initial: Settings | null; on
   const [key, setKey] = useState(initial?.accessKey ?? '');
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
   const [busy, setBusy] = useState(false);
-  const input = { color: C.ink, borderColor: C.line, borderWidth: 1, borderRadius: 8, padding: 12, marginTop: 6, fontSize: 16 };
 
   async function test() {
     setBusy(true);
@@ -22,10 +21,11 @@ export function SetupScreen({ initial, onSaved }: { initial: Settings | null; on
   }
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: C.bg }} contentContainerStyle={{ padding: 14, paddingTop: 60 }}>
-      <Text style={T.h1}>Kavach setup</Text>
-      <Text style={[T.muted, { marginVertical: 8 }]}>
-        Kavach's brain runs on a server. Enter its address and your access code once. The AssemblyAI keys stay on the server, never on this phone.
+    <Screen>
+      <View style={{ marginBottom: 20 }}><Logo size={52} /></View>
+      <Text style={T.h1}>Connect to Kavach</Text>
+      <Text style={[T.muted, { marginTop: 6, marginBottom: 18 }]}>
+        Kavach's brain runs on a secure server. Enter its address and your access code once. The AssemblyAI keys stay on the server, never on this device.
       </Text>
       <Panel>
         <Text style={T.body}>Server address (https)</Text>
@@ -39,6 +39,6 @@ export function SetupScreen({ initial, onSaved }: { initial: Settings | null; on
       <Btn label={busy ? 'Testing…' : 'Test connection'} onPress={test} disabled={busy || !url} />
       {result && <Text style={{ color: result.ok ? C.accent : C.danger, marginBottom: 10 }}>{result.message}</Text>}
       <Btn label="Save" kind="primary" onPress={save} disabled={!url} />
-    </ScrollView>
+    </Screen>
   );
 }

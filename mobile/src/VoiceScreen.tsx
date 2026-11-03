@@ -1,10 +1,10 @@
 // Papa and the son each record 10-30 seconds of their own voice here, after agreeing. The sample goes to the Kavach
 // server, which keeps it so a cloned voice can be made from it (AssemblyAI makes clones only in its dashboard).
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { PermissionsAndroid, Platform, ScrollView, Switch, Text, TextInput, View } from 'react-native';
+import { PermissionsAndroid, Platform, Switch, Text, TextInput, View } from 'react-native';
 import { AudioBridge, BridgeHandle } from './AudioBridge';
 import { voiceRecorderUrl } from './bridge';
-import { Btn, C, Panel, T } from './ui';
+import { Btn, C, Panel, Screen, T, Title, input } from './ui';
 import { normalizeUrl, type Settings } from './config';
 
 type Person = 'papa' | 'son';
@@ -52,12 +52,11 @@ export function VoiceScreen({ settings, onBack }: { settings: Settings; onBack: 
   const choose = (p: Person) => { if (!busy) { setPerson(p); setAgreed(false); setRec({ state: 'idle', seconds: 0, message: '' }); setSession((n) => n + 1); } };
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: C.bg }} contentContainerStyle={{ padding: 14, paddingTop: 60 }}>
+    <Screen>
       {ready && (
         <AudioBridge key={`${person}-${name}-${session}`} ref={bridge} onMessage={onMessage} uri={voiceRecorderUrl(settings, person, name.trim())} />
       )}
-      <Text style={T.h1}>My voice</Text>
-      <Text style={[T.muted, { marginBottom: 12 }]}>So Kavach can speak in your voice when you ask it to.</Text>
+      <Title title="My voice" subtitle="So Kavach can speak in your voice when you ask it to." />
 
       <View style={{ flexDirection: 'row' }}>
         <View style={{ flex: 1, marginRight: 6 }}><Btn label="I am Papa" kind={person === 'papa' ? 'primary' : 'plain'} onPress={() => choose('papa')} /></View>
@@ -67,7 +66,7 @@ export function VoiceScreen({ settings, onBack }: { settings: Settings; onBack: 
       <Panel>
         <Text style={T.body}>Your name</Text>
         <TextInput value={name} onChangeText={setName} placeholder="Name" placeholderTextColor={C.muted}
-          style={{ color: C.ink, borderWidth: 1, borderColor: C.line, borderRadius: 8, padding: 10, marginTop: 6 }} />
+          style={input} />
       </Panel>
 
       <Panel>
@@ -109,6 +108,6 @@ export function VoiceScreen({ settings, onBack }: { settings: Settings; onBack: 
             onPress={() => { setRec({ state: 'ready', seconds: 0, message: '' }); bridge.current?.send({ type: 'rec_start' }); }} />}
       {!canStart && !busy && <Text style={T.muted}>Enter your name and agree to start.</Text>}
       <Btn label="Back" onPress={() => { bridge.current?.send({ type: 'rec_cancel' }); onBack(); }} />
-    </ScrollView>
+    </Screen>
   );
 }

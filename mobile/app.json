@@ -3,11 +3,11 @@
     "name": "Kavach",
     "slug": "kavach",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "ios": {
-      "supportsTablet": false,
+      "supportsTablet": true,
       "bundleIdentifier": "com.kavach.app",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "Kavach listens to the call to spot scams and carries your voice to the other phone."

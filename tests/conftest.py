@@ -12,3 +12,5 @@ os.environ["REPORTS_DIR"] = os.path.join(tempfile.mkdtemp(prefix="kavach-reports
 os.environ["KAVACH_WARNING_VOICE_ID"] = ""  # no cloned-voice TTS session opened by the app's startup
 os.environ["TELEGRAM_BOT_TOKEN"] = ""
 os.environ["TELEGRAM_CHAT_ID"] = ""
+os.environ["KAVACH_ACCESS_KEY"] = ""  # a key in the local .env must not lock the tests out
+os.environ["VOICES_DIR"] = os.path.join(tempfile.mkdtemp(prefix="kavach-voices-"))

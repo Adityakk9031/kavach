@@ -49,3 +49,9 @@ A real deployment would put Kavach in the call path (a Kavach number or call for
 - The WebView's microphone on iPhone and Android with an https server (the part most likely to need a fix).
 - Take back through the app's bridge (it works at the server level and in the earlier browser tests).
 - A cloud-hosted server: not set up yet.
+
+## iPhone, iPad and Mac
+
+- **iPhone / iPad:** the app is one codebase (Expo). `supportsTablet` is on, the layout is a centred column that also suits iPad. A build for a real iPhone needs an Apple Developer account (EAS Build, then TestFlight); Expo Go works for quick tests. Xcode is not installed on the development Mac, so no iOS simulator run was done.
+- **Mac (Apple Silicon):** an iPhone/iPad app installed from TestFlight/App Store runs on the Mac; and there is a **web build** (`cd mobile && npx expo start --web`, or `npx expo export --platform web`) that opens in Safari/Chrome on a Mac. The audio page runs in an iframe allowed to use the microphone (`mobile/src/AudioBridge.web.tsx`); the server address must be https.
+- Checked: web build rendered in a browser at phone and desktop widths (Home, Setup, My voice). NOT checked: the web build's microphone path on a Mac, an iOS device, TestFlight.

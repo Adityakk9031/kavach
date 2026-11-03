@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ScrollView, Switch, Text, View } from 'react-native';
-import { Btn, C, Panel, T } from './ui';
+import { Switch, Text, View } from 'react-native';
+import { Btn, C, Logo, Panel, Pill, Screen, SectionLabel, T } from './ui';
 
 const rand = () => Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('');
 
@@ -14,36 +14,55 @@ export function HomeScreen({ onProtect, onCaller, onSettings, onVoice }: {
   const [rehearsal, setRehearsal] = useState(true);
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: C.bg }} contentContainerStyle={{ padding: 14, paddingTop: 60 }}>
-      <Text style={T.h1}>Kavach</Text>
-      <Text style={[T.muted, { marginBottom: 12 }]}>Scam-call protector</Text>
+    <Screen>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+        <Logo size={40} />
+        <View style={{ marginLeft: 14, flex: 1 }}>
+          <Text style={T.h1}>Kavach</Text>
+          <Text style={T.muted}>A shield for the people we love</Text>
+        </View>
+        <Pill label={rehearsal ? 'Rehearsal' : 'Live alerts on'} tone={rehearsal ? 'neutral' : 'warn'} />
+      </View>
 
-      <Panel>
-        <Text style={T.body}>Call code</Text>
-        <Text style={{ color: C.ink, fontSize: 38, letterSpacing: 6, textAlign: 'center', marginVertical: 8 }}>{code}</Text>
-        <Text style={T.muted}>Both phones use the same code. A code works for one call only.</Text>
-        <View style={{ height: 8 }} />
-        <Btn label="New code" onPress={() => setCode(rand())} />
+      <View style={{ height: 14 }} />
+      <SectionLabel>This call</SectionLabel>
+      <Panel style={{ alignItems: 'center', paddingVertical: 22 }}>
+        <Text style={T.muted}>Both phones use this code</Text>
+        <View style={{ flexDirection: 'row', marginVertical: 14 }}>
+          {code.split('').map((ch, i) => (
+            <View key={i} style={{ width: 56, height: 68, marginHorizontal: 5, borderRadius: 14, backgroundColor: C.raised,
+              borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ color: C.ink, fontSize: 32, fontWeight: '800' }}>{ch}</Text>
+            </View>
+          ))}
+        </View>
+        <Text style={[T.muted, { textAlign: 'center' }]}>A code works for one call only.</Text>
+        <View style={{ height: 12, width: '100%' }} />
+        <View style={{ width: '100%' }}><Btn label="New code" onPress={() => setCode(rand())} /></View>
       </Panel>
 
       <Panel>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <View style={{ flex: 1, paddingRight: 10 }}>
-            <Text style={T.body}>Rehearsal</Text>
-            <Text style={T.muted}>On: no Telegram messages are sent. Turn off for the real demo.</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ flex: 1, paddingRight: 12 }}>
+            <Text style={T.h2}>Rehearsal mode</Text>
+            <Text style={T.muted}>On: no Telegram messages are sent. Turn it off for the real demo.</Text>
           </View>
-          <Switch value={rehearsal} onValueChange={setRehearsal} />
+          <Switch value={rehearsal} onValueChange={setRehearsal} trackColor={{ true: C.accent, false: C.line }} />
         </View>
       </Panel>
 
-      <Btn label="I am being called (protect me)" kind="primary" onPress={() => onProtect(code, rehearsal)} />
-      <Btn label="I am the test caller (friend's phone)" onPress={() => onCaller(code, rehearsal)} />
-      <Btn label="My voice (for Kavach to speak as me)" onPress={onVoice} />
-      <Btn label="Settings" onPress={onSettings} />
-      <Text style={[T.muted, { marginTop: 12 }]}>
-        Kavach carries the call itself, between the two phones, so it can whisper the warning and mute the person. It does not
-        listen to ordinary phone-network calls: no phone app can.
+      <SectionLabel>Start</SectionLabel>
+      <Btn label="I am being called: protect me" sub="Kavach listens and warns you" kind="primary" onPress={() => onProtect(code, rehearsal)} />
+      <Btn label="I am the test caller" sub="On a friend's phone, plays the scammer" onPress={() => onCaller(code, rehearsal)} />
+
+      <SectionLabel>Set up</SectionLabel>
+      <Btn label="My voice" sub="Record a consented sample so Kavach can speak as you" onPress={onVoice} />
+      <Btn label="Server and access code" onPress={onSettings} />
+
+      <Text style={[T.muted, { marginTop: 10, textAlign: 'center' }]}>
+        Kavach carries the call itself, between the two phones, so it can whisper the warning and mute you toward the caller.
+        It cannot hear ordinary phone-network calls: no app can.
       </Text>
-    </ScrollView>
+    </Screen>
   );
 }

@@ -1,10 +1,10 @@
 // The protected person's screen: warning in the earpiece, risk, hand over / take back, evidence, complaint.
 import React, { useEffect, useReducer, useRef, useState } from 'react';
-import { PermissionsAndroid, Platform, ScrollView, Text, View } from 'react-native';
+import { PermissionsAndroid, Platform, Text, View } from 'react-native';
 import { useKeepAwake } from 'expo-keep-awake';
 import { AudioBridge, BridgeHandle } from './AudioBridge';
 import { STAGE_LABELS, bridgeUrl, initialState, reduce } from './bridge';
-import { Btn, C, Chip, Meter, Panel, T } from './ui';
+import { Btn, C, Chip, Meter, Panel, Pill, Screen, SectionLabel, T, Title } from './ui';
 import { ReportPanel } from './ReportPanel';
 import type { Settings } from './config';
 
@@ -32,14 +32,14 @@ export function ProtectScreen({ settings, code, rehearsal, onBack }: {
 
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
-    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 14, paddingTop: 50, paddingBottom: offerTakeover ? 190 : 14 }}>
+    <Screen bottom={offerTakeover ? 220 : 32}>
       {ready && (
         <AudioBridge ref={bridge} onMessage={dispatch}
           uri={bridgeUrl(settings, { call: callId, role: 'receiver', mode: rehearsal ? 'eval' : 'live' })} />
       )}
-      <Text style={T.h1}>Protected call</Text>
-      <Text style={T.muted}>Code {code}{rehearsal ? ' · rehearsal (no Telegram alerts)' : ''} · {status}</Text>
-      <View style={{ height: 12 }} />
+      <Title title="Protected call" subtitle={`Code ${code}${rehearsal ? ' · rehearsal, no Telegram alerts' : ''}`}
+        right={<Pill label={s.takeover ? 'Kavach on the call' : s.triggered ? 'Scam warning' : status}
+          tone={s.takeover ? 'good' : s.triggered ? 'bad' : s.sttOk.caller ? 'good' : 'neutral'} />} />
 
       {s.micError ? <Panel style={{ borderColor: C.danger }}><Text style={{ color: C.danger }}>{s.micError}</Text></Panel> : null}
 
@@ -66,8 +66,12 @@ export function ProtectScreen({ settings, code, rehearsal, onBack }: {
         </Panel>
       )}
 
+      <SectionLabel>Scam risk</SectionLabel>
       <Panel>
-        <Text style={T.h2}>Scam risk {s.risk}{s.triggered ? '  ·  WARNING' : ''}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+          <Text style={{ color: riskColor, fontSize: 48, fontWeight: '800' }}>{s.risk}</Text>
+          <Text style={[T.muted, { marginLeft: 6 }]}>/ 100{s.triggered ? '  ·  warning given' : ''}</Text>
+        </View>
         <Meter value={s.risk} color={riskColor} />
         <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
           {Object.entries(STAGE_LABELS).map(([k, label]) => (
@@ -120,7 +124,7 @@ export function ProtectScreen({ settings, code, rehearsal, onBack }: {
         ))}
         {s.transcript.length === 0 ? <Text style={T.muted}>Nothing yet.</Text> : null}
       </Panel>
-    </ScrollView>
+    </Screen>
     {offerTakeover && (
       <View style={{ position: 'absolute', left: 12, right: 12, bottom: 24, padding: 14, borderRadius: 16,
                      backgroundColor: C.danger, elevation: 10, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 10 }}>

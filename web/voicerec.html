@@ -23,6 +23,7 @@
   const post = (obj) => {
     const text = JSON.stringify({ type: 'rec', ...obj });
     if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(text);
+    else if (window.parent !== window) window.parent.postMessage(text, '*');
     else (window.__kavachMessages ||= []).push(obj);
   };
 
@@ -70,6 +71,7 @@
     },
   };
   post({ state: 'ready' });
+  window.addEventListener('message', (e) => { if (e.data && e.data.kavachCmd && window.kavach) window.kavach.cmd(e.data.kavachCmd); });
 </script>
 </body>
 </html>
