@@ -3,7 +3,7 @@ import type { Settings } from './config';
 
 const normalizeUrl = (u: string) => u.trim().replace(/\/+$/, '');
 
-export type Role = 'receiver' | 'caller';
+export type Role = 'receiver' | 'caller' | 'listen';
 
 export function bridgeUrl(s: Settings, opts: { call: string; role: Role; mode: 'live' | 'eval'; callerNumber?: string }): string {
   const q = new URLSearchParams({ call: opts.call, role: opts.role, mode: opts.mode });

@@ -13,13 +13,18 @@
   App -> page:  window.kavach.cmd({type: 'takeover' | 'takeback' | 'end_call' | 'barge_in' | 'sample' | 'stop'})
   Page -> app:  ReactNativeWebView.postMessage(JSON): every server event, plus {type:'bridge', state:...} and
                 {type:'mic_error', name, message}
-  URL: bridge.html?call=<id>&role=receiver|caller&key=<access key>&mode=live|eval&caller_number=<number>
+  URL: bridge.html?call=<id>&role=receiver|caller|listen&key=<access key>&mode=live|eval&caller_number=<number>
+  role=listen: a real phone call on speaker, on this same phone. The microphone hears the caller, so it goes in on the
+  caller socket (only the caller's words are checked for a scam); events and the warning come on the receiver socket.
 -->
 <script type="module">
   import { connectCall, startMic, fileToPcm16, streamPcm, Player, SOURCE, callIdFromUrl, withKey } from './audio.js';
+  import { MicGate, silenceLike } from './speakerlink.js';
 
   const params = new URLSearchParams(location.search);
-  const role = params.get('role') === 'caller' ? 'caller' : 'receiver';
+  const role = ['caller', 'listen'].includes(params.get('role')) ? params.get('role') : 'receiver';
+  const listen = role === 'listen';
+  const gate = new MicGate();
   const mode = params.get('mode') === 'eval' ? 'eval' : 'live';
   const callId = callIdFromUrl();
   const post = (obj) => {
@@ -30,7 +35,7 @@
   };
   const dbg = (window.kavachDebug = { sent: 0, chunksIn: 0 });
 
-  let call, player, mic, sample, loud = 0, ended = false;
+  let call, listener, player, mic, sample, loud = 0, ended = false;
 
   function vad(pcm) { // receiver: the person speaks over the warning -> stop it here first, then tell the server
     if (role !== 'receiver' || !player.isPlaying(SOURCE.WARNING)) { loud = 0; return; }
@@ -54,7 +59,12 @@
     const pcm = new Int16Array(buf);
     vad(pcm);
     dbg.sent++;
-    call.sendAudio(buf);
+    if (listen) { // what Kavach itself plays must not be heard back as if the caller had said it
+      const mute = gate.shouldMute({ personaPlaying: player.isPlaying(SOURCE.PERSONA), warningPlaying: player.isPlaying(SOURCE.WARNING),
+                                     warningOnSameSpeaker: true }, performance.now());
+      if (mute) dbg.muted = (dbg.muted || 0) + 1;
+      listener.sendAudio(mute ? silenceLike(buf) : buf);
+    } else call.sendAudio(buf);
     const now = performance.now();
     if (now - lastLevelPost > 150) { lastLevelPost = now; post({ type: 'bridge', state: 'level', level: +level(pcm).toFixed(3) }); }
   }
@@ -68,13 +78,26 @@
   async function start() {
     player = new Player();
     await player.resume();
-    call = connectCall(callId, role, {
+    if (listen) {
+      listener = connectCall(callId, 'caller', {
+        onEvent(ev) {
+          if (ev.type === 'call_rejected') post(ev);
+          if (ev.type === 'flush_playback') player.flush(ev.source);
+        },
+        onAudio(source, pcm) { if (source === SOURCE.PERSONA) { dbg.chunksIn++; player.play(source, pcm); } },
+      }, { mode, caller_number: params.get('caller_number') || '' });
+    }
+    call = connectCall(callId, listen ? 'receiver' : role, {
       onEvent(ev) {
         if (ev.type === 'flush_playback') player.flush(ev.source);
         if (ev.type === 'call_ended') stopAudio();
         post(ev);
       },
-      onAudio(source, pcm) { dbg.chunksIn++; player.play(source, pcm); },
+      onAudio(source, pcm) {
+        // only the warning: the caller is already coming out of the speaker, and the decoy arrives on the caller socket
+        if (listen && source !== SOURCE.WARNING) return;
+        dbg.chunksIn++; player.play(source, pcm);
+      },
     }, role === 'caller' ? { mode, caller_number: params.get('caller_number') || '' } : { mode });
     call.ws.onopen = async () => {
       post({ type: 'bridge', state: 'connected', role, call_id: callId });
@@ -105,6 +128,7 @@
       } else if (c.type === 'stop') {
         stopAudio();
         call.ws.close();
+        if (listener) listener.ws.close();
       } else {
         call.send(c);
       }

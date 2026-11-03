@@ -11,7 +11,7 @@ import { Onboarding } from './src/Onboarding';
 import { EMPTY, Prefs, loadPrefs, savePrefs } from './src/prefs';
 import { C } from './src/ui';
 
-type Screen = { name: 'home' } | { name: 'setup' } | { name: 'voice' } | { name: 'protect' | 'caller'; code: string; rehearsal: boolean };
+type Screen = { name: 'home' } | { name: 'setup' } | { name: 'voice' } | { name: 'protect' | 'caller'; code: string; rehearsal: boolean; listen?: boolean };
 
 export default function App() {
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -48,11 +48,11 @@ export default function App() {
   } else if (screen.name === 'voice') {
     body = <VoiceScreen settings={settings} onBack={home} />;
   } else if (screen.name === 'protect') {
-    body = <ProtectScreen key={screen.code} settings={settings} code={screen.code} rehearsal={screen.rehearsal} onBack={home} />;
+    body = <ProtectScreen key={screen.code} settings={settings} code={screen.code} rehearsal={screen.rehearsal} listen={screen.listen} onBack={home} />;
   } else if (screen.name === 'caller') {
     body = <CallerScreen key={screen.code} settings={settings} code={screen.code} rehearsal={screen.rehearsal} onBack={home} />;
   } else {
-    body = <HomeScreen role={prefs.role ?? 'papa'} settings={settings} onSwitch={() => setSwitching(true)} onReset={() => { const p = EMPTY; setPrefs(p); savePrefs(p); }} onProtect={(code, rehearsal) => setScreen({ name: 'protect', code, rehearsal })}
+    body = <HomeScreen role={prefs.role ?? 'papa'} settings={settings} onSwitch={() => setSwitching(true)} onReset={() => { const p = EMPTY; setPrefs(p); savePrefs(p); }} onProtect={(code, rehearsal, listen) => setScreen({ name: 'protect', code, rehearsal, listen })}
       onCaller={(code, rehearsal) => setScreen({ name: 'caller', code, rehearsal })} onSettings={() => setScreen({ name: 'setup' })}
       onVoice={() => setScreen({ name: 'voice' })} />;
   }

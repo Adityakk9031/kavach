@@ -17,7 +17,7 @@ const HOW = [
 
 export function HomeScreen({ role, settings, onProtect, onCaller, onSettings, onVoice, onReset, onSwitch }: {
   role: Role; settings: Settings;
-  onProtect: (code: string, rehearsal: boolean) => void;
+  onProtect: (code: string, rehearsal: boolean, listen?: boolean) => void;
   onCaller: (code: string, rehearsal: boolean) => void;
   onSettings: () => void;
   onVoice: () => void;
@@ -67,10 +67,10 @@ export function HomeScreen({ role, settings, onProtect, onCaller, onSettings, on
           <View style={{ backgroundColor: C.accentDeep, borderRadius: 22, padding: 22, marginBottom: 16 }}>
             <Text style={{ color: '#fff', fontSize: 28, fontWeight: '800' }}>You are protected</Text>
             <Text style={{ color: '#d6f5ec', marginTop: 8, fontSize: 16, lineHeight: 22 }}>
-              When a call worries you, open Kavach and tap the button below. It listens and warns you if it sounds like a scam.
+              When a call worries you, put it on speaker, open Kavach and tap the button below. It listens and warns you if it sounds like a scam.
             </Text>
           </View>
-          <Btn label="Protect my call" sub="Open this when a call comes in" kind="primary" onPress={() => onProtect(code, false)} />
+          <Btn label="Protect my call" sub="Put the call on speaker first" kind="primary" onPress={() => onProtect(rand(), false, true)} />
           {voiceCard}
           <SectionLabel>How Kavach helps</SectionLabel>
           <Panel>

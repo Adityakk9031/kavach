@@ -8,8 +8,8 @@ import { Btn, C, Chip, Meter, Panel, Pill, Screen, SectionLabel, T, Title } from
 import { ReportPanel } from './ReportPanel';
 import type { Settings } from './config';
 
-export function ProtectScreen({ settings, code, rehearsal, onBack }: {
-  settings: Settings; code: string; rehearsal: boolean; onBack: () => void;
+export function ProtectScreen({ settings, code, rehearsal, listen = false, onBack }: {
+  settings: Settings; code: string; rehearsal: boolean; listen?: boolean; onBack: () => void;
 }) {
   useKeepAwake();
   const callId = `app-${code.toLowerCase()}`;
@@ -24,7 +24,7 @@ export function ProtectScreen({ settings, code, rehearsal, onBack }: {
 
   const speaking = s.warning?.state === 'speaking';
   const status = s.rejected ? s.rejected : s.ended ? 'Call ended' : s.closed ? s.closed
-    : !s.connected ? 'Connecting…' : s.sttOk.caller ? 'Listening' : 'Connected, starting speech recognition…';
+    : !s.connected ? 'Connecting…' : s.sttOk.caller ? 'Listening' : 'Getting ready…';
   const riskColor = s.risk >= 60 ? C.danger : s.risk >= 40 ? C.warn : C.accent;
 
   // After the warning, a big card floats over everything so a scared person can hand the call over with one tap
@@ -40,16 +40,21 @@ export function ProtectScreen({ settings, code, rehearsal, onBack }: {
       )}
       {ready && (
         <AudioBridge ref={bridge} onMessage={dispatch}
-          uri={bridgeUrl(settings, { call: callId, role: 'receiver', mode: rehearsal ? 'eval' : 'live' })} />
+          uri={bridgeUrl(settings, { call: callId, role: listen ? 'listen' : 'receiver', mode: rehearsal ? 'eval' : 'live' })} />
       )}
-      <Title title="Protecting your call" subtitle={rehearsal ? `Test code ${code} · no Telegram alerts` : 'Kavach is listening'}
-        right={<Pill label={s.takeover ? 'Kavach on the call' : s.triggered ? 'Scam warning' : status}
-          tone={s.takeover ? 'good' : s.triggered ? 'bad' : s.sttOk.caller ? 'good' : 'neutral'} />} />
+      <Title title="Protecting your call" subtitle={rehearsal ? `Test code ${code} · no Telegram alerts` : undefined} />
+      <View style={{ flexDirection: 'row', marginTop: -6, marginBottom: 16 }}>
+        <Pill label={s.takeover ? 'Kavach on the call' : s.triggered ? 'Scam warning' : status}
+          tone={s.takeover ? 'good' : s.triggered ? 'bad' : s.sttOk.caller ? 'good' : 'neutral'} />
+      </View>
 
       {s.connected && !s.ended && s.transcript.length === 0 && !s.triggered && (
         <Panel>
-          <Text style={T.h2}>Kavach is ready</Text>
-          <Text style={T.muted}>Waiting for the call. When someone talks, you will see the words here and the scam meter will move.</Text>
+          <Text style={T.h2}>{listen ? 'Put your call on speaker' : 'Kavach is ready'}</Text>
+          <Text style={T.muted}>{listen
+            ? 'Hold the phone where Kavach can hear the caller. When they talk, the bar below moves and their words appear here.'
+            : 'Waiting for the call. When someone talks, you will see the words here and the scam meter will move.'}</Text>
+          {listen ? <Meter value={s.level * 100} color={C.accent} /> : null}
         </Panel>
       )}
       {s.micError ? <Panel style={{ borderColor: C.danger }}><Text style={{ color: C.danger }}>{s.micError}</Text></Panel> : null}
@@ -66,7 +71,7 @@ export function ProtectScreen({ settings, code, rehearsal, onBack }: {
           <Text style={[T.h2, { color: '#fff' }]}>Kavach is speaking to you</Text>
           <Text style={{ color: '#fff', marginTop: 4 }}>{s.warning?.text}</Text>
           <Text style={{ color: '#fff', marginTop: 6, fontSize: 13 }}>
-            Your microphone is muted to the caller while this plays. Speak to stop it.
+            {listen ? 'Press MUTE on your phone call now, so the caller cannot hear this.' : 'Your microphone is muted to the caller while this plays. Speak to stop it.'}
           </Text>
         </Panel>
       )}
@@ -94,7 +99,7 @@ export function ProtectScreen({ settings, code, rehearsal, onBack }: {
 
       {s.takeover && (
         <Panel style={{ borderColor: C.accent }}>
-          <Text style={T.h2}>Kavach is on the call (the caller cannot hear you)</Text>
+          <Text style={T.h2}>{listen ? 'Kavach is talking to the caller through your speaker' : 'Kavach is on the call (the caller cannot hear you)'}</Text>
           {s.personaText ? <Text style={T.muted}>Kavach says: {s.personaText}</Text> : null}
         </Panel>
       )}
@@ -104,7 +109,7 @@ export function ProtectScreen({ settings, code, rehearsal, onBack }: {
           {!s.takeover
             ? <Btn label="Hand over to Kavach" onPress={() => bridge.current?.send({ type: 'takeover' })} />
             : <Btn label="Take back" kind="primary" onPress={() => bridge.current?.send({ type: 'takeback' })} />}
-          <Btn label="Hang up" kind="danger" onPress={() => bridge.current?.send({ type: 'end_call' })} />
+          <Btn label={listen ? 'Stop listening' : 'Hang up'} kind="danger" onPress={() => bridge.current?.send({ type: 'end_call' })} />
         </View>
       ) : (
         <View>
@@ -141,7 +146,7 @@ export function ProtectScreen({ settings, code, rehearsal, onBack }: {
                      backgroundColor: C.danger, elevation: 10, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 10 }}>
         <Text style={[T.h2, { color: '#fff' }]}>This looks like a scam</Text>
         <Text style={{ color: '#fff', marginTop: 4, marginBottom: 8 }}>
-          Scared? Let Kavach talk to the caller for you. The caller cannot hear you.
+          {listen ? 'Scared? Un-mute your call and stay quiet. Kavach will talk to the caller through your speaker.' : 'Scared? Let Kavach talk to the caller for you. The caller cannot hear you.'}
         </Text>
         <Btn label="Let Kavach take over" kind="primary" onPress={() => bridge.current?.send({ type: 'takeover' })} />
       </View>
