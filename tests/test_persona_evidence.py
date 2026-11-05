@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+from types import SimpleNamespace
 
 import pytest
 import websockets
@@ -411,3 +412,34 @@ def test_the_persona_may_ask_about_upi_and_ifsc_but_not_say_an_address():
 def test_organisations_are_not_collected_as_the_callers_name():
     for text in ("This is Mumbai Police calling you.", "This is State Bank head office.", "I am from the Cyber Crime Cell"):
         assert not any(t == "person_name" for t, _ in kinds(text)), text
+
+
+async def test_takeover_while_the_caller_is_talking_waits_and_answers_them_instead_of_talking_over(server):
+    room, cp, llm, caller, receiver, s = await make(server)
+    await cp.on_final(room, turn("You are under digital arrest."))  # before the takeover: the persona still needs the story
+    await cp.on_speech_started(room, "caller", {})
+    await room.control_handlers["takeover"](room, "receiver", {})
+    await asyncio.sleep(0.2)
+    assert not caller.binary and not any(e.get("text") == OPENING for e in receiver.text)
+    await cp.on_final(room, turn("Pay fifty thousand now.", idx=1))
+    await wait_for(lambda: len(caller.binary) >= 3)
+    assert not any(e.get("text") == OPENING for e in receiver.text)
+    said = [m["content"] for m in llm.calls[-1] if m["role"] == "user"]
+    assert said == ["You are under digital arrest.", "Pay fifty thousand now."]
+    await s.close()
+
+
+async def test_the_persona_asks_once_for_a_upi_id_to_be_spelled(server):
+    room, cp, llm, caller, receiver, s = await make(server)
+    room.evidence = SimpleNamespace(valid_items=lambda: [{"type": "upi_id", "value": "customs.clear@oakbank"}])
+    await room.control_handlers["takeover"](room, "receiver", {})
+    await cp._reply(turn=turn("Pay to customs dot clear at okbank."))
+    assert "letter by letter" in llm.calls[-1][0]["content"]
+    await cp._reply(turn=turn("Pay now."))
+    assert "letter by letter" not in llm.calls[-1][0]["content"]
+    await s.close()
+
+
+def test_a_bank_the_money_goes_to_is_not_the_agency_the_caller_claims():
+    assert ("agency", "Oak Bank") not in kinds("Sir, the account is held at Oak Bank and you must pay.")
+    assert ("agency", "State Bank") in kinds("This is Sharma calling from State Bank about your card.")

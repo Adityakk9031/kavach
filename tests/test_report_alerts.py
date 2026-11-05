@@ -171,7 +171,8 @@ def test_every_report_field_is_filled_from_the_call():
     assert "hallucinated@bank" not in r.evidence["upi_id"]  # invalid LLM items never reach the report
     assert len(r.key_quotes) == 2 and r.key_quotes[0]["time"]
     assert [t["who"] for t in r.transcript][-1].startswith("Kavach decoy persona")
-    assert r.money_shared is None and r.otp_shared is None and r.missing == []
+    assert r.money_shared is None and r.otp_shared is None
+    assert len(r.missing) == 1 and "pay.now@okbank" in r.missing[0] and "may be misheard" in r.missing[0]  # speech recognition can mishear an ID
 
 
 def test_markdown_and_pdf_contain_the_banner_fields_and_next_steps(tmp_path):

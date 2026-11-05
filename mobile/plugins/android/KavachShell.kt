@@ -12,6 +12,7 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.Binder
 import android.os.Build
+import android.os.IBinder
 import android.os.Parcel
 import java.net.Socket
 import kotlin.concurrent.thread
@@ -24,7 +25,6 @@ class KavachShell : Binder() {
     @Volatile private var running = false
     @Volatile private var source_ = ""
     @Volatile private var voice = "wait"
-    private var savedCallVolume = -1
 
     override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean {
         when (code) {
@@ -40,26 +40,36 @@ class KavachShell : Binder() {
                     val audio = ShellContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
                     val stream = AudioManager.STREAM_VOICE_CALL
                     audio.adjustStreamVolume(stream, if (on) AudioManager.ADJUST_MUTE else AudioManager.ADJUST_UNMUTE, 0)
-                    if (!on && savedCallVolume >= 0) { audio.setStreamVolume(stream, savedCallVolume, 0); savedCallVolume = -1 }
-                    when {
-                        audio.isStreamMute(stream) == on -> "ok"
-                        // Some phones refuse a call mute: the lowest call volume still lets the warning be heard over the caller
-                        on -> {
-                            savedCallVolume = audio.getStreamVolume(stream)
-                            audio.setStreamVolume(stream, audio.getStreamMinVolume(stream), 0)
-                            "lowered"
-                        }
-                        else -> "refused"
-                    }
+                    // Never just turn the call volume down: Android caps every other sound at it, so the warning would go quiet too
+                    if (audio.isStreamMute(stream) == on) "ok" else "refused"
                 } catch (e: Throwable) { e.javaClass.simpleName })
             }
-            MUTE -> try {
-                (ShellContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager).isMicrophoneMute = data.readInt() == 1
-            } catch (_: Throwable) {}
+            MUTE -> reply?.writeString(try {
+                val audio = ShellContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                audio.isMicrophoneMute = data.readInt() == 1
+                audio.isMicrophoneMute.toString()
+            } catch (e: Throwable) { e.javaClass.simpleName })
+            HANG_UP -> reply?.writeString(hangUp())
             DESTROY -> { running = false; System.exit(0) }
             else -> return super.onTransact(code, data, reply, flags)
         }
         return true
+    }
+
+    // Telecom's own hang-up as the shell, then the phone's end-call key, which the system handles for itself.
+    private fun hangUp(): String {
+        val failures = ArrayList<String>()
+        try {
+            val binder = Class.forName("android.os.ServiceManager").getMethod("getService", String::class.java).invoke(null, "telecom") as IBinder
+            val telecom = Class.forName("com.android.internal.telecom.ITelecomService\$Stub").getMethod("asInterface", IBinder::class.java).invoke(null, binder)
+            if (telecom.javaClass.getMethod("endCall", String::class.java).invoke(telecom, "com.android.shell") == true) return "telecom"
+            failures += "telecom=false"
+        } catch (e: Throwable) { failures += "telecom=" + reason(e) }
+        try {
+            if (Runtime.getRuntime().exec(arrayOf("/system/bin/input", "keyevent", "6")).waitFor() == 0) return "key"
+            failures += "key=exit"
+        } catch (e: Throwable) { failures += "key=" + reason(e) }
+        return failures.joinToString(" ")
     }
 
     private fun capture(port: Int) {
@@ -192,6 +202,7 @@ class KavachShell : Binder() {
         const val SPEAKER = 4
         const val MUTE = 5
         const val SILENCE = 6
+        const val HANG_UP = 7
         const val USAGE_CALL_ASSISTANT = 17
         const val CALL_REDIRECT_PSTN = 1
         const val DESTROY = 16777115 // Shizuku's own code for ending a user service

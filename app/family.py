@@ -2,7 +2,7 @@
 
 * A voice note sent to the bot plays on the protected person's phone at once, even after the call has been cut:
   the son cannot ring a father whose line is busy with a scammer, so his voice goes straight to the Kavach app.
-* "End the call": drops the call on the person's side.
+* "End the call": drops the real call on the person's phone, and says so only when the phone confirms it.
 
 Only the one configured Telegram chat can do either. Voice notes are decoded in memory and never stored.
 """
@@ -90,8 +90,10 @@ class FamilyDesk:
         if not voice:
             return
         room = self.rooms.family_target()
-        if room is None:
-            await self._say("No call to send this to. Papa's Kavach app is not connected right now.")
+        # With no call running, the phone's always-on link is surer than the socket of a call that has just ended.
+        phone = getattr(self.rooms, "phone", None) if room is None or room.ended else None
+        if room is None and phone is None:
+            await self._say("I could not send this. Papa's phone is not connected to Kavach right now.")
             return
         if voice.get("duration", 0) > MAX_SECONDS:
             await self._say(f"That voice note is too long. Keep it under {MAX_SECONDS} seconds.")
@@ -105,11 +107,16 @@ class FamilyDesk:
             log.exception("could not fetch the voice note")
             await self._say("I could not download that voice note. Please try again.")
             return
+        seconds = round(len(pcm) / 2 / self.settings.sample_rate)
+        if phone is not None:
+            delivered = await self.rooms.play_on_phone(pcm)
+            await self._say(f"▶️ Playing on Papa's phone now ({seconds} s)." if delivered
+                            else "Papa's phone did not confirm it got this. It may have no internet right now.")
+            return
         # The family's voice comes first: stop a warning that is still playing in Papa's earpiece.
         if room.warning is not None and room.warning.active:
             await room.warning.barge_in("family")
         delivered = await room.play_family(pcm)
-        seconds = round(len(pcm) / 2 / self.settings.sample_rate)
         await self._say(f"▶️ Playing on Papa's phone now ({seconds} s)." if delivered
                         else "Papa's app is not connected, so it could not be played.")
 
@@ -131,5 +138,12 @@ class FamilyDesk:
             return
         room.log_event("ended_from_telegram", {})
         await self.alerter.answer_callback(cq["id"], "Ending the call.")
+        if room.phone_call:
+            result = await room.hang_up()
+            if not (result or "").startswith("ok"):
+                room.log_event("hang_up_failed", {"result": result})
+                await self._say("⚠️ I could not cut Papa's phone call, so it is still on. Kavach is still protecting it. "
+                                "Please try ringing or messaging Papa.")
+                return
         await room.end()
         await self._say("☎️ The call was ended. Send a voice note now and it will play on Papa's phone.")

@@ -95,6 +95,8 @@ def regex_items(text: str) -> list[Item]:
                 continue  # the domain part of an e-mail or UPI ID
             add(kind, m)
     for m in AGENCY_RE.finditer(text):
+        if m.group(1).endswith("Bank") and m.group(0).split()[0] in ("at", "of"):
+            continue  # "the account is held at Oak Bank" is where the money goes, not who they claim to be
         items.append(Item("agency", m.group(1).strip(), text[max(0, m.start() - 40):m.end() + 40].strip(), "regex"))
     low = text.lower()
     for app in KNOWN_APPS:

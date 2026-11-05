@@ -62,3 +62,20 @@ def test_takeover_check_reports_the_latest_listener_call(client):
     assert body["seconds_sent_to_caller"] == 2.0
     assert body["persona_sent"][0]["text"] == "Hello?"
     assert body["client_voice_route"][0]["route"] == "yes telephony>18"
+
+
+def test_the_phones_always_on_link_is_held_and_confirms_a_voice_note(monkeypatch):
+    monkeypatch.setattr(main.settings, "kavach_access_key", "k")
+    with TestClient(main.app) as client:
+        with client.websocket_connect("/ws/phone?key=k") as ws:
+            main.rooms.phone_heard.clear()
+            ws.send_text('{"type":"note_received"}')
+            ws.send_text('{"type":"other"}')
+            deadline = time.time() + 3
+            while not main.rooms.phone_heard.is_set() and time.time() < deadline:
+                time.sleep(0.01)
+            assert main.rooms.phone is not None and main.rooms.phone_heard.is_set()
+        deadline = time.time() + 3
+        while main.rooms.phone is not None and time.time() < deadline:
+            time.sleep(0.01)
+        assert main.rooms.phone is None  # gone with the socket, so a voice note is not sent into nothing

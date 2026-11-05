@@ -66,6 +66,11 @@ WANTED = {
 }
 
 
+def spell_note(upi_id: str) -> str:
+    return (f" They just told you a UPI ID, heard as {upi_id}. Before anything else, say you are writing it down and ask them "
+            "to spell the name of the bank part slowly, letter by letter. Do not say the ID back to them.")
+
+
 def progress_note(items: list[dict]) -> str:
     """What the caller has already given and what to ask for next, so the persona moves on instead of asking again."""
     have = {i["type"]: i["value"] for i in items}
@@ -130,6 +135,7 @@ class Persona:
 
 class CallPersona:
     REPLY_DELAY_S = 0.7  # wait for the caller to finish: STT can split one long line into two finals
+    OPENING_WAIT_S = 8.0
 
     def __init__(self, persona: Persona, room: CallRoom):
         self.persona, self.room = persona, room
@@ -142,6 +148,8 @@ class CallPersona:
         self.pending: asyncio.Task | None = None
         self.on_takeover_hooks: list = []
         self.replies = 0
+        self.caller_talking = False
+        self.spelled: set[str] = set()  # UPI IDs the caller has been asked to spell, since speech recognition mishears them
         self.sent_bytes = 0  # voice handed to the caller's connection, for checking a takeover from the logs
 
     @property
@@ -171,7 +179,8 @@ class CallPersona:
         await room.broadcast({"type": "takeover", "state": "on"})
         for hook in self.on_takeover_hooks:
             await hook(self)
-        self.pending = asyncio.create_task(self._reply(opening=True))
+        # If the caller is mid-sentence, answering what they say beats talking over them; the opening is only a fallback.
+        self.pending = asyncio.create_task(self._reply(opening=True, wait_s=self.OPENING_WAIT_S if self.caller_talking else 0))
 
     async def on_takeback(self, room: CallRoom, role: str, msg: dict) -> None:
         if role != "receiver" or not self.active:
@@ -194,9 +203,12 @@ class CallPersona:
     # ---- conversation ----------------------------------------------------------------------------
 
     async def on_final(self, room: CallRoom, turn: dict) -> None:
-        if not self.active or turn["channel"] != "caller":
+        if turn["channel"] != "caller":
             return
-        self.history.append({"role": "user", "content": turn["text"]})
+        self.caller_talking = False
+        self.history.append({"role": "user", "content": turn["text"]})  # from before a takeover too: the persona needs the story so far
+        if not self.active:
+            return
         if self.pending and not self.pending.done():
             self.pending.cancel()  # the scammer said more: answer the latest thing only
         self.pending = asyncio.create_task(self._reply(turn=turn))
@@ -204,7 +216,10 @@ class CallPersona:
     async def on_speech_started(self, room: CallRoom, channel: str, ev: dict) -> None:
         """The scammer starts talking over the persona: stop talking, like a polite person would. If a reply is only
         being prepared (not yet speaking) drop it: the caller is not done, and their next final will trigger one."""
-        if channel != "caller" or not self.active:
+        if channel != "caller":
+            return
+        self.caller_talking = True
+        if not self.active:
             return
         if self.speaking:
             await self._interrupt("caller_speech")
@@ -221,11 +236,13 @@ class CallPersona:
             await self.room.flush_playback(role_, SOURCE_PERSONA)
         self.room.log_event("persona_interrupted", {"why": why}, t0)
 
-    async def _reply(self, turn: dict | None = None, opening: bool = False) -> None:
+    async def _reply(self, turn: dict | None = None, opening: bool = False, wait_s: float = 0) -> None:
         room = self.room
         try:
             if not opening:
                 await asyncio.sleep(self.REPLY_DELAY_S)
+            elif wait_s:
+                await asyncio.sleep(wait_s)
             t_start = time.monotonic()
             llm_ms = None
             if opening:
@@ -234,6 +251,10 @@ class CallPersona:
                 try:
                     items = room.evidence.valid_items() if room.evidence is not None else []
                     prompt = system_prompt(self.s) + "\n\nNotes for this moment: " + progress_note(items)
+                    unspelled = next((i["value"] for i in items if i["type"] == "upi_id" and i["value"] not in self.spelled), None)
+                    if unspelled:
+                        self.spelled.add(unspelled)
+                        prompt += spell_note(unspelled)
                     msgs = [{"role": "system", "content": prompt}] + self.history[-12:]
                     raw, llm_ms = await self.persona.llm.chat(
                         self.s.persona_model, msgs, max_tokens=120, temperature=0.7, timeout=6,

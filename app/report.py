@@ -55,6 +55,11 @@ class Report:
     missing: list[str] = field(default_factory=list)
 
 
+KNOWN_UPI_HANDLES = {"okaxis", "oksbi", "okhdfcbank", "okicici", "ybl", "ibl", "axl", "paytm", "pthdfc", "ptaxis", "ptsbi", "ptyes",
+                     "upi", "apl", "sbi", "hdfcbank", "icici", "axisbank", "kotak", "yesbank", "barodampay", "pnb", "unionbank",
+                     "cnrb", "idfcbank", "indus", "federal", "freecharge", "airtel", "jupiteraxis", "fbl", "waicici", "wasbi"}
+
+
 def _ist(ts: float | None) -> str | None:
     return datetime.fromtimestamp(ts, IST).strftime("%d %b %Y, %H:%M:%S IST") if ts else None
 
@@ -114,6 +119,11 @@ def build(store, call_id: str, notes: str = "") -> Report:
         otp_shared=None if call["otp_shared"] is None else bool(call["otp_shared"]), notes=notes)
     if not evidence.get("upi_id") and not evidence.get("bank_account"):
         r.missing.append("No UPI ID or bank account was stated by the caller on this call.")
+    for upi in evidence.get("upi_id", []):
+        handle = upi.rsplit("@", 1)[-1].lower()
+        doubt = "" if handle in KNOWN_UPI_HANDLES else f" \"@{handle}\" is not a bank handle Kavach knows, so it may be misheard."
+        r.missing.append(f"The UPI ID {upi} was written from speech recognition.{doubt} Check its spelling against the transcript "
+                         "and any message from the caller before filing.")
     if call["caller_number"] is None:
         r.missing.append("The caller's number was not captured; add it from your phone's call log.")
     return r

@@ -296,7 +296,8 @@ def takeover_check() -> dict:
     call_id = latest[0]["id"]
     events = store.events(call_id)
     wanted = {"takeover": [], "persona_sent": [], "persona_guard": [], "persona_error": [], "client_voice_route": [],
-              "client_warning_mute": [], "warning_start": []}
+              "client_warning_mute": [], "client_warning_sound": [], "warn_first_audio": [], "warn_done": [],
+              "client_hang_up": [], "hang_up_failed": []}
     for e in events:
         if e["type"] in wanted:
             wanted[e["type"]].append(e["payload"])
@@ -313,6 +314,11 @@ async def call_control(call_id: str, body: dict):
         raise HTTPException(404, "No such running call")
     if body.get("type") not in ("takeover", "takeback", "end_call"):
         raise HTTPException(400, "Unknown command")
+    if body["type"] == "end_call" and room.phone_call:
+        result = await room.hang_up()
+        if not (result or "").startswith("ok"):
+            room.log_event("hang_up_failed", {"result": result})
+            raise HTTPException(502, "The phone could not end the call")
     await handle_control(room, "receiver", {"type": body["type"]})
     return {"ok": True}
 
@@ -362,8 +368,36 @@ async def handle_control(room, role: str, msg: dict) -> None:
     elif kind == "client_event":
         # Browser-side timings (e.g. playback actually started) for latency logging.
         room.log_event(f"client_{msg.get('name', 'event')}", {"role": role, **msg.get("payload", {})})
-        if msg.get("name") in ("voice_route", "warning_mute"):
+        if msg.get("name") in ("voice_route", "warning_mute", "warning_sound", "hang_up"):
             logging.getLogger("kavach.phone").info("PHONE %s call=%s %s", msg["name"], room.call_id, msg.get("payload"))
+        if msg.get("name") == "hang_up":
+            room.hang_up_reported(str(msg.get("payload", {}).get("result", "")))
+
+
+@app.websocket("/ws/phone")
+async def phone_socket(ws: WebSocket):
+    """Held open all the time by the phone's background service, so a family voice note reaches it with no call on."""
+    if not key_ok(ws.query_params.get("key")):
+        await ws.close(code=4403)
+        return
+    await ws.accept()
+    peer = Peer(ws)
+    rooms.phone = peer
+    log = logging.getLogger("kavach.phone")
+    log.info("PHONE link up")
+    try:
+        while True:
+            msg = await ws.receive()
+            if msg["type"] == "websocket.disconnect":
+                break
+            if msg.get("text") and json.loads(msg["text"]).get("type") == "note_received":
+                rooms.phone_heard.set()
+    except WebSocketDisconnect:
+        pass
+    finally:
+        if rooms.phone is peer:
+            rooms.phone = None
+            log.info("PHONE link down")
 
 
 @app.websocket("/ws/events/{call_id}")

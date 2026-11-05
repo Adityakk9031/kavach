@@ -1,5 +1,6 @@
 """The son's side: a Telegram voice note plays on Papa's phone (even after the call was cut); End-the-call button."""
 
+import asyncio
 import io
 import json
 import math
@@ -138,8 +139,9 @@ class FakeAlerter:
 
 
 class FakeRoom:
-    def __init__(self, delivered=True, warning_active=False):
+    def __init__(self, delivered=True, warning_active=False, phone_call=False, hang_up=None):
         self.played, self.ended, self.delivered, self.events = [], False, delivered, []
+        self.phone_call, self.hang_up_answer, self.hang_ups = phone_call, hang_up, 0
         self.barged = []
         self.warning = SimpleNamespace(active=warning_active, barge_in=self._barge)
 
@@ -155,6 +157,10 @@ class FakeRoom:
 
     async def end(self):
         self.ended = True
+
+    async def hang_up(self):
+        self.hang_ups += 1
+        return self.hang_up_answer
 
 
 def desk_for(room, audio=b"", chat="999"):
@@ -194,7 +200,7 @@ async def test_strangers_and_non_voice_messages_are_ignored_and_problems_are_exp
 
     desk2, alerter2, _ = desk_for(None)  # no call and no app connected
     await desk2.handle_message(voice_update())
-    assert "No call to send this to" in alerter2.said[-1]
+    assert "not connected to Kavach" in alerter2.said[-1]
 
     desk3, alerter3, _ = desk_for(FakeRoom(), audio=b"garbage")
     await desk3.handle_message(voice_update())
@@ -220,6 +226,61 @@ async def test_the_end_button_ends_the_call_and_invites_a_voice_note():
     assert room.ended and alerter.answers == ["Ending the call."]
     assert "Send a voice note now" in alerter.said[-1]
     assert ("ended_from_telegram", {}) in room.events
+
+
+async def test_the_end_button_drops_the_real_phone_call_and_says_so_only_when_the_phone_confirms():
+    room = FakeRoom(phone_call=True, hang_up="ok telecom")
+    desk, alerter, st = desk_for(room)
+    await desk.handle_control(control_press(st.make_answer_token("live1")))
+    assert room.hang_ups == 1 and room.ended and "was ended" in alerter.said[-1]
+
+
+@pytest.mark.parametrize("answer", ["failed no Shizuku", None])
+async def test_if_the_phone_cannot_hang_up_the_family_is_told_and_protection_carries_on(answer):
+    room = FakeRoom(phone_call=True, hang_up=answer)
+    desk, alerter, st = desk_for(room)
+    await desk.handle_control(control_press(st.make_answer_token("live1")))
+    assert not room.ended and "could not cut" in alerter.said[-1] and "was ended" not in alerter.said[-1]
+
+
+async def test_a_real_call_room_asks_the_phone_and_waits_for_its_answer():
+    FakeStt.instances.clear()
+    room = CallRoom("apk-1", FakeStt, Store(":memory:"))
+    receiver = FakeWs()
+    await room.join("receiver", receiver)
+    assert room.phone_call
+    waiting = asyncio.create_task(room.hang_up())
+    await asyncio.sleep(0)
+    assert receiver.text[-1]["type"] == "hang_up"
+    room.hang_up_reported("ok key")
+    assert await waiting == "ok key"
+    assert await room.hang_up(wait_s=0.01) is None  # the phone never answered
+
+
+class PhoneLink:
+    def __init__(self, registry, acknowledges=True):
+        self.registry, self.acknowledges, self.frames = registry, acknowledges, []
+
+    async def send_bytes(self, data):
+        self.frames.append(data)
+        if self.acknowledges:
+            self.registry.phone_heard.set()
+        return True
+
+
+async def test_with_no_call_on_a_voice_note_goes_over_the_phones_always_on_link():
+    reg = RoomRegistry(NoStt, Store(":memory:"), 16000)
+    reg.phone = PhoneLink(reg)
+    desk = FamilyDesk(FakeAlerter(voice_note(1.0)), reg.store, reg, Settings(_env_file=None, telegram_chat_id="999"))
+    await desk.handle_message(voice_update())
+    assert reg.phone.frames and all(f[0] == SOURCE_FAMILY for f in reg.phone.frames)
+    assert "Playing on Papa's phone" in desk.alerter.said[-1]
+
+
+async def test_a_dead_phone_link_is_not_reported_as_played():
+    reg = RoomRegistry(NoStt, Store(":memory:"), 16000)
+    reg.phone = PhoneLink(reg, acknowledges=False)
+    assert await reg.play_on_phone(chunk(ms=1000), wait_s=0.01) is False
 
 
 async def test_the_end_button_ignores_strangers_and_calls_that_are_already_over():

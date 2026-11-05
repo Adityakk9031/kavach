@@ -97,6 +97,7 @@ class CallRoom:
         self.store = store
         self.sample_rate = sample_rate
         self.parties: dict[str, Peer] = {}
+        self.hang_up_result: asyncio.Future | None = None
         self.stt: dict[str, Stt] = {}
         self.clocks: dict[str, AudioClock] = {}
         self.listeners: set[Peer] = set()
@@ -209,6 +210,28 @@ class CallRoom:
         peer = self.parties.get(role)
         if peer:
             await peer.send_bytes(bytes([source]) + pcm)
+
+    @property
+    def phone_call(self) -> bool:
+        """A real phone call heard by the phone's background listener, rather than a call between two browser tabs."""
+        return self.call_id.startswith("apk-")
+
+    async def hang_up(self, wait_s: float = 5.0) -> str | None:
+        """Ask the person's phone to drop the real call. Returns what the phone reports ("ok ..." once the call has really
+        gone), or None if it did not answer in time."""
+        peer = self.parties.get("receiver")
+        if peer is None:
+            return None
+        self.hang_up_result = asyncio.get_running_loop().create_future()
+        await peer.send_text(json.dumps({"type": "hang_up"}))
+        try:
+            return await asyncio.wait_for(self.hang_up_result, wait_s)
+        except asyncio.TimeoutError:
+            return None
+
+    def hang_up_reported(self, result: str) -> None:
+        if self.hang_up_result is not None and not self.hang_up_result.done():
+            self.hang_up_result.set_result(result)
 
     async def play_family(self, pcm: bytes) -> bool:
         """The family's voice note, to the protected person's phone only. Works after the call has ended too (the person's
@@ -331,6 +354,25 @@ class RoomRegistry:
         self.stt_factory = stt_factory
         self.store = store
         self.sample_rate = sample_rate
+        self.phone: Peer | None = None  # the phone's always-on link, for family voice notes with no call on
+        self.phone_heard = asyncio.Event()
+
+    async def play_on_phone(self, pcm: bytes, wait_s: float = 5.0) -> bool:
+        """Send a family voice note over the phone's always-on link. True only once the phone says the note arrived, since
+        a link that has quietly died still accepts what is written to it."""
+        peer = self.phone
+        if peer is None:
+            return False
+        self.phone_heard.clear()
+        step = self.sample_rate * 2  # one second per frame
+        for i in range(0, len(pcm), step):
+            if not await peer.send_bytes(bytes([SOURCE_FAMILY]) + pcm[i:i + step]):
+                return False
+        try:
+            await asyncio.wait_for(self.phone_heard.wait(), wait_s)
+            return True
+        except asyncio.TimeoutError:
+            return False
 
     def family_target(self, grace_s: float = 900.0) -> "CallRoom | None":
         """The call a family message goes to: a running call whose person's app is connected, else (the 'cut the call, then
