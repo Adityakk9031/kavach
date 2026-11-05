@@ -84,7 +84,8 @@ export function reduce(s: CallState, m: any): CallState {
     case 'takeover':
       return { ...s, takeover: m.state === 'on' };
     case 'persona':
-      return m.text ? { ...s, personaText: m.text } : s;
+      return m.text ? { ...s, personaText: m.text,
+        transcript: [...s.transcript, { channel: 'kavach', text: m.text, final: true }].slice(-60) } : s;
     case 'evidence': {
       const have = new Set(s.evidence.map((e) => `${e.type}|${e.normalized ?? e.value}`));
       const fresh = (m.items as Evidence[]).filter((e) => !have.has(`${e.type}|${e.normalized ?? e.value}`));

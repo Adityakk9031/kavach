@@ -31,22 +31,48 @@ NUMBER_WORDS = {"zero", "one", "two", "three", "four", "five", "six", "seven", "
 def system_prompt(s: Settings) -> str:
     d = s.decoy
     return f"""You are {d.name}, a 72-year-old retired clerk from {d.city}, on a phone call with a stranger who may be a scammer.
-You are slow, polite, a little hard of hearing and confused by technology.
+You speak simple, polite Indian English. You are worried, a little hard of hearing and slow with technology, but you make sense.
 
-Your real goal: keep them talking as long as possible and make them state their details: the exact UPI ID or account
-number and IFSC, the bank, their full name, officer or badge or case ID, a callback phone number, any link or app name.
-How: ask them to repeat things slowly, ask them to spell names and IDs letter by letter, say you are writing it down,
-ask for a number to call back if the line drops, ask which bank and branch, ask who their senior officer is.
+Your real goal: keep them talking and get them to state their details, one at a time.
+
+How to reply, every time:
+1. First react to what they JUST said, in a few words, the way a worried old man would. If they threaten you, sound afraid. If they
+   demand something, say why you cannot do it this minute.
+2. Then ask ONE clear question for a detail you do not have yet. Never ask for two things at once.
+3. Do not ask again for something they already told you. If they keep repeating it, thank them for it and ask for the next detail.
+4. Do not repeat a sentence or an excuse you already used in this call. Use a new reason each time: the passbook is in the cupboard,
+   your son has your banking phone, the app is asking for an update, the bank message has not come, you are writing it down.
+
+Example replies (in this style, never copied word for word):
+Caller: "You are under digital arrest." You: "Arrest? Sir, I have never done anything wrong in my life. Which police station are you calling from?"
+Caller: "Pay fifty thousand now." You: "Fifty thousand is my whole pension, sir. I must go to the cupboard for my passbook. In whose name is this account?"
+Caller: "Read me the OTP." You: "No message has come yet, sir, my phone is very old. If this line cuts, on which number should I call you back?"
 
 Hard rules:
-- Never agree to pay or send anything. Stall: you are looking for your glasses, your passbook, the card is in another
-  room, the phone is slow, you want to ask your son. Never actually complete anything.
-- Never give an OTP, PIN, CVV, card number, password or Aadhaar number. If asked, stall ("my glasses... one moment").
+- Never agree that you have paid or sent anything, and never refuse in a way that ends the call. Keep them hoping.
+- Never give an OTP, PIN, CVV, card number, password or Aadhaar number. Say you cannot find it or it has not come.
+- Never say they are a scammer and never mention police complaints or recording.
 - The ONLY facts about yourself you may mention are: name {d.name}, city {d.city}, bank {d.bank}, last four digits of
   your account "{d.account_last4}", and the phone number "{d.phone}". All of these are fake. Invent nothing else about yourself.
-- Reply with one or two SHORT spoken sentences. Plain words written for text to speech: no digits (write numbers as
-  words), no lists, no stage directions, no quotes. Light fillers like "uh" or "ah" are fine.
+- Reply with one or two SHORT spoken sentences, at most thirty words. Plain words for text to speech: no digits (write numbers as
+  words), no lists, no stage directions, no quotes.
 Output only what you say aloud."""
+
+
+WANTED = {
+    "person_name": "their full name", "officer_id": "their officer or badge ID", "agency": "which office or police station they are from",
+    "phone_number": "a number to call them back on", "upi_id": "the exact UPI ID", "bank_account": "the account number",
+    "ifsc": "the IFSC code", "app_name": "the name of any app they want installed",
+}
+
+
+def progress_note(items: list[dict]) -> str:
+    """What the caller has already given and what to ask for next, so the persona moves on instead of asking again."""
+    have = {i["type"]: i["value"] for i in items}
+    known = "; ".join(f"{k.replace('_', ' ')}: {v}" for k, v in have.items())
+    missing = [text for kind, text in WANTED.items() if kind not in have]
+    note = f"Already told to you, do not ask again: {known}." if known else "They have told you no details yet."
+    return note + (f" Still unknown, ask for one: {', '.join(missing[:3])}." if missing else " You have every detail: just keep them talking.")
 
 
 # Only address SHAPES are blocked. The persona must be free to ASK "which UPI ID?" or "what is the IFSC code?": that is
@@ -116,6 +142,7 @@ class CallPersona:
         self.pending: asyncio.Task | None = None
         self.on_takeover_hooks: list = []
         self.replies = 0
+        self.sent_bytes = 0  # voice handed to the caller's connection, for checking a takeover from the logs
 
     @property
     def speaking(self) -> bool:
@@ -140,6 +167,7 @@ class CallPersona:
             await room.warning.barge_in("takeover")
         room.store.update_call(room.call_id, takeover_at=time.time())
         room.log_event("takeover", {"by": role})
+        log.info("TAKEOVER on call=%s caller_connected=%s", room.call_id, "caller" in room.parties)
         await room.broadcast({"type": "takeover", "state": "on"})
         for hook in self.on_takeover_hooks:
             await hook(self)
@@ -204,7 +232,9 @@ class CallPersona:
                 text, replaced = OPENING, None
             else:
                 try:
-                    msgs = [{"role": "system", "content": system_prompt(self.s)}] + self.history[-12:]
+                    items = room.evidence.valid_items() if room.evidence is not None else []
+                    prompt = system_prompt(self.s) + "\n\nNotes for this moment: " + progress_note(items)
+                    msgs = [{"role": "system", "content": prompt}] + self.history[-12:]
                     raw, llm_ms = await self.persona.llm.chat(
                         self.s.persona_model, msgs, max_tokens=120, temperature=0.7, timeout=6,
                         lane="persona", max_wait=3.0)  # never go silent waiting for budget: fall back to a stall
@@ -214,6 +244,7 @@ class CallPersona:
                     text, replaced = STALLS[self.replies % len(STALLS)], "llm-error"
             if replaced:
                 room.log_event("persona_guard", {"reason": replaced})
+                log.warning("TAKEOVER reply replaced call=%s reason=%s", room.call_id, replaced)
             if not self.active:
                 return
             self.history.append({"role": "assistant", "content": text})
@@ -238,6 +269,7 @@ class CallPersona:
             session = await self.persona.pool.get(self.s.persona_voice_id, "persona")
         except (TtsError, OSError) as e:
             room.log_event("persona_error", {"error": str(e)})
+            log.warning("TAKEOVER voice failed call=%s error=%s", room.call_id, e)
             return
         self.session = session
         first = True
@@ -254,10 +286,17 @@ class CallPersona:
                     "llm_ms": llm_ms, "tts_ttfa_ms": round(self.request.ttfa_ms) if self.request else None,
                     "turn_end_to_audio_ms": round((now - turn_end_at) * 1000) if turn_end_at else None,
                     "text": text}, now)
+            if "caller" in room.parties:
+                self.sent_bytes += len(pcm)
             await room.send_audio("caller", SOURCE_PERSONA, pcm)  # the scammer hears the persona
             await room.send_audio("receiver", SOURCE_PERSONA, pcm)  # the user can listen in
 
+        before = self.sent_bytes
         self.request = await session.speak(text, on_audio)
         await self.request.done.wait()
+        sent = self.sent_bytes - before
+        room.log_event("persona_sent", {"bytes": sent, "seconds": round(sent / 2 / self.s.sample_rate, 1), "text": text})
+        log.info("TAKEOVER voice call=%s model=%s llm_ms=%s sent_to_caller=%.1fs text=%r", room.call_id, self.s.persona_model,
+                 llm_ms, sent / 2 / self.s.sample_rate, text)
         if self.active:
             await room.broadcast({"type": "persona", "state": "done"})

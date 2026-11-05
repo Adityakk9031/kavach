@@ -49,6 +49,7 @@ class KavachListenerService : AccessibilityService() {
     @Volatile private var recording = false
     @Volatile private var playingUntil = 0L
     private var track: AudioTrack? = null
+    private val playQueue = java.util.concurrent.LinkedBlockingQueue<ByteArray>()
     private var card: LinearLayout? = null
     private var statusText: TextView? = null
     private var wordsText: TextView? = null
@@ -63,9 +64,11 @@ class KavachListenerService : AccessibilityService() {
             if (active && !inCall) startCall() else if (!active && inCall) stopCall()
             if (inCall && shell != null) {
                 val state = (shellCall(KavachShell.STATUS) ?: "").split("|")
-                voiceInCall = state.getOrNull(1) == "yes"
-                current = "Direct " + state[0] + if (state.size > 1) "  |  voice " + (if (voiceInCall) "in call" else "speaker") else ""
+                voiceInCall = state.getOrNull(1)?.startsWith("yes") == true
+                state.getOrNull(1)?.let { if (it != reportedRoute && it != "wait") { reportedRoute = it; report("voice_route", "route", it) } }
+                current = "Direct " + state[0] + if (state.size > 1) "  |  voice " + state[1].take(44) else ""
             }
+            if (silenced && System.currentTimeMillis() > playingUntil + 400) setSilenced(false)
             if (inCall) { statusText?.text = "$current  |  ${peak * 100 / 32767}%  |  risk $risk"; peak = 0 }
             main.postDelayed(this, 1000)
         }
@@ -84,14 +87,61 @@ class KavachListenerService : AccessibilityService() {
 
     @Volatile private var voiceInCall = false
     @Volatile private var shellOut: java.io.OutputStream? = null
-    private var takenOver = false
+    @Volatile private var takenOver = false
     private var takeButton: Button? = null
 
     private fun setTakeover(on: Boolean) {
         takenOver = on
         takeButton?.text = if (on) "Take back" else "Let Kavach take over"
         // Without a way into the call itself, the phone's speaker is the only way the caller can hear Kavach.
-        if (!voiceInCall) (getSystemService(Context.AUDIO_SERVICE) as AudioManager).isSpeakerphoneOn = on
+        // The mic mixes into the call, so the user's own voice is cut while Kavach talks directly
+        if (voiceInCall) shellCall(KavachShell.MUTE) { it.writeInt(if (on) 1 else 0) }
+        else {
+            (getSystemService(Context.AUDIO_SERVICE) as AudioManager).isSpeakerphoneOn = on
+            shellCall(KavachShell.SPEAKER) { it.writeInt(if (on) 1 else 0) }
+        }
+    }
+
+    // The warning and family notes play on the media stream, so the caller's voice can be muted on the call stream under them.
+    // The user's mic goes off too: nothing of the warning can reach the caller, even on speaker.
+    @Volatile private var silenced = false
+    private var warnTrack: AudioTrack? = null
+    private val warnQueue = java.util.concurrent.LinkedBlockingQueue<ByteArray>()
+
+    private fun setSilenced(on: Boolean) {
+        if (silenced == on) return
+        silenced = on
+        val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val result = shellCall(KavachShell.SILENCE) { it.writeInt(if (on) 1 else 0) }
+        if (!takenOver) shellCall(KavachShell.MUTE) { it.writeInt(if (on) 1 else 0) }
+        if (on) {
+            savedMusic = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
+            audio.setStreamVolume(AudioManager.STREAM_MUSIC, audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC) * 4 / 5, 0)
+            current = "Warning  |  caller muted: " + (result ?: "no Shizuku")
+            report("warning_mute", "result", result ?: "no Shizuku")
+        } else if (savedMusic >= 0) {
+            audio.setStreamVolume(AudioManager.STREAM_MUSIC, savedMusic, 0)
+            savedMusic = -1
+        }
+    }
+    private var savedMusic = -1
+    private var reportedRoute = ""
+
+    // Tells the server what the phone actually did, so a test call can be checked from the logs
+    private fun report(name: String, field: String, value: String) {
+        val payload = JSONObject().put(field, value)
+        receiver?.send(JSONObject().put("type", "client_event").put("name", name).put("payload", payload).toString())
+    }
+
+    private fun openWarnTrack(): AudioTrack {
+        val minOut = AudioTrack.getMinBufferSize(16000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
+        val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val t = AudioTrack(AudioManager.STREAM_MUSIC, 16000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, minOut * 4, AudioTrack.MODE_STREAM)
+        // At the ear, so it stays private, unless the user chose speaker
+        if (!audio.isSpeakerphoneOn) audio.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
+            .firstOrNull { it.type == android.media.AudioDeviceInfo.TYPE_BUILTIN_EARPIECE }?.let { t.setPreferredDevice(it) }
+        t.play()
+        return t
     }
 
     private fun shizukuReady() = try {
@@ -120,7 +170,7 @@ class KavachListenerService : AccessibilityService() {
         return try {
             write(data)
             shell?.transact(code, data, reply, 0)
-            if (code == KavachShell.STATUS) reply.readString() else null
+            if (code == KavachShell.STATUS || code == KavachShell.SILENCE) reply.readString() else null
         } catch (_: Exception) { null } finally { data.recycle(); reply.recycle() }
     }
 
@@ -160,14 +210,32 @@ class KavachListenerService : AccessibilityService() {
     private fun startCall() {
         inCall = true
         risk = 0
+        reportedRoute = ""
         showCard()
         val id = "apk-" + System.currentTimeMillis()
         val base = server.replace("https://", "wss://").trimEnd('/')
         caller = http.newWebSocket(Request.Builder().url("$base/ws/call/$id/caller?mode=live&key=$key").build(), Audio())
         receiver = http.newWebSocket(Request.Builder().url("$base/ws/call/$id/receiver?mode=live&key=$key").build(), Audio(true))
-        val minOut = AudioTrack.getMinBufferSize(16000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
-        track = AudioTrack(AudioManager.STREAM_MUSIC, 16000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
-            minOut * 4, AudioTrack.MODE_STREAM).also { it.play() }
+        // On the call's own audio path, so the warning stays private and the user can listen to a takeover
+        track = callTrack()
+        playQueue.clear()
+        warnQueue.clear()
+        shellCall(KavachShell.SILENCE) { it.writeInt(0) }
+        warnTrack = openWarnTrack()
+        thread {
+            val out = warnTrack
+            while (inCall && out != null) {
+                val pcm = warnQueue.poll(500, java.util.concurrent.TimeUnit.MILLISECONDS) ?: continue
+                try { out.write(pcm, 0, pcm.size) } catch (_: Exception) { break }
+            }
+        }
+        thread {
+            val out = track
+            while (inCall && out != null) {
+                val pcm = playQueue.poll(500, java.util.concurrent.TimeUnit.MILLISECONDS) ?: continue
+                try { out.write(pcm, 0, pcm.size) } catch (_: Exception) { break }
+            }
+        }
         startMic()
     }
 
@@ -184,6 +252,12 @@ class KavachListenerService : AccessibilityService() {
     )
 
     // Test build: tries each audio source for a few seconds during the call, and stays on the first one that hears sound.
+    private fun callTrack(): AudioTrack {
+        val minOut = AudioTrack.getMinBufferSize(16000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
+        return AudioTrack(AudioManager.STREAM_VOICE_CALL, 16000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
+            minOut * 4, AudioTrack.MODE_STREAM).also { it.play() }
+    }
+
     private fun startMic() {
         recording = true
         thread {
@@ -255,6 +329,7 @@ class KavachListenerService : AccessibilityService() {
         inCall = false
         recording = false
         if (takenOver) setTakeover(false)
+        setSilenced(false)
         if (shell != null) {
             shellCall(KavachShell.STOP)
             try { Shizuku.unbindUserService(shellArgs, shellConnection, true) } catch (_: Exception) {}
@@ -263,8 +338,9 @@ class KavachListenerService : AccessibilityService() {
         shellSocket?.let { try { it.close() } catch (_: Exception) {} }
         receiver?.send("{\"type\":\"end_call\"}")
         main.postDelayed({ caller?.close(1000, null); receiver?.close(1000, null) }, 1500)
-        track?.let { try { it.stop(); it.release() } catch (_: Exception) {} }
+        listOf(track, warnTrack).forEach { t -> t?.let { try { it.stop(); it.release() } catch (_: Exception) {} } }
         track = null
+        warnTrack = null
         card?.let { (getSystemService(WINDOW_SERVICE) as WindowManager).removeView(it) }
         card = null
     }
@@ -280,10 +356,12 @@ class KavachListenerService : AccessibilityService() {
             val ms = pcm.size / 32L
             if (source == 2 && voiceInCall) {
                 val out = shellOut
-                if (out != null) { try { voiceWriter.execute { out.write(pcm) } } catch (_: Exception) {}; return }
+                if (out != null) try { voiceWriter.execute { try { out.write(pcm) } catch (_: Exception) {} } } catch (_: Exception) {}
             }
+            if (source == 2) { playQueue.put(pcm); return }
             playingUntil = maxOf(playingUntil, System.currentTimeMillis()) + ms
-            track?.write(pcm, 0, pcm.size, AudioTrack.WRITE_NON_BLOCKING)
+            main.post { setSilenced(true) }
+            warnQueue.put(pcm)
         }
         override fun onMessage(webSocket: WebSocket, text: String) {
             if (!events) return
@@ -291,6 +369,12 @@ class KavachListenerService : AccessibilityService() {
             when (ev.optString("type")) {
                 "detection" -> risk = ev.optDouble("risk_cum", ev.optDouble("risk", risk.toDouble())).toInt()
                 "transcript" -> if (ev.optBoolean("final")) showWords(ev.optString("text"))
+                "flush_playback" -> {
+                    val persona = ev.optInt("source") == 2
+                    (if (persona) playQueue else warnQueue).clear()
+                    (if (persona) track else warnTrack)?.let { try { it.pause(); it.flush(); it.play() } catch (_: Exception) {} }
+                    if (!persona) { playingUntil = 0L; main.post { setSilenced(false) } }
+                }
                 "takeover" -> { val on = ev.optString("state") == "on"; main.post { setTakeover(on) } }
                 "persona" -> if (ev.optString("text").isNotEmpty()) showWords("Kavach says: " + ev.optString("text"))
                 "warning" -> if (ev.optString("state") == "speaking") showWords("This looks like a scam. " + ev.optString("text"))

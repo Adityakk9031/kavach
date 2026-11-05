@@ -154,7 +154,7 @@ export function ProtectScreen({ settings, code, rehearsal, listen = false, watch
         <Text style={T.h2}>What was said</Text>
         {s.transcript.slice(-8).map((t, i) => (
           <Text key={i} style={{ marginTop: 6, color: t.channel === 'caller' ? C.caller : C.receiver, opacity: t.final ? 1 : 0.6 }}>
-            {t.channel === 'caller' ? 'Caller' : 'You'}: <Text style={{ color: C.ink }}>{t.text}</Text>
+            {t.channel === 'caller' ? 'Caller' : t.channel === 'kavach' ? 'Kavach' : 'You'}: <Text style={{ color: C.ink }}>{t.text}</Text>
           </Text>
         ))}
         {s.transcript.length === 0 ? <Text style={T.muted}>Nothing yet.</Text> : null}

@@ -287,6 +287,24 @@ def live_call() -> dict:
     return {"call_id": room.call_id if room else None}
 
 
+@app.get("/api/calls/takeover-check")
+def takeover_check() -> dict:
+    """What the latest background-listener call did: Kavach's lines and voice sent, and what the phone reported back."""
+    latest = store.query("SELECT id FROM calls WHERE id LIKE 'apk-%' ORDER BY rowid DESC LIMIT 1")
+    if not latest:
+        return {"call_id": None}
+    call_id = latest[0]["id"]
+    events = store.events(call_id)
+    wanted = {"takeover": [], "persona_sent": [], "persona_guard": [], "persona_error": [], "client_voice_route": [],
+              "client_warning_mute": [], "warning_start": []}
+    for e in events:
+        if e["type"] in wanted:
+            wanted[e["type"]].append(e["payload"])
+    room = rooms.rooms.get(call_id)
+    return {"call_id": call_id, "running": room is not None and not room.ended, "seconds_sent_to_caller":
+            round(sum(p.get("seconds", 0) for p in wanted["persona_sent"]), 1), **wanted}
+
+
 @app.post("/api/calls/{call_id}/control")
 async def call_control(call_id: str, body: dict):
     """Hand over, take back or end from the app, which watches the call instead of being a party on it."""
@@ -344,6 +362,8 @@ async def handle_control(room, role: str, msg: dict) -> None:
     elif kind == "client_event":
         # Browser-side timings (e.g. playback actually started) for latency logging.
         room.log_event(f"client_{msg.get('name', 'event')}", {"role": role, **msg.get("payload", {})})
+        if msg.get("name") in ("voice_route", "warning_mute"):
+            logging.getLogger("kavach.phone").info("PHONE %s call=%s %s", msg["name"], room.call_id, msg.get("payload"))
 
 
 @app.websocket("/ws/events/{call_id}")

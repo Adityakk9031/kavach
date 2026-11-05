@@ -1,5 +1,6 @@
 """The app finds the phone's background call and sends it commands, without being a party on it."""
 
+import time
 from types import SimpleNamespace
 
 import pytest
@@ -47,3 +48,17 @@ def test_control_runs_takeover_and_refuses_the_rest(client):
     assert room.takeover is False
     assert client.post("/api/calls/apk-1/control", json={"type": "other"}).status_code == 400
     assert client.post("/api/calls/nope/control", json={"type": "takeover"}).status_code == 404
+
+
+def test_takeover_check_reports_the_latest_listener_call(client):
+    call_id = f"apk-check-{time.time_ns()}"
+    main.store.start_call(call_id)
+    main.store.add_event(call_id, "takeover", 1.0, {"by": "receiver"})
+    main.store.add_event(call_id, "persona_sent", 2.0, {"bytes": 64000, "seconds": 2.0, "text": "Hello?"})
+    main.store.add_event(call_id, "client_voice_route", 3.0, {"route": "yes telephony>18"})
+    body = client.get("/api/calls/takeover-check").json()
+    assert body["call_id"] == call_id
+    assert body["running"] is False
+    assert body["seconds_sent_to_caller"] == 2.0
+    assert body["persona_sent"][0]["text"] == "Hello?"
+    assert body["client_voice_route"][0]["route"] == "yes telephony>18"

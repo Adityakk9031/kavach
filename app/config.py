@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     detector_model: str = "qwen3.5-4b-32k-fast"
     detector_reasoning_effort: str = ""  # only sent when set and supported
     detector_fallback_model: str = "gemma-4-31b"
-    persona_model: str = "qwen3.5-4b-32k-fast"
+    persona_model: str = "gemma-4-31b"
     script_gen_model: str = "gemma-4-31b"
 
     # --- voices ---
