@@ -39,6 +39,13 @@ def test_live_call_finds_the_newest_running_listener_call_only(client):
     assert client.get("/api/calls/live").json()["call_id"] is None
 
 
+def test_phone_status_says_whether_the_phone_is_linked(client, monkeypatch):
+    monkeypatch.setattr(main.rooms, "phone", None)
+    assert client.get("/api/phone").json() == {"connected": False}
+    monkeypatch.setattr(main.rooms, "phone", object())
+    assert client.get("/api/phone").json() == {"connected": True}
+
+
 def test_control_runs_takeover_and_refuses_the_rest(client):
     room = fake_room("apk-1")
     main.rooms.rooms["apk-1"] = room

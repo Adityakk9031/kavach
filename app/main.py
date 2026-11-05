@@ -22,7 +22,7 @@ from app.llm import LLM
 from app import report as report_mod
 from app.alerts import Alerter, CallAlerts
 from app.evidence import EvidenceCollector
-from app.family import FamilyDesk
+from app.family import DESK, FamilyDesk
 from app.finalize import handle_answer_callback, make_finalize
 from app.persona import Persona
 from app.pipeline import CallPipeline
@@ -287,6 +287,12 @@ def live_call() -> dict:
     return {"call_id": room.call_id if room else None}
 
 
+@app.get("/api/phone")
+def phone_status() -> dict:
+    """Whether the protected person's phone is linked to Kavach right now (its always-on connection), for the family's app."""
+    return {"connected": rooms.phone is not None}
+
+
 @app.get("/api/calls/takeover-check")
 def takeover_check() -> dict:
     """What the latest background-listener call did: Kavach's lines and voice sent, and what the phone reported back."""
@@ -302,8 +308,11 @@ def takeover_check() -> dict:
         if e["type"] in wanted:
             wanted[e["type"]].append(e["payload"])
     room = rooms.rooms.get(call_id)
+    desk = [{"type": e["type"], "ago_s": round(time.time() - e["ts_wall"]), **e["payload"]} for e in store.events(DESK)[-10:]]
     return {"call_id": call_id, "running": room is not None and not room.ended, "seconds_sent_to_caller":
-            round(sum(p.get("seconds", 0) for p in wanted["persona_sent"]), 1), **wanted}
+            round(sum(p.get("seconds", 0) for p in wanted["persona_sent"]), 1), **wanted,
+            "echo_removed": [e["payload"] for e in events if e["type"] == "echo_removed"],
+            "phone_link": rooms.phone is not None, "telegram": desk}
 
 
 @app.post("/api/calls/{call_id}/control")

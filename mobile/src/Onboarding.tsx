@@ -18,15 +18,13 @@ export function Onboarding({ onDone, startAtRoles = false, onCancel }: { onDone:
     <Screen top={72}>
       {!last ? (
         <View>
-          <View style={{ marginBottom: 28 }}><Logo size={56} /></View>
-          <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: C.accent + '22', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-            <Text style={{ color: C.accent, fontSize: 20, fontWeight: '800' }}>{PAGES[i].n}</Text>
-          </View>
+          <View style={{ marginBottom: 28 }}><Logo size={48} /></View>
+          <Text style={[T.muted, { marginBottom: 8 }]}>{PAGES[i].n} of {PAGES.length}</Text>
           <Text style={T.h1}>{PAGES[i].title}</Text>
           <Text style={[T.body, { color: C.muted, marginTop: 14, marginBottom: 30 }]}>{PAGES[i].body}</Text>
           <View style={{ flexDirection: 'row', marginBottom: 20 }}>
             {PAGES.map((_, k) => (
-              <View key={k} style={{ height: 6, borderRadius: 3, marginRight: 6, width: k === i ? 28 : 8, backgroundColor: k === i ? C.accent : C.line }} />
+              <View key={k} style={{ height: 4, borderRadius: 2, marginRight: 6, width: k === i ? 24 : 8, backgroundColor: k === i ? C.ink : C.line }} />
             ))}
           </View>
           <Btn label="Next" kind="primary" onPress={() => setI(i + 1)} />
@@ -38,20 +36,20 @@ export function Onboarding({ onDone, startAtRoles = false, onCancel }: { onDone:
       ) : (
         <View>
           <Pressable onPress={() => (onCancel ? onCancel() : setI(PAGES.length - 1))} style={{ paddingBottom: 18 }} hitSlop={12}>
-            <Text style={{ color: C.accent, fontSize: 16, fontWeight: '600' }}>‹ {onCancel ? 'Cancel' : 'Back'}</Text>
+            <Text style={{ color: C.ink, fontSize: 16, fontWeight: '600' }}>‹ {onCancel ? 'Cancel' : 'Back'}</Text>
           </Pressable>
-          <Text style={T.h1}>Who will use this phone?</Text>
-          <Text style={[T.muted, { marginTop: 8, marginBottom: 22 }]}>We will show you only what you need.</Text>
+          <Text style={T.h1}>Whose phone is this?</Text>
+          <Text style={[T.muted, { marginTop: 8, marginBottom: 22 }]}>You will see only what you need. You can change this later.</Text>
           <Pressable onPress={() => onDone('papa')} accessibilityRole="button">
-            <View style={{ backgroundColor: C.accent, borderRadius: 18, padding: 20, marginBottom: 14 }}>
-              <Text style={{ color: '#04251d', fontSize: 20, fontWeight: '800' }}>I want to be protected</Text>
-              <Text style={{ color: '#04251d', opacity: 0.75, marginTop: 4 }}>For a parent or anyone who gets scam calls.</Text>
+            <View style={{ backgroundColor: C.panel, borderColor: C.line, borderWidth: 1, borderRadius: 14, padding: 20, marginBottom: 12 }}>
+              <Text style={{ color: C.ink, fontSize: 20, fontWeight: '700' }}>This phone is the one to protect</Text>
+              <Text style={{ color: C.muted, marginTop: 4, fontSize: 15 }}>For Papa, Mummy or anyone who gets scam calls. Kavach runs on this phone.</Text>
             </View>
           </Pressable>
           <Pressable onPress={() => onDone('family')} accessibilityRole="button">
-            <View style={{ backgroundColor: C.panel, borderColor: C.line, borderWidth: 1, borderRadius: 18, padding: 20 }}>
-              <Text style={{ color: C.ink, fontSize: 20, fontWeight: '800' }}>I look after someone</Text>
-              <Text style={{ color: C.muted, marginTop: 4 }}>For a son, daughter or relative who wants to help from far away.</Text>
+            <View style={{ backgroundColor: C.panel, borderColor: C.line, borderWidth: 1, borderRadius: 14, padding: 20 }}>
+              <Text style={{ color: C.ink, fontSize: 20, fontWeight: '700' }}>I look after someone</Text>
+              <Text style={{ color: C.muted, marginTop: 4, fontSize: 15 }}>For the son or daughter. Record your voice for the warning and get the alerts.</Text>
             </View>
           </Pressable>
         </View>

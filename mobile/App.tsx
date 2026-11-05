@@ -62,7 +62,7 @@ export default function App() {
   } else if (screen.name === 'setup' || !settings) {
     body = <SetupScreen initial={settings} onSaved={(s) => { setSettings(s); home(); }} onBack={settings ? home : undefined} />;
   } else if (screen.name === 'voice') {
-    body = <VoiceScreen settings={settings} onBack={home} />;
+    body = <VoiceScreen settings={settings} person={prefs.role === 'family' ? 'son' : 'papa'} onBack={home} />;
   } else if (screen.name === 'protect') {
     body = <ProtectScreen key={screen.code} settings={settings} code={screen.code} rehearsal={screen.rehearsal} listen={screen.listen} watchCall={screen.watchCall} onBack={home} />;
   } else if (screen.name === 'caller') {
@@ -72,5 +72,5 @@ export default function App() {
       onCaller={(code, rehearsal) => setScreen({ name: 'caller', code, rehearsal })} onSettings={() => setScreen({ name: 'setup' })}
       onVoice={() => setScreen({ name: 'voice' })} />;
   }
-  return <View style={{ flex: 1, backgroundColor: C.bg }}><StatusBar style="light" />{body}</View>;
+  return <View style={{ flex: 1, backgroundColor: C.bg }}><StatusBar style="dark" />{body}</View>;
 }

@@ -297,6 +297,13 @@ class CallRoom:
         elif kind == "final":
             if not ev["text"].strip():
                 return
+            if channel == "caller" and self.persona is not None:
+                kept = self.persona.strip_echo(ev["text"])
+                if kept != ev["text"]:
+                    self.log_event("echo_removed", {"heard": ev["text"], "kept": kept}, now)
+                    if not kept:
+                        return
+                    ev = dict(ev, text=kept)
             latency_ms = None
             if ev["audio_end_ms"] is not None:
                 sent_at = self.clocks[channel].time_at(ev["audio_end_ms"]) if channel in self.clocks else None

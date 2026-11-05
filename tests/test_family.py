@@ -14,7 +14,7 @@ import pytest
 from app.alerts import Alerter, CallAlerts, control_keyboard
 from app.call_room import SOURCE_FAMILY, CallRoom, RoomRegistry
 from app.config import Settings
-from app.family import FamilyDesk, decode_voice_note
+from app.family import DESK, FamilyDesk, decode_voice_note
 from app.store import Store
 from tests.test_call_room import FakeStt, FakeWs, chunk
 from tests.test_tts_warner import NoStt
@@ -233,6 +233,8 @@ async def test_the_end_button_drops_the_real_phone_call_and_says_so_only_when_th
     desk, alerter, st = desk_for(room)
     await desk.handle_control(control_press(st.make_answer_token("live1")))
     assert room.hang_ups == 1 and room.ended and "was ended" in alerter.said[-1]
+    # the press and the phone's answer are kept, so a test call can be checked afterwards
+    assert [(e["type"], e["payload"].get("result")) for e in st.events(DESK)] == [("end_pressed", None), ("end_result", "ok telecom")]
 
 
 @pytest.mark.parametrize("answer", ["failed no Shizuku", None])
@@ -275,6 +277,7 @@ async def test_with_no_call_on_a_voice_note_goes_over_the_phones_always_on_link(
     await desk.handle_message(voice_update())
     assert reg.phone.frames and all(f[0] == SOURCE_FAMILY for f in reg.phone.frames)
     assert "Playing on Papa's phone" in desk.alerter.said[-1]
+    assert reg.store.events(DESK)[-1]["payload"] == {"result": "played", "via": "phone link"}
 
 
 async def test_a_dead_phone_link_is_not_reported_as_played():

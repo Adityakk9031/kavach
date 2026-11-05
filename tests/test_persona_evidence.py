@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import time
 from types import SimpleNamespace
 
 import pytest
@@ -160,12 +161,12 @@ class OnePool:
         return self.s
 
 
-async def make(server, llm_reply="Ah, can you say the account number slowly please?"):
+async def make(server, llm_reply="Ah, can you say the account number slowly please?", call_id="p1"):
     cfg = Settings(_env_file=None, tts_ws_url=server.url, assemblyai_api_key="k", persona_voice_id="aai-gunnar")
     s = TtsSession(cfg, "aai-gunnar")
     await s.start()
     llm = FakeLLM(llm_reply)
-    room = CallRoom("p1", NoStt, Store(":memory:"))
+    room = CallRoom(call_id, NoStt, Store(":memory:"))
     caller, receiver = FakeWs(), FakeWs()
     await room.join("caller", caller)
     await room.join("receiver", receiver)
@@ -242,6 +243,43 @@ async def test_caller_speaking_interrupts_the_persona(server):
     assert len(caller.binary) <= n + 1  # generation cancelled; at most a frame already on the wire
     assert [e for e in caller.text if e["type"] == "flush_playback" and e["source"] == SOURCE_PERSONA]
     assert any(e["type"] == "persona_interrupted" for e in room.store.events("p1"))
+    await s.close()
+
+
+async def test_on_a_phone_call_the_persona_hearing_itself_does_not_cut_it_off(server):
+    # A real phone captured Kavach's voice with the caller's side: every reply was cut after a second as "caller speech"
+    room, cp, llm, caller, receiver, s = await make(server, call_id="apk-1")
+    await room.control_handlers["takeover"](room, "receiver", {})
+    await wait_for(lambda: len(caller.binary) >= 3 and cp.speaking)
+    await cp.on_speech_started(room, "caller", {})
+    assert not any(e["type"] == "flush_playback" for e in caller.text)
+    assert not any(e["type"] == "persona_interrupted" for e in room.store.events("apk-1"))
+    await s.close()
+
+
+async def test_echo_of_the_persona_is_removed_from_caller_turns_on_phone_calls(server):
+    room, cp, llm, caller, receiver, s = await make(server, call_id="apk-2")
+    said = "Wait, please do not arrest me, sir. I am writing this address down now. Can you please spell the name of the bank slowly, letter by letter?"
+    cp.said.append((time.monotonic(), said))
+    # heard back word for word, or nearly: nothing of it is the caller
+    assert cp.strip_echo(said) == ""
+    assert cp.strip_echo("Naresh Nisha I am writing this address down now. Can you please name of the bank slowly letter by letter.") == ""
+    # the caller's real words after the echo are kept
+    assert cp.strip_echo(said + " The bank is Okbank and the UPI ID is customs dot clear.") == \
+        "The bank is Okbank and the UPI ID is customs dot clear."
+    assert cp.strip_echo("The bank is Okbank, sir.") == "The bank is Okbank, sir."
+    # the echo never reaches the transcript, the detector or the persona
+    finals = []
+    room.on_final_hooks.append(lambda r, t: finals.append(t) or asyncio.sleep(0))
+    await room._on_stt_event("caller", {"type": "final", "text": said, "audio_start_ms": 0, "audio_end_ms": 5000, "turn_order": 1})
+    assert finals == [] and any(e["type"] == "echo_removed" for e in room.store.events("apk-2"))
+    await s.close()
+
+
+async def test_echo_removal_leaves_browser_calls_alone(server):
+    room, cp, llm, caller, receiver, s = await make(server)
+    cp.said.append((time.monotonic(), OPENING))
+    assert cp.strip_echo(OPENING) == OPENING
     await s.close()
 
 

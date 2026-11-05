@@ -54,7 +54,7 @@ export function ProtectScreen({ settings, code, rehearsal, listen = false, watch
     <Screen bottom={offerTakeover ? 220 : 32}>
       {!s.ended && (
         <Pressable onPress={() => { bridge.current?.send({ type: 'stop' }); onBack(); }} hitSlop={12} style={{ paddingBottom: 14 }}>
-          <Text style={{ color: C.accent, fontSize: 16, fontWeight: '600' }}>‹ Home</Text>
+          <Text style={{ color: C.ink, fontSize: 16, fontWeight: '600' }}>‹ Home</Text>
         </Pressable>
       )}
       {ready && !watchCall && (
@@ -80,16 +80,16 @@ export function ProtectScreen({ settings, code, rehearsal, listen = false, watch
 
       {s.family && (
         <Panel style={{ backgroundColor: C.accent, borderColor: C.accent }}>
-          <Text style={[T.h2, { color: '#fff' }]}>A message from your family is playing</Text>
-          <Text style={{ color: '#fff', marginTop: 4 }}>{s.family.seconds} seconds. Listen to it now.</Text>
+          <Text style={[T.h2, { color: C.onDark }]}>A message from your family is playing</Text>
+          <Text style={{ color: C.onDark, marginTop: 4 }}>{s.family.seconds} seconds. Listen to it now.</Text>
         </Panel>
       )}
 
       {speaking && (
         <Panel style={{ backgroundColor: C.danger, borderColor: C.danger }}>
-          <Text style={[T.h2, { color: '#fff' }]}>Kavach is speaking to you</Text>
-          <Text style={{ color: '#fff', marginTop: 4 }}>{s.warning?.text}</Text>
-          <Text style={{ color: '#fff', marginTop: 6, fontSize: 13 }}>
+          <Text style={[T.h2, { color: C.onDark }]}>Kavach is speaking to you</Text>
+          <Text style={{ color: C.onDark, marginTop: 4 }}>{s.warning?.text}</Text>
+          <Text style={{ color: C.onDark, marginTop: 6, fontSize: 13 }}>
             {listen ? 'Press MUTE on your phone call now, so the caller cannot hear this.' : 'Your microphone is muted to the caller while this plays. Speak to stop it.'}
           </Text>
         </Panel>
@@ -163,8 +163,8 @@ export function ProtectScreen({ settings, code, rehearsal, listen = false, watch
     {offerTakeover && (
       <View style={{ position: 'absolute', left: 12, right: 12, bottom: 24, padding: 14, borderRadius: 16,
                      backgroundColor: C.danger, elevation: 10, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 10 }}>
-        <Text style={[T.h2, { color: '#fff' }]}>This looks like a scam</Text>
-        <Text style={{ color: '#fff', marginTop: 4, marginBottom: 8 }}>
+        <Text style={[T.h2, { color: C.onDark }]}>This looks like a scam</Text>
+        <Text style={{ color: C.onDark, marginTop: 4, marginBottom: 8 }}>
           {listen ? 'Scared? Un-mute your call and stay quiet. Kavach will talk to the caller through your speaker.' : 'Scared? Let Kavach talk to the caller for you. The caller cannot hear you.'}
         </Text>
         <Btn label="Let Kavach take over" kind="primary" onPress={() => command('takeover')} />

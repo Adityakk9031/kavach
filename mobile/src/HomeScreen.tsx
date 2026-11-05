@@ -1,4 +1,5 @@
 // Home, for the two kinds of user: the person being protected, and the family member looking after them.
+// Each sees only their own part: the protected person sets the phone up once, the family member records the warning voice.
 import React, { useEffect, useState } from 'react';
 import { Linking, PermissionsAndroid, Platform, Pressable, Text, View } from 'react-native';
 import { Btn, C, Logo, Panel, Pill, Screen, SectionLabel, T, Toggle } from './ui';
@@ -7,13 +8,21 @@ import type { Role } from './prefs';
 
 const rand = () => Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('');
 
-const HOW = [
-  ['Listens', 'Kavach hears the call and spots pressure about money, police or your bank.'],
-  ['Warns you privately', 'A trusted voice speaks only to you. The caller hears nothing.'],
-  ['Takes over if you are scared', 'One tap, and Kavach talks to the caller in your voice and keeps the evidence.'],
-  ['Tells your family', 'They get a message, can end the call, or send you a voice note.'],
-  ['Prepares your complaint', 'A draft for 1930 for you to check and file yourself.'],
-];
+function Step({ n, title, body, done, children }: { n: number; title: string; body: string; done?: boolean; children?: React.ReactNode }) {
+  return (
+    <View style={{ flexDirection: 'row', marginTop: n > 1 ? 18 : 0 }}>
+      <View style={{ width: 30, height: 30, borderRadius: 15, borderWidth: 2, borderColor: done ? C.accent : C.line,
+        backgroundColor: done ? C.accent : C.panel, alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+        <Text style={{ color: done ? C.onDark : C.muted, fontWeight: '700' }}>{done ? '✓' : n}</Text>
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={[T.body, { fontWeight: '600' }]}>{title}</Text>
+        <Text style={[T.muted, { marginTop: 2, marginBottom: children ? 10 : 0 }]}>{body}</Text>
+        {children}
+      </View>
+    </View>
+  );
+}
 
 export function HomeScreen({ role, settings, onProtect, onCaller, onSettings, onVoice, onReset, onSwitch }: {
   role: Role; settings: Settings;
@@ -28,93 +37,89 @@ export function HomeScreen({ role, settings, onProtect, onCaller, onSettings, on
   const [rehearsal, setRehearsal] = useState(true);
   const [tools, setTools] = useState(false);
   const [voice, setVoice] = useState<'unknown' | 'yes' | 'no'>('unknown');
-  const person = role === 'papa' ? 'papa' : 'son';
+  const [linked, setLinked] = useState<boolean | null>(null);
+  const papa = role === 'papa';
 
   useEffect(() => {
     const { base, headers } = api(settings);
     fetch(`${base}/api/voices`, { headers }).then((r) => r.json())
-      .then((d) => setVoice(d.samples?.[person] ? 'yes' : 'no')).catch(() => setVoice('unknown'));
-  }, [settings, person]);
+      .then((d) => setVoice(d.samples?.[papa ? 'papa' : 'son'] ? 'yes' : 'no')).catch(() => setVoice('unknown'));
+    if (papa) return;
+    // The family's app and Papa's phone share this Kavach server; this says whether Papa's phone is on the line to it
+    const check = () => fetch(`${base}/api/phone`, { headers }).then((r) => r.json())
+      .then((d) => setLinked(typeof d.connected === 'boolean' ? d.connected : null)).catch(() => setLinked(null));
+    check();
+    const timer = setInterval(check, 10000);
+    return () => clearInterval(timer);
+  }, [settings, papa]);
 
-  const voiceCard = (
-    <Panel>
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-        <Text style={[T.h2, { flex: 1 }]}>{role === 'papa' ? 'Your voice' : 'Your voice for Papa'}</Text>
-        {voice === 'yes' ? <Pill label="Recorded" tone="good" /> : voice === 'no' ? <Pill label="Not yet" tone="warn" /> : null}
-      </View>
-      <Text style={[T.muted, { marginBottom: 12 }]}>
-        {role === 'papa'
-          ? 'Record 20 seconds so Kavach can sound like you when it talks to a caller for you.'
-          : 'Record 20 seconds. Kavach can use your voice for the warning Papa hears, so it sounds like you.'}
-      </Text>
-      <Btn label={voice === 'yes' ? 'Record again' : 'Record my voice'} kind={voice === 'yes' ? 'plain' : 'primary'} onPress={onVoice} />
-    </Panel>
-  );
+  const voicePill = voice === 'yes' ? <Pill label="Recorded" tone="good" /> : voice === 'no' ? <Pill label="Not yet" tone="warn" /> : null;
 
   return (
     <Screen>
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-        <Logo size={36} />
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 24 }}>
+        <Logo size={32} />
         <Text style={[T.h2, { marginLeft: 12, flex: 1 }]}>Kavach</Text>
-        <Pressable onPress={onSwitch} hitSlop={12} accessibilityRole="button" style={{ marginRight: 16 }}>
-          <Text style={{ color: C.accent, fontWeight: '600' }}>{role === 'papa' ? 'Protected ▾' : 'Family ▾'}</Text>
-        </Pressable>
-        <Pressable onPress={onSettings} hitSlop={12}><Text style={{ color: C.muted }}>Settings</Text></Pressable>
+        <Pressable onPress={onSettings} hitSlop={12} accessibilityRole="button"><Text style={{ color: C.muted, fontSize: 15 }}>Settings</Text></Pressable>
       </View>
 
-      {role === 'papa' ? (
+      {papa ? (
         <View>
-          <View style={{ backgroundColor: C.accentDeep, borderRadius: 22, padding: 22, marginBottom: 16 }}>
-            <Text style={{ color: '#fff', fontSize: 28, fontWeight: '800' }}>You are protected</Text>
-            <Text style={{ color: '#d6f5ec', marginTop: 8, fontSize: 16, lineHeight: 22 }}>
-              When a call worries you, put it on speaker, open Kavach and tap the button below. It listens and warns you if it sounds like a scam.
-            </Text>
-          </View>
-          <Btn label="Protect my call" sub="Put the call on speaker first" kind="primary" onPress={() => onProtect(rand(), false, true)} />
-          {Platform.OS === 'android' && (
-            <Panel>
-              <Text style={T.h2}>Protect every call</Text>
-              <Text style={[T.muted, { marginVertical: 8 }]}>Allow the microphone, then turn on "Kavach call protection" in Accessibility. Do this once. During a call, put it on speaker.</Text>
-              <Text style={[T.muted, { marginBottom: 8 }]}>For direct call listening, also start the Shizuku app and allow Kavach in it.</Text>
-              <Btn label="Turn on protection" kind="primary" onPress={async () => {
+          <Text style={T.h1}>Your calls are protected</Text>
+          <Text style={[T.muted, { marginTop: 8, marginBottom: 20 }]}>
+            On every call, Kavach listens for a scam. If it hears one, it warns you quietly in your family's voice.
+            A small Kavach button stays on the screen during the call: tap it to turn Kavach off for that call, tap again to turn it back on.
+          </Text>
+
+          <SectionLabel>Set up once</SectionLabel>
+          <Panel>
+            <Step n={1} title="Turn on Kavach" body={'In Accessibility, open "Kavach call protection" and switch it on.'}>
+              {Platform.OS === 'android' ? <Btn label="Open Accessibility" kind="primary" onPress={async () => {
                 await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
                 Linking.sendIntent('android.settings.ACCESSIBILITY_SETTINGS');
-              }} />
-            </Panel>
-          )}
-          {voiceCard}
-          <SectionLabel>How Kavach helps</SectionLabel>
-          <Panel>
-            {HOW.map(([t, b], k) => (
-              <View key={t} style={{ flexDirection: 'row', marginTop: k ? 14 : 0 }}>
-                <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: C.accent + '22', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
-                  <Text style={{ color: C.accent, fontWeight: '800' }}>{k + 1}</Text>
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={T.body}>{t}</Text>
-                  <Text style={T.muted}>{b}</Text>
-                </View>
-              </View>
-            ))}
+              }} /> : null}
+            </Step>
+            <Step n={2} title="Start Shizuku" body="Open the Shizuku app, start it, and allow Kavach. This lets Kavach hear the call without the speaker." />
+            <Step n={3} title="Record your voice" done={voice === 'yes'}
+              body="20 seconds. If you hand a call over, Kavach talks to the caller in your voice.">
+              <Btn label={voice === 'yes' ? 'Record again' : 'Record my voice'} onPress={onVoice} />
+            </Step>
           </Panel>
         </View>
       ) : (
         <View>
-          <View style={{ backgroundColor: C.accentDeep, borderRadius: 22, padding: 22, marginBottom: 16 }}>
-            <Text style={{ color: '#fff', fontSize: 28, fontWeight: '800' }}>You look after Papa</Text>
-            <Text style={{ color: '#d6f5ec', marginTop: 8, fontSize: 16, lineHeight: 22 }}>
-              If a call to Papa looks like a scam, you get a message on Telegram within seconds.
-            </Text>
-          </View>
-          {voiceCard}
-          <SectionLabel>What you can do from Telegram</SectionLabel>
+          <Text style={T.h1}>You look after Papa</Text>
+          <Text style={[T.muted, { marginTop: 8, marginBottom: 20 }]}>
+            If a call to Papa looks like a scam, you get a Telegram message within seconds.
+          </Text>
+
           <Panel>
-            {[['End the call', 'Tap the button in the alert and the call is cut.'],
-              ['Send a voice note', 'Record one in the bot chat. It plays on Papa\'s phone at once, even after the call ended.'],
-              ['Answer two questions', 'Did money or an OTP go out? That fills in the complaint draft.'],
-              ['Get the complaint', 'A PDF draft for 1930 arrives after the call.']].map(([t, b], k) => (
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={[T.body, { flex: 1, fontWeight: '600' }]}>Papa's phone</Text>
+              {linked === null ? null : <Pill label={linked ? 'Connected' : 'Not connected'} tone={linked ? 'good' : 'warn'} />}
+            </View>
+            <Text style={[T.muted, { marginTop: 6 }]}>
+              {linked === false ? 'Kavach is not running on Papa\'s phone right now. Check that it is on in Accessibility there.'
+                : 'Both phones use the same Kavach server, so your voice and messages reach Papa.'}
+            </Text>
+          </Panel>
+
+          <Panel>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+              <Text style={[T.body, { flex: 1, fontWeight: '600' }]}>Your voice for the warning</Text>
+              {voicePill}
+            </View>
+            <Text style={[T.muted, { marginBottom: 12 }]}>Record 20 seconds. Papa hears the scam warning in your voice, so he trusts it.</Text>
+            <Btn label={voice === 'yes' ? 'Record again' : 'Record my voice'} kind={voice === 'yes' ? 'plain' : 'primary'} onPress={onVoice} />
+          </Panel>
+
+          <SectionLabel>From the Telegram alert you can</SectionLabel>
+          <Panel>
+            {[['End the call', 'Tap the button under the alert. The call on Papa\'s phone is cut.'],
+              ['Send a voice note', 'It plays on Papa\'s phone straight away, during the call or after it.'],
+              ['Get the complaint draft', 'A PDF for 1930 arrives after the call, for you to check and file.']].map(([t, b], k) => (
               <View key={t} style={{ marginTop: k ? 14 : 0 }}>
-                <Text style={T.body}>{t}</Text>
+                <Text style={[T.body, { fontWeight: '600' }]}>{t}</Text>
                 <Text style={T.muted}>{b}</Text>
               </View>
             ))}
@@ -122,17 +127,23 @@ export function HomeScreen({ role, settings, onProtect, onCaller, onSettings, on
         </View>
       )}
 
-      <Pressable onPress={() => setTools(!tools)} style={{ padding: 14 }}>
-        <Text style={[T.muted, { textAlign: 'center' }]}>{tools ? 'Hide tester tools' : 'Tester tools'}</Text>
-      </Pressable>
+      <View style={{ flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', marginTop: 8 }}>
+        <Pressable onPress={onSwitch} style={{ padding: 12 }} accessibilityRole="button">
+          <Text style={T.muted}>{papa ? 'Not Papa? Switch to family' : 'Switch to the protected phone'}</Text>
+        </Pressable>
+        <Pressable onPress={() => setTools(!tools)} style={{ padding: 12 }} accessibilityRole="button">
+          <Text style={T.muted}>{tools ? 'Hide tester tools' : 'Tester tools'}</Text>
+        </Pressable>
+      </View>
       {tools && (
         <Panel>
+          {papa && <Btn label="Protect a call on speaker" sub="Without Shizuku: put the call on speaker first" onPress={() => onProtect(rand(), false, true)} />}
           <Text style={T.muted}>Two-phone test code (both phones use the same one)</Text>
           <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 12 }}>
             {code.split('').map((ch, i) => (
-              <View key={i} style={{ width: 50, height: 60, marginHorizontal: 4, borderRadius: 12, backgroundColor: C.raised,
+              <View key={i} style={{ width: 50, height: 60, marginHorizontal: 4, borderRadius: 10, backgroundColor: C.raised,
                 borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: C.ink, fontSize: 28, fontWeight: '800' }}>{ch}</Text>
+                <Text style={{ color: C.ink, fontSize: 28, fontWeight: '700' }}>{ch}</Text>
               </View>
             ))}
           </View>

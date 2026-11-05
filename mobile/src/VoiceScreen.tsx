@@ -1,5 +1,6 @@
-// Papa and the son each record 10-30 seconds of their own voice here, after agreeing. The sample goes to the Kavach
-// server, which keeps it so a cloned voice can be made from it (AssemblyAI makes clones only in its dashboard).
+// Each person records 10-30 seconds of their own voice on their own phone, after agreeing: Papa on the protected phone
+// (Kavach speaks in it when he hands a call over), the son or daughter on the family phone (the warning Papa hears).
+// The sample goes to the Kavach server, which keeps it so a cloned voice can be made from it.
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { PermissionsAndroid, Platform, Switch, Text, TextInput, View } from 'react-native';
 import { AudioBridge, BridgeHandle } from './AudioBridge';
@@ -7,21 +8,19 @@ import { voiceRecorderUrl } from './bridge';
 import { Btn, C, Panel, Screen, T, Title, input } from './ui';
 import { normalizeUrl, type Settings } from './config';
 
-type Person = 'papa' | 'son';
+export type Person = 'papa' | 'son';
 type Rec = { state: 'idle' | 'ready' | 'recording' | 'uploading' | 'uploaded' | 'error'; seconds: number; message: string };
 type Listing = { samples: Record<string, { seconds: number; recorded_at: string; speaker_name: string }>; consent_text: string; min_seconds: number; max_seconds: number };
 
 const READ_ALOUD = 'Hello, this is me speaking calmly. Today the weather is pleasant, and I am sitting at home with a cup of tea. ' +
   'Please do not worry about me. If anything seems strange, I will call you back and we will talk it through together.';
 
-export function VoiceScreen({ settings, onBack }: { settings: Settings; onBack: () => void }) {
-  const [person, setPerson] = useState<Person>('papa');
+export function VoiceScreen({ settings, person, onBack }: { settings: Settings; person: Person; onBack: () => void }) {
   const [name, setName] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [rec, setRec] = useState<Rec>({ state: 'idle', seconds: 0, message: '' });
   const [listing, setListing] = useState<Listing | null>(null);
   const [ready, setReady] = useState(Platform.OS !== 'android');
-  const [session, setSession] = useState(0); // a fresh recorder page for each person / attempt
   const bridge = useRef<BridgeHandle>(null);
 
   useEffect(() => {
@@ -49,19 +48,14 @@ export function VoiceScreen({ settings, onBack }: { settings: Settings; onBack: 
   const have = listing?.samples[person];
   const canStart = ready && agreed && name.trim().length > 0 && !busy;
 
-  const choose = (p: Person) => { if (!busy) { setPerson(p); setAgreed(false); setRec({ state: 'idle', seconds: 0, message: '' }); setSession((n) => n + 1); } };
-
   return (
     <Screen>
       {ready && (
-        <AudioBridge key={`${person}-${name}-${session}`} ref={bridge} onMessage={onMessage} uri={voiceRecorderUrl(settings, person, name.trim())} />
+        <AudioBridge key={`${person}-${name}`} ref={bridge} onMessage={onMessage} uri={voiceRecorderUrl(settings, person, name.trim())} />
       )}
-      <Title title="My voice" subtitle="So Kavach can speak in your voice when you ask it to." />
-
-      <View style={{ flexDirection: 'row' }}>
-        <View style={{ flex: 1, marginRight: 6 }}><Btn label="I am Papa" kind={person === 'papa' ? 'primary' : 'plain'} onPress={() => choose('papa')} /></View>
-        <View style={{ flex: 1, marginLeft: 6 }}><Btn label="I am the son" kind={person === 'son' ? 'primary' : 'plain'} onPress={() => choose('son')} /></View>
-      </View>
+      <Title title={person === 'papa' ? 'Your voice' : 'Your voice for the warning'}
+        subtitle={person === 'papa' ? 'If you hand a call over, Kavach talks to the caller in this voice.'
+          : 'Papa hears the scam warning in this voice, so he knows it is family.'} />
 
       <Panel>
         <Text style={T.body}>Your name</Text>
@@ -73,7 +67,7 @@ export function VoiceScreen({ settings, onBack }: { settings: Settings; onBack: 
         <Text style={T.h2}>Your agreement</Text>
         <Text style={[T.muted, { marginVertical: 6 }]}>{listing?.consent_text ?? 'Loading…'}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Switch value={agreed} onValueChange={setAgreed} disabled={busy} />
+          <Switch value={agreed} onValueChange={setAgreed} disabled={busy} trackColor={{ true: C.accent, false: C.line }} thumbColor={C.onDark} />
           <Text style={[T.body, { flex: 1, marginLeft: 10 }]}>I agree, and this is my own voice.</Text>
         </View>
       </Panel>
@@ -94,7 +88,7 @@ export function VoiceScreen({ settings, onBack }: { settings: Settings; onBack: 
       {rec.state === 'uploaded' && (
         <Panel style={{ borderColor: C.accent }}>
           <Text style={[T.h2, { color: C.accent }]}>Saved ({rec.seconds} s)</Text>
-          <Text style={T.muted}>The owner now adds this voice in the AssemblyAI dashboard and sends the voice id to Kavach.</Text>
+          <Text style={T.muted}>Kavach starts using it once the voice has been set up on the server.</Text>
         </Panel>
       )}
       {rec.state === 'error' && <Panel style={{ borderColor: C.danger }}><Text style={{ color: C.danger }}>{rec.message}</Text></Panel>}

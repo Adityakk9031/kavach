@@ -7,6 +7,8 @@ import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.media.AudioAttributes
 import android.media.AudioDeviceInfo
 import android.media.AudioFormat
@@ -20,6 +22,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.Parcel
 import android.view.Gravity
+import android.view.View
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Button
@@ -39,14 +42,15 @@ import java.net.ServerSocket
 import kotlin.concurrent.thread
 import kotlin.math.abs
 
-/** Turned on once in Android's Accessibility settings. Whenever a call is active it shows a floating card and streams
- *  the microphone (the call on speaker) to Kavach. Test build: this is what proves whether the mic is audible in a call. */
+/** Turned on once in Android's Accessibility settings. Every call is protected by itself: a small Kavach card floats over
+ *  the dialer while the call lasts, and one tap on it turns protection off for that call, or back on. */
 class KavachListenerService : AccessibilityService() {
     private val server = "__KAVACH_SERVER__"
     private val key = "__KAVACH_KEY__"
     private val main = Handler(Looper.getMainLooper())
     private val http = OkHttpClient.Builder().pingInterval(20, java.util.concurrent.TimeUnit.SECONDS).build()
-    private var inCall = false
+    private var inCall = false  // protecting the current call: streaming it to Kavach
+    private var callActive = false  // the phone is in a call, protected or not
     private var caller: WebSocket? = null
     private var receiver: WebSocket? = null
     @Volatile private var recording = false
@@ -64,7 +68,8 @@ class KavachListenerService : AccessibilityService() {
         override fun run() {
             val mode = (getSystemService(Context.AUDIO_SERVICE) as AudioManager).mode
             val active = mode == AudioManager.MODE_IN_CALL
-            if (active && !inCall) startCall() else if (!active && inCall) stopCall()
+            if (active && !callActive) { callActive = true; startCall(); showCard() }
+            else if (!active && callActive) { callActive = false; if (inCall) stopCall(); removeCard() }
             if (inCall && shell != null) {
                 val state = (shellCall(KavachShell.STATUS) ?: "").split("|")
                 voiceInCall = state.getOrNull(1)?.startsWith("yes") == true
@@ -72,7 +77,7 @@ class KavachListenerService : AccessibilityService() {
                 current = "Direct " + state[0] + if (state.size > 1) "  |  voice " + state[1].take(44) else ""
             }
             if (silenced && System.currentTimeMillis() > playingUntil + 400) setSilenced(false)
-            if (inCall) { statusText?.text = "$current  |  ${peak * 100 / 32767}%  |  risk $risk"; peak = 0 }
+            if (inCall) { statusText?.text = if (risk > 0) "Listening  ·  scam risk $risk" else "Listening"; peak = 0 }
             main.postDelayed(this, 1000)
         }
     }
@@ -91,12 +96,15 @@ class KavachListenerService : AccessibilityService() {
 
     @Volatile private var voiceInCall = false
     @Volatile private var shellOut: java.io.OutputStream? = null
+    // Until when Kavach's voice is playing into the call. Some phones capture it again with the caller's side, and the
+    // server would take it for the scammer talking over Kavach, so the capture sends silence until then.
+    @Volatile private var voiceUntil = 0L
     @Volatile private var takenOver = false
     private var takeButton: Button? = null
 
     private fun setTakeover(on: Boolean) {
         takenOver = on
-        takeButton?.text = if (on) "Take back" else "Let Kavach take over"
+        takeButton?.text = if (on) "Take the call back" else "Let Kavach talk to the caller"
         // Without a way into the call itself, the phone's speaker is the only way the caller can hear Kavach.
         // The mic mixes into the call, so the user's own voice is cut while Kavach talks directly
         if (voiceInCall) shellCall(KavachShell.MUTE) { it.writeInt(if (on) 1 else 0) }
@@ -302,7 +310,8 @@ class KavachListenerService : AccessibilityService() {
                     if (abs(s) > peak) peak = abs(s)
                     i += 2
                 }
-                caller?.send(buf.copyOf(n).toByteString())
+                val echo = System.currentTimeMillis() < voiceUntil + 800
+                caller?.send(if (echo) ByteArray(n).toByteString() else buf.copyOf(n).toByteString())
             }
         }
         shellOut = null
@@ -315,6 +324,7 @@ class KavachListenerService : AccessibilityService() {
     override fun onDestroy() {
         main.removeCallbacks(poll)
         if (inCall) stopCall()
+        removeCard()
         serviceOn = false
         phone?.close(1000, null)
         phone = null
@@ -325,7 +335,7 @@ class KavachListenerService : AccessibilityService() {
         inCall = true
         risk = 0
         reportedRoute = ""
-        showCard()
+        showProtection()
         val id = "apk-" + System.currentTimeMillis()
         val base = server.replace("https://", "wss://").trimEnd('/')
         caller = http.newWebSocket(Request.Builder().url("$base/ws/call/$id/caller?mode=live&key=$key").build(), Audio())
@@ -450,12 +460,12 @@ class KavachListenerService : AccessibilityService() {
         }
         shellSocket?.let { try { it.close() } catch (_: Exception) {} }
         receiver?.send("{\"type\":\"end_call\"}")
-        main.postDelayed({ caller?.close(1000, null); receiver?.close(1000, null) }, 1500)
+        val (c, r) = caller to receiver  // these sockets only: Kavach may already be back on with new ones
+        main.postDelayed({ c?.close(1000, null); r?.close(1000, null) }, 1500)
         listOf(track, warnTrack).forEach { t -> t?.let { try { it.stop(); it.release() } catch (_: Exception) {} } }
         track = null
         warnTrack = null
-        card?.let { (getSystemService(WINDOW_SERVICE) as WindowManager).removeView(it) }
-        card = null
+        showProtection()
     }
 
     private inner class Audio(val events: Boolean = false) : WebSocketListener() {
@@ -469,7 +479,10 @@ class KavachListenerService : AccessibilityService() {
             val ms = pcm.size / 32L
             if (source == 2 && voiceInCall) {
                 val out = shellOut
-                if (out != null) try { voiceWriter.execute { try { out.write(pcm) } catch (_: Exception) {} } } catch (_: Exception) {}
+                if (out != null) {
+                    voiceUntil = maxOf(voiceUntil, System.currentTimeMillis()) + ms
+                    try { voiceWriter.execute { try { out.write(pcm) } catch (_: Exception) {} } } catch (_: Exception) {}
+                }
             }
             if (source == 2) { playQueue.put(pcm); return }
             playingUntil = maxOf(playingUntil, System.currentTimeMillis()) + ms
@@ -501,21 +514,74 @@ class KavachListenerService : AccessibilityService() {
 
     private fun showWords(text: String) { main.post { wordsText?.text = text.takeLast(160) } }
 
+    private var toggleButton: Button? = null
+    private var stateText: TextView? = null
+    private var dot: View? = null
+
+    // The card over the dialer: whether Kavach is on for this call, a button to switch it, and the takeover button.
     private fun showCard() {
-        val wm = getSystemService(WINDOW_SERVICE) as WindowManager
-        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(Color.parseColor("#E60F6F5A")); setPadding(28, 20, 28, 20) }
-        statusText = TextView(this).apply { setTextColor(Color.WHITE); textSize = 15f; text = "Kavach  |  starting" }
-        wordsText = TextView(this).apply { setTextColor(Color.WHITE); textSize = 13f; text = "Starting." }
-        val take = Button(this).apply { text = "Let Kavach take over"; setOnClickListener { receiver?.send(if (takenOver) "{\"type\":\"takeback\"}" else "{\"type\":\"takeover\"}") } }
+        if (card != null) return
+        val dp = resources.displayMetrics.density
+        fun round(color: String, radius: Float) = GradientDrawable().apply { setColor(Color.parseColor(color)); cornerRadius = radius * dp }
+        val box = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL; background = round("#F21C1A17", 16f)
+            setPadding((16 * dp).toInt(), (12 * dp).toInt(), (16 * dp).toInt(), (12 * dp).toInt())
+        }
+        val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        val light = View(this).apply { background = round("#3FAE6A", 6f) }
+        dot = light
+        row.addView(light, LinearLayout.LayoutParams((12 * dp).toInt(), (12 * dp).toInt()).apply { rightMargin = (10 * dp).toInt() })
+        val texts = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        stateText = TextView(this).apply { setTextColor(Color.WHITE); textSize = 17f; typeface = Typeface.DEFAULT_BOLD; text = "Kavach is on" }
+        statusText = TextView(this).apply { setTextColor(Color.parseColor("#C9C3B8")); textSize = 13f; text = "Starting" }
+        texts.addView(stateText); texts.addView(statusText)
+        row.addView(texts, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+        val toggle = Button(this).apply {
+            isAllCaps = false; textSize = 15f; setTextColor(Color.WHITE); background = round("#3A3631", 10f); text = "Turn off"
+            setOnClickListener { v ->
+                v.isEnabled = false  // one switch at a time: the last one must finish closing first
+                main.postDelayed({ v.isEnabled = true }, 2000)
+                if (inCall) stopCall() else startCall()
+            }
+        }
+        toggleButton = toggle
+        row.addView(toggle, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, (44 * dp).toInt()))
+        wordsText = TextView(this).apply { setTextColor(Color.WHITE); textSize = 14f; setPadding(0, (8 * dp).toInt(), 0, 0) }
+        val take = Button(this).apply {
+            isAllCaps = false; textSize = 17f; typeface = Typeface.DEFAULT_BOLD; setTextColor(Color.WHITE); background = round("#B3261E", 12f)
+            text = "Let Kavach talk to the caller"
+            setOnClickListener { receiver?.send(if (takenOver) "{\"type\":\"takeback\"}" else "{\"type\":\"takeover\"}") }
+        }
         takeButton = take
-        box.addView(statusText); box.addView(wordsText); box.addView(take)
+        box.addView(row); box.addView(wordsText)
+        box.addView(take, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (52 * dp).toInt()).apply { topMargin = (10 * dp).toInt() })
         val lp = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, PixelFormat.TRANSLUCENT)
         lp.gravity = Gravity.TOP
-        lp.y = 120
-        wm.addView(box, lp)
+        lp.y = (48 * dp).toInt()
+        lp.horizontalMargin = 0.03f
+        (getSystemService(WINDOW_SERVICE) as WindowManager).addView(box, lp)
         card = box
+        showProtection()
+    }
+
+    // Puts the card in step with whether this call is being protected
+    private fun showProtection() {
+        main.post {
+            val on = inCall
+            stateText?.text = if (on) "Kavach is on" else "Kavach is off"
+            (dot?.background as? GradientDrawable)?.setColor(Color.parseColor(if (on) "#3FAE6A" else "#8A847B"))
+            toggleButton?.text = if (on) "Turn off" else "Turn on"
+            takeButton?.visibility = if (on) View.VISIBLE else View.GONE
+            if (!on) { statusText?.text = "Not listening to this call"; wordsText?.text = "Tap Turn on to protect this call." }
+            else wordsText?.text = ""
+        }
+    }
+
+    private fun removeCard() {
+        card?.let { try { (getSystemService(WINDOW_SERVICE) as WindowManager).removeView(it) } catch (_: Exception) {} }
+        card = null; toggleButton = null; stateText = null; statusText = null; wordsText = null; takeButton = null; dot = null
     }
 
     private companion object {

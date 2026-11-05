@@ -7,6 +7,7 @@ Take back is instant: cancel the TTS, flush both tabs' persona playback, unmute 
 """
 
 import asyncio
+import difflib
 import logging
 import re
 import time
@@ -133,9 +134,17 @@ class Persona:
         return p
 
 
+def _words(text: str) -> list[str]:
+    return re.findall(r"[a-z0-9']+", text.lower())
+
+
 class CallPersona:
     REPLY_DELAY_S = 0.7  # wait for the caller to finish: STT can split one long line into two finals
     OPENING_WAIT_S = 8.0
+    # On a real phone call the persona's voice goes into the call, and some phones capture it again with the caller's side.
+    # Speech this soon after the persona stops is its own echo, not the scammer talking over it.
+    ECHO_TAIL_S = 1.5
+    ECHO_MEMORY_S = 30.0
 
     def __init__(self, persona: Persona, room: CallRoom):
         self.persona, self.room = persona, room
@@ -150,11 +159,37 @@ class CallPersona:
         self.replies = 0
         self.caller_talking = False
         self.spelled: set[str] = set()  # UPI IDs the caller has been asked to spell, since speech recognition mishears them
+        self.said: list[tuple[float, str]] = []  # (when, text) of recent persona lines, to recognise their echo
         self.sent_bytes = 0  # voice handed to the caller's connection, for checking a takeover from the logs
 
     @property
     def speaking(self) -> bool:
         return (self.request is not None and not self.request.done.is_set()) or time.monotonic() < self.play_until
+
+    @property
+    def echo_possible(self) -> bool:
+        return self.room.phone_call and (self.speaking or time.monotonic() < self.play_until + self.ECHO_TAIL_S)
+
+    def strip_echo(self, text: str) -> str:
+        """Removes the persona's own recent words from a caller turn on a phone call, where the phone can capture
+        Kavach's voice along with the caller's. Returns what the caller really said, or "" if it was all echo."""
+        if not self.room.phone_call:
+            return text
+        now = time.monotonic()
+        self.said = [(t, x) for t, x in self.said if now - t < self.ECHO_MEMORY_S]
+        tokens = text.split()
+        norm = [(_words(tok) or [""])[0] for tok in tokens]
+        echo = [False] * len(tokens)
+        for _, said in self.said:
+            m = difflib.SequenceMatcher(None, norm, _words(said), autojunk=False)
+            for b in m.get_matching_blocks():
+                if b.size >= 3 or (b.size and b.size == len([w for w in norm if w])):
+                    for i in range(b.a, b.a + b.size):
+                        echo[i] = True
+        kept = [tok for tok, w, e in zip(tokens, norm, echo) if not e and w]
+        if not any(echo):
+            return text
+        return " ".join(kept) if len(kept) >= 3 else ""
 
     async def close(self) -> None:
         self.active = False
@@ -218,6 +253,8 @@ class CallPersona:
         being prepared (not yet speaking) drop it: the caller is not done, and their next final will trigger one."""
         if channel != "caller":
             return
+        if self.active and self.echo_possible:
+            return  # Kavach hearing itself; a real reply still arrives as a final, with the echo removed
         self.caller_talking = True
         if not self.active:
             return
@@ -269,6 +306,7 @@ class CallPersona:
             if not self.active:
                 return
             self.history.append({"role": "assistant", "content": text})
+            self.said.append((time.monotonic(), text))
             self.replies += 1
             idx = room.turn_idx
             room.turn_idx += 1

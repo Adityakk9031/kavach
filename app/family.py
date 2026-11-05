@@ -17,6 +17,7 @@ import av
 from app.call_room import CallRoom, RoomRegistry
 
 log = logging.getLogger("kavach.family")
+DESK = "family-desk"  # events table key for what the family does in Telegram
 MAX_SECONDS = 120
 VOICE_ID_RE = re.compile(r"[\w.-]{3,64}")
 CONTROL_RE =re.compile(r"c:([\w-]{4,16}):e")
@@ -51,6 +52,14 @@ def decode_voice_note(data: bytes, rate: int = 16000, max_seconds: int = MAX_SEC
 class FamilyDesk:
     def __init__(self, alerter, store, rooms: RoomRegistry, settings):
         self.alerter, self.store, self.rooms, self.settings = alerter, store, rooms, settings
+
+    def _log(self, type_: str, **payload) -> None:
+        """What the family did in Telegram and what came of it, kept apart from any call so a test can be checked from
+        the logs even when no call was on."""
+        try:
+            self.store.add_event(DESK, type_, time.monotonic(), payload)
+        except Exception:
+            log.exception("could not log a family action")
 
     def _authorized(self, chat_id) -> bool:
         return str(chat_id) == str(self.settings.telegram_chat_id)
@@ -92,7 +101,10 @@ class FamilyDesk:
         room = self.rooms.family_target()
         # With no call running, the phone's always-on link is surer than the socket of a call that has just ended.
         phone = getattr(self.rooms, "phone", None) if room is None or room.ended else None
+        self._log("voice_note", call=getattr(room, "call_id", None), call_running=bool(room and not room.ended),
+                  phone_link=getattr(self.rooms, "phone", None) is not None, seconds=voice.get("duration"))
         if room is None and phone is None:
+            self._log("voice_note_result", result="no phone")
             await self._say("I could not send this. Papa's phone is not connected to Kavach right now.")
             return
         if voice.get("duration", 0) > MAX_SECONDS:
@@ -110,6 +122,7 @@ class FamilyDesk:
         seconds = round(len(pcm) / 2 / self.settings.sample_rate)
         if phone is not None:
             delivered = await self.rooms.play_on_phone(pcm)
+            self._log("voice_note_result", result="played" if delivered else "no ack", via="phone link")
             await self._say(f"▶️ Playing on Papa's phone now ({seconds} s)." if delivered
                             else "Papa's phone did not confirm it got this. It may have no internet right now.")
             return
@@ -117,6 +130,7 @@ class FamilyDesk:
         if room.warning is not None and room.warning.active:
             await room.warning.barge_in("family")
         delivered = await room.play_family(pcm)
+        self._log("voice_note_result", result="played" if delivered else "no ack", via="call")
         await self._say(f"▶️ Playing on Papa's phone now ({seconds} s)." if delivered
                         else "Papa's app is not connected, so it could not be played.")
 
@@ -133,6 +147,7 @@ class FamilyDesk:
             return
         call_id = self.store.call_for_token(m.group(1))
         room = self.rooms.rooms.get(call_id) if call_id else None
+        self._log("end_pressed", call=call_id, running=bool(room and not room.ended))
         if room is None or room.ended:
             await self.alerter.answer_callback(cq["id"], "That call has already ended.")
             return
@@ -140,6 +155,7 @@ class FamilyDesk:
         await self.alerter.answer_callback(cq["id"], "Ending the call.")
         if room.phone_call:
             result = await room.hang_up()
+            self._log("end_result", call=call_id, result=result)
             if not (result or "").startswith("ok"):
                 room.log_event("hang_up_failed", {"result": result})
                 await self._say("⚠️ I could not cut Papa's phone call, so it is still on. Kavach is still protecting it. "
