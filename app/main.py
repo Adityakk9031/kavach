@@ -279,6 +279,26 @@ def call_turns(call_id: str) -> list[dict]:
     return store.turns(call_id)
 
 
+@app.get("/api/calls/live")
+def live_call() -> dict:
+    """The call the phone's background listener is streaming now, so the app can open onto it."""
+    running = [r for r in rooms.rooms.values() if not r.ended and r.call_id.startswith("apk-")]
+    room = max(running, key=lambda r: r.started_wall, default=None)
+    return {"call_id": room.call_id if room else None}
+
+
+@app.post("/api/calls/{call_id}/control")
+async def call_control(call_id: str, body: dict):
+    """Hand over, take back or end from the app, which watches the call instead of being a party on it."""
+    room = rooms.rooms.get(call_id)
+    if room is None or room.ended:
+        raise HTTPException(404, "No such running call")
+    if body.get("type") not in ("takeover", "takeback", "end_call"):
+        raise HTTPException(400, "Unknown command")
+    await handle_control(room, "receiver", {"type": body["type"]})
+    return {"ok": True}
+
+
 @app.websocket("/ws/call/{call_id}/{role}")
 async def call_socket(ws: WebSocket, call_id: str, role: str, caller_number: str | None = None, mode: str | None = None):
     """One tab of the call. Binary in = PCM from the mic; text in = JSON control messages."""

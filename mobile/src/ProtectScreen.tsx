@@ -6,19 +6,38 @@ import { AudioBridge, BridgeHandle } from './AudioBridge';
 import { STAGE_LABELS, bridgeUrl, initialState, reduce } from './bridge';
 import { Btn, C, Chip, Meter, Panel, Pill, Screen, SectionLabel, T, Title } from './ui';
 import { ReportPanel } from './ReportPanel';
-import type { Settings } from './config';
+import { api, type Settings } from './config';
 
-export function ProtectScreen({ settings, code, rehearsal, listen = false, onBack }: {
-  settings: Settings; code: string; rehearsal: boolean; listen?: boolean; onBack: () => void;
+export function ProtectScreen({ settings, code, rehearsal, listen = false, watchCall, onBack }: {
+  settings: Settings; code: string; rehearsal: boolean; listen?: boolean; watchCall?: string; onBack: () => void;
 }) {
   useKeepAwake();
-  const callId = `app-${code.toLowerCase()}`;
+  const callId = watchCall ?? `app-${code.toLowerCase()}`;
   const [s, dispatch] = useReducer(reduce, initialState);
   const bridge = useRef<BridgeHandle>(null);
   const [ready, setReady] = useState(Platform.OS !== 'android');
+  // The background listener streams this call, so here the app only shows it and sends commands
+  const command = (type: 'takeover' | 'takeback' | 'end_call') => {
+    if (!watchCall) { bridge.current?.send({ type }); return; }
+    const { base, headers } = api(settings);
+    fetch(`${base}/api/calls/${watchCall}/control`, { method: 'POST', headers, body: JSON.stringify({ type }) }).catch(() => {});
+  };
+
+  useEffect(() => {
+    if (!watchCall) return;
+    const { base } = api(settings);
+    const ws = new WebSocket(`${base.replace(/^http/, 'ws')}/ws/events/${watchCall}?key=${encodeURIComponent(settings.accessKey)}`);
+    ws.onopen = () => {
+      dispatch({ type: 'bridge', state: 'connected' });
+      dispatch({ type: 'stt_status', channel: 'caller', ok: true });
+    };
+    ws.onmessage = (e) => { try { dispatch(JSON.parse(e.data)); } catch { /* not an event */ } };
+    ws.onerror = () => dispatch({ type: 'bridge', state: 'socket_error' });
+    return () => ws.close();
+  }, [watchCall, settings]);
 
   useEffect(() => { // Android asks for the microphone itself; iOS asks inside the audio page
-    if (Platform.OS !== 'android') return;
+    if (Platform.OS !== 'android' || watchCall) return;
     PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO).finally(() => setReady(true));
   }, []);
 
@@ -38,7 +57,7 @@ export function ProtectScreen({ settings, code, rehearsal, listen = false, onBac
           <Text style={{ color: C.accent, fontSize: 16, fontWeight: '600' }}>‹ Home</Text>
         </Pressable>
       )}
-      {ready && (
+      {ready && !watchCall && (
         <AudioBridge ref={bridge} onMessage={dispatch}
           uri={bridgeUrl(settings, { call: callId, role: listen ? 'listen' : 'receiver', mode: rehearsal ? 'eval' : 'live' })} />
       )}
@@ -50,8 +69,8 @@ export function ProtectScreen({ settings, code, rehearsal, listen = false, onBac
 
       {s.connected && !s.ended && s.transcript.length === 0 && !s.triggered && (
         <Panel>
-          <Text style={T.h2}>{listen ? 'Put your call on speaker' : 'Kavach is ready'}</Text>
-          <Text style={T.muted}>{listen
+          <Text style={T.h2}>{watchCall ? 'Listening to your call' : listen ? 'Put your call on speaker' : 'Kavach is ready'}</Text>
+          <Text style={T.muted}>{watchCall ? 'The caller\'s words and the scam meter will appear here.' : listen
             ? 'Hold the phone where Kavach can hear the caller. When they talk, the bar below moves and their words appear here.'
             : 'Waiting for the call. When someone talks, you will see the words here and the scam meter will move.'}</Text>
           {listen ? <Meter value={s.level * 100} color={C.accent} /> : null}
@@ -99,7 +118,7 @@ export function ProtectScreen({ settings, code, rehearsal, listen = false, onBac
 
       {s.takeover && (
         <Panel style={{ borderColor: C.accent }}>
-          <Text style={T.h2}>{listen ? 'Kavach is talking to the caller through your speaker' : 'Kavach is on the call (the caller cannot hear you)'}</Text>
+          <Text style={T.h2}>{watchCall ? 'Kavach is talking to the caller. Stay quiet.' : listen ? 'Kavach is talking to the caller through your speaker' : 'Kavach is on the call (the caller cannot hear you)'}</Text>
           {s.personaText ? <Text style={T.muted}>Kavach says: {s.personaText}</Text> : null}
         </Panel>
       )}
@@ -107,9 +126,9 @@ export function ProtectScreen({ settings, code, rehearsal, listen = false, onBac
       {!s.ended ? (
         <View>
           {!s.takeover
-            ? <Btn label="Hand over to Kavach" onPress={() => bridge.current?.send({ type: 'takeover' })} />
-            : <Btn label="Take back" kind="primary" onPress={() => bridge.current?.send({ type: 'takeback' })} />}
-          <Btn label={listen ? 'Stop listening' : 'Hang up'} kind="danger" onPress={() => bridge.current?.send({ type: 'end_call' })} />
+            ? <Btn label="Hand over to Kavach" onPress={() => command('takeover')} />
+            : <Btn label="Take back" kind="primary" onPress={() => command('takeback')} />}
+          <Btn label={listen || watchCall ? 'Stop listening' : 'Hang up'} kind="danger" onPress={() => command('end_call')} />
         </View>
       ) : (
         <View>
@@ -148,7 +167,7 @@ export function ProtectScreen({ settings, code, rehearsal, listen = false, onBac
         <Text style={{ color: '#fff', marginTop: 4, marginBottom: 8 }}>
           {listen ? 'Scared? Un-mute your call and stay quiet. Kavach will talk to the caller through your speaker.' : 'Scared? Let Kavach talk to the caller for you. The caller cannot hear you.'}
         </Text>
-        <Btn label="Let Kavach take over" kind="primary" onPress={() => bridge.current?.send({ type: 'takeover' })} />
+        <Btn label="Let Kavach take over" kind="primary" onPress={() => command('takeover')} />
       </View>
     )}
     </View>

@@ -26,7 +26,8 @@
         "RECORD_AUDIO",
         "MODIFY_AUDIO_SETTINGS",
         "INTERNET"
-      ]
+      ],
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -35,6 +36,15 @@
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#15171a"
-    }
+    },
+    "plugins": [
+      "./plugins/withKavachListener"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "cfeef491-4dc3-4427-96e6-708d30dd7a64"
+      }
+    },
+    "owner": "dcwfdcfhch"
   }
 }

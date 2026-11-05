@@ -1,6 +1,6 @@
 // Home, for the two kinds of user: the person being protected, and the family member looking after them.
 import React, { useEffect, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Linking, PermissionsAndroid, Platform, Pressable, Text, View } from 'react-native';
 import { Btn, C, Logo, Panel, Pill, Screen, SectionLabel, T, Toggle } from './ui';
 import { api, type Settings } from './config';
 import type { Role } from './prefs';
@@ -71,6 +71,17 @@ export function HomeScreen({ role, settings, onProtect, onCaller, onSettings, on
             </Text>
           </View>
           <Btn label="Protect my call" sub="Put the call on speaker first" kind="primary" onPress={() => onProtect(rand(), false, true)} />
+          {Platform.OS === 'android' && (
+            <Panel>
+              <Text style={T.h2}>Protect every call</Text>
+              <Text style={[T.muted, { marginVertical: 8 }]}>Allow the microphone, then turn on "Kavach call protection" in Accessibility. Do this once. During a call, put it on speaker.</Text>
+              <Text style={[T.muted, { marginBottom: 8 }]}>For direct call listening, also start the Shizuku app and allow Kavach in it.</Text>
+              <Btn label="Turn on protection" kind="primary" onPress={async () => {
+                await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+                Linking.sendIntent('android.settings.ACCESSIBILITY_SETTINGS');
+              }} />
+            </Panel>
+          )}
           {voiceCard}
           <SectionLabel>How Kavach helps</SectionLabel>
           <Panel>

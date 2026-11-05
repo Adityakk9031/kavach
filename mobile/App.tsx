@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, BackHandler, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Settings, loadSettings } from './src/config';
+import { Settings, api, loadSettings } from './src/config';
 import { SetupScreen } from './src/SetupScreen';
 import { HomeScreen } from './src/HomeScreen';
 import { ProtectScreen } from './src/ProtectScreen';
@@ -11,7 +11,7 @@ import { Onboarding } from './src/Onboarding';
 import { EMPTY, Prefs, loadPrefs, savePrefs } from './src/prefs';
 import { C } from './src/ui';
 
-type Screen = { name: 'home' } | { name: 'setup' } | { name: 'voice' } | { name: 'protect' | 'caller'; code: string; rehearsal: boolean; listen?: boolean };
+type Screen = { name: 'home' } | { name: 'setup' } | { name: 'voice' } | { name: 'protect' | 'caller'; code: string; rehearsal: boolean; listen?: boolean; watchCall?: string };
 
 export default function App() {
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -23,6 +23,22 @@ export default function App() {
   useEffect(() => {
     Promise.all([loadSettings(), loadPrefs()]).then(([s, p]) => { setSettings(s); setPrefs(p); setLoaded(true); if (!s) setScreen({ name: 'setup' }); });
   }, []);
+
+  // A call the background listener is streaming opens here by itself. One the user left stays closed.
+  const seenLive = useRef<string | null>(null);
+  useEffect(() => {
+    if (!settings || screen.name !== 'home') return;
+    const { base, headers } = api(settings);
+    const check = () => fetch(`${base}/api/calls/live`, { headers }).then((r) => r.json()).then((d) => {
+      if (d.call_id && d.call_id !== seenLive.current) {
+        seenLive.current = d.call_id;
+        setScreen({ name: 'protect', code: d.call_id, rehearsal: false, watchCall: d.call_id });
+      }
+    }).catch(() => {});
+    check();
+    const timer = setInterval(check, 3000);
+    return () => clearInterval(timer);
+  }, [settings, screen.name]);
 
   // Android's back button: leave a sub-screen for Home, or cancel a user switch, instead of closing the app
   useEffect(() => {
@@ -48,7 +64,7 @@ export default function App() {
   } else if (screen.name === 'voice') {
     body = <VoiceScreen settings={settings} onBack={home} />;
   } else if (screen.name === 'protect') {
-    body = <ProtectScreen key={screen.code} settings={settings} code={screen.code} rehearsal={screen.rehearsal} listen={screen.listen} onBack={home} />;
+    body = <ProtectScreen key={screen.code} settings={settings} code={screen.code} rehearsal={screen.rehearsal} listen={screen.listen} watchCall={screen.watchCall} onBack={home} />;
   } else if (screen.name === 'caller') {
     body = <CallerScreen key={screen.code} settings={settings} code={screen.code} rehearsal={screen.rehearsal} onBack={home} />;
   } else {
