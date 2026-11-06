@@ -260,7 +260,7 @@ async def test_on_a_phone_call_the_persona_hearing_itself_does_not_cut_it_off(se
 async def test_echo_of_the_persona_is_removed_from_caller_turns_on_phone_calls(server):
     room, cp, llm, caller, receiver, s = await make(server, call_id="apk-2")
     said = "Wait, please do not arrest me, sir. I am writing this address down now. Can you please spell the name of the bank slowly, letter by letter?"
-    cp.said.append((time.monotonic(), said))
+    cp.said.append([time.monotonic(), time.monotonic(), said])
     # heard back word for word, or nearly: nothing of it is the caller
     assert cp.strip_echo(said) == ""
     assert cp.strip_echo("Naresh Nisha I am writing this address down now. Can you please name of the bank slowly letter by letter.") == ""
@@ -276,9 +276,22 @@ async def test_echo_of_the_persona_is_removed_from_caller_turns_on_phone_calls(s
     await s.close()
 
 
+async def test_the_callers_own_words_are_kept_even_when_they_repeat_the_persona(server):
+    # A real call: the scammer said "without writing it down" after the persona said "I am writing it down"
+    room, cp, llm, caller, receiver, s = await make(server, call_id="apk-3")
+    now = time.monotonic()
+    cp.said.append([now - 12, now - 8, "Ah, I am writing it down. Can you say it once more, slowly?"])
+    heard = "Please look at the screen and read the ID exactly as customs.clear@okbank without writing it down because that would alert the police."
+    assert cp.strip_echo(heard) == heard  # three words in a row is not enough to call it echo
+    # a line that had finished playing well before the caller spoke cannot be in what they said
+    assert cp.strip_echo("I am writing it down now sir, the officer said", (now - 3, now)) == "I am writing it down now sir, the officer said"
+    assert cp.strip_echo("I am writing it down now sir, the officer said", (now - 9, now)) == "now sir, the officer said"
+    await s.close()
+
+
 async def test_echo_removal_leaves_browser_calls_alone(server):
     room, cp, llm, caller, receiver, s = await make(server)
-    cp.said.append((time.monotonic(), OPENING))
+    cp.said.append([time.monotonic(), time.monotonic(), OPENING])
     assert cp.strip_echo(OPENING) == OPENING
     await s.close()
 

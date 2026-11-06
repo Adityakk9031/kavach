@@ -298,7 +298,10 @@ class CallRoom:
             if not ev["text"].strip():
                 return
             if channel == "caller" and self.persona is not None:
-                kept = self.persona.strip_echo(ev["text"])
+                clock = self.clocks.get(channel)
+                start = clock.time_at(ev["audio_start_ms"]) if clock and ev.get("audio_start_ms") is not None else None
+                end = clock.time_at(ev["audio_end_ms"]) if clock and ev.get("audio_end_ms") is not None else None
+                kept = self.persona.strip_echo(ev["text"], (start, end or now) if start is not None else None)
                 if kept != ev["text"]:
                     self.log_event("echo_removed", {"heard": ev["text"], "kept": kept}, now)
                     if not kept:

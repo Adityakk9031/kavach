@@ -145,6 +145,7 @@ class CallPersona:
     # Speech this soon after the persona stops is its own echo, not the scammer talking over it.
     ECHO_TAIL_S = 1.5
     ECHO_MEMORY_S = 30.0
+    ECHO_MIN_WORDS = 4  # a shorter run, like "writing it down", is often the scammer's own words
 
     def __init__(self, persona: Persona, room: CallRoom):
         self.persona, self.room = persona, room
@@ -159,7 +160,7 @@ class CallPersona:
         self.replies = 0
         self.caller_talking = False
         self.spelled: set[str] = set()  # UPI IDs the caller has been asked to spell, since speech recognition mishears them
-        self.said: list[tuple[float, str]] = []  # (when, text) of recent persona lines, to recognise their echo
+        self.said: list[list] = []  # [said at, played until, text] of recent persona lines, to recognise their echo
         self.sent_bytes = 0  # voice handed to the caller's connection, for checking a takeover from the logs
 
     @property
@@ -170,20 +171,23 @@ class CallPersona:
     def echo_possible(self) -> bool:
         return self.room.phone_call and (self.speaking or time.monotonic() < self.play_until + self.ECHO_TAIL_S)
 
-    def strip_echo(self, text: str) -> str:
+    def strip_echo(self, text: str, heard: tuple[float, float] | None = None) -> str:
         """Removes the persona's own recent words from a caller turn on a phone call, where the phone can capture
-        Kavach's voice along with the caller's. Returns what the caller really said, or "" if it was all echo."""
+        Kavach's voice along with the caller's. Returns what the caller really said, or "" if it was all echo.
+        `heard` is when the turn's audio arrived (monotonic start, end): only a line playing then can be in it."""
         if not self.room.phone_call:
             return text
         now = time.monotonic()
-        self.said = [(t, x) for t, x in self.said if now - t < self.ECHO_MEMORY_S]
+        self.said = [line for line in self.said if now - line[1] < self.ECHO_MEMORY_S]
+        lines = [said for began, ended, said in self.said
+                 if heard is None or (began <= heard[1] and heard[0] <= ended + self.ECHO_TAIL_S)]
         tokens = text.split()
         norm = [(_words(tok) or [""])[0] for tok in tokens]
         echo = [False] * len(tokens)
-        for _, said in self.said:
+        for said in lines:
             m = difflib.SequenceMatcher(None, norm, _words(said), autojunk=False)
             for b in m.get_matching_blocks():
-                if b.size >= 3 or (b.size and b.size == len([w for w in norm if w])):
+                if b.size >= self.ECHO_MIN_WORDS or (b.size and b.size == len([w for w in norm if w])):
                     for i in range(b.a, b.a + b.size):
                         echo[i] = True
         kept = [tok for tok, w, e in zip(tokens, norm, echo) if not e and w]
@@ -306,7 +310,7 @@ class CallPersona:
             if not self.active:
                 return
             self.history.append({"role": "assistant", "content": text})
-            self.said.append((time.monotonic(), text))
+            self.said.append([time.monotonic(), time.monotonic(), text])
             self.replies += 1
             idx = room.turn_idx
             room.turn_idx += 1
@@ -339,6 +343,8 @@ class CallPersona:
                 return
             now = time.monotonic()
             self.play_until = max(self.play_until, now) + len(pcm) / 2 / self.s.sample_rate
+            if self.said:
+                self.said[-1][1] = self.play_until
             if first:
                 first = False
                 room.log_event("persona_first_audio", {
