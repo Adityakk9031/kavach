@@ -307,6 +307,9 @@ class CallPersona:
             if replaced:
                 room.log_event("persona_guard", {"reason": replaced})
                 log.warning("TAKEOVER reply replaced call=%s reason=%s", room.call_id, replaced)
+            # On a phone call the scammer can talk over Kavach without cutting it off: finish this line, then answer
+            while room.phone_call and self.active and self.speaking:
+                await asyncio.sleep(0.05)
             if not self.active:
                 return
             self.history.append({"role": "assistant", "content": text})

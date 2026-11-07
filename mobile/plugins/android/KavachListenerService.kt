@@ -96,9 +96,6 @@ class KavachListenerService : AccessibilityService() {
 
     @Volatile private var voiceInCall = false
     @Volatile private var shellOut: java.io.OutputStream? = null
-    // Until when Kavach's voice is playing into the call. Some phones capture it again with the caller's side, and the
-    // server would take it for the scammer talking over Kavach, so the capture sends silence until then.
-    @Volatile private var voiceUntil = 0L
     @Volatile private var takenOver = false
     private var takeButton: Button? = null
 
@@ -310,8 +307,9 @@ class KavachListenerService : AccessibilityService() {
                     if (abs(s) > peak) peak = abs(s)
                     i += 2
                 }
-                val echo = System.currentTimeMillis() < voiceUntil + 800
-                caller?.send(if (echo) ByteArray(n).toByteString() else buf.copyOf(n).toByteString())
+                // Sent even while Kavach's voice plays into the call, so what the scammer says over it is kept. Some
+                // phones capture that voice again here; the server recognises it and removes it from the transcript.
+                caller?.send(buf.copyOf(n).toByteString())
             }
         }
         shellOut = null
@@ -480,7 +478,6 @@ class KavachListenerService : AccessibilityService() {
             if (source == 2 && voiceInCall) {
                 val out = shellOut
                 if (out != null) {
-                    voiceUntil = maxOf(voiceUntil, System.currentTimeMillis()) + ms
                     try { voiceWriter.execute { try { out.write(pcm) } catch (_: Exception) {} } } catch (_: Exception) {}
                 }
             }

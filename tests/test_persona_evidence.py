@@ -289,6 +289,42 @@ async def test_the_callers_own_words_are_kept_even_when_they_repeat_the_persona(
     await s.close()
 
 
+async def test_on_a_phone_call_the_scammer_talking_over_kavach_is_kept_and_answered_after_its_line(server):
+    # The phone sends the caller's side even while Kavach's voice plays into the call, so Kavach's own voice comes back
+    # mixed with what the scammer says over it
+    room, cp, llm, caller, receiver, s = await make(server, llm_reply="Okbank? Which branch is that, sir?", call_id="apk-5")
+    await room.control_handlers["takeover"](room, "receiver", {})
+    await wait_for(lambda: cp.request is not None and cp.request.done.is_set() and cp.speaking)
+    opening_until = cp.said[0][1]
+    await room.on_audio("caller", b"\x01\x00" * 16000)  # one second of the call, heard while the opening plays
+    await room._on_stt_event("caller", {"type": "speech_started", "audio_ms": 0})
+    scammer = "Sir, the money goes to Okbank, the account is in the name of Vikram."
+    await room._on_stt_event("caller", {"type": "final", "text": OPENING + " " + scammer,
+                                        "audio_start_ms": 0, "audio_end_ms": 1000, "turn_order": 1})
+    events = room.store.events("apk-5")
+    assert not any(e["type"] == "persona_interrupted" for e in events)  # its own voice did not cut Kavach off
+    assert not any(e["type"] == "flush_playback" for e in caller.text)
+    assert [e["payload"]["kept"] for e in events if e["type"] == "echo_removed"] == [scammer]
+    assert [t["text"] for t in room.store.turns("apk-5") if t["channel"] == "caller"] == [scammer]
+
+    # Kavach answers what the scammer said, but only once its own line has finished playing
+    await wait_for(lambda: any(e["type"] == "persona" and e.get("text", "").startswith("Okbank?") for e in receiver.text), t=15)
+    assert llm.calls[0][-1] == {"role": "user", "content": scammer}
+    reply_audio = [e for e in room.store.events("apk-5") if e["type"] == "persona_first_audio"][-1]
+    assert reply_audio["payload"]["text"].startswith("Okbank?") and reply_audio["ts_mono"] >= opening_until - 0.05
+
+    # its answer heard back on its own is dropped: no turn, no reply to itself
+    await wait_for(lambda: cp.speaking)
+    start = room.clocks["caller"].audio_ms
+    await room.on_audio("caller", b"\x01\x00" * 16000)
+    await room._on_stt_event("caller", {"type": "final", "text": "Okbank which branch is that sir",
+                                        "audio_start_ms": start + 1, "audio_end_ms": start + 1000, "turn_order": 2})
+    await asyncio.sleep(cp.REPLY_DELAY_S + 0.3)
+    assert len(llm.calls) == 1
+    assert [t["text"] for t in room.store.turns("apk-5") if t["channel"] == "caller"] == [scammer]
+    await s.close()
+
+
 async def test_echo_removal_leaves_browser_calls_alone(server):
     room, cp, llm, caller, receiver, s = await make(server)
     cp.said.append([time.monotonic(), time.monotonic(), OPENING])
