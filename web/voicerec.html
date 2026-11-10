@@ -19,6 +19,7 @@
   const params = new URLSearchParams(location.search);
   const person = params.get('person') === 'son' ? 'son' : 'papa';
   const speaker = params.get('name') || '';
+  const take = ['1', '2', '3'].includes(params.get('take')) ? params.get('take') : '1';
   const RATE = 16000, MAX_S = 30;
   const post = (obj) => {
     const text = JSON.stringify({ type: 'rec', ...obj });
@@ -54,7 +55,7 @@
     const seconds = samples / RATE;
     post({ state: 'uploading', seconds: +seconds.toFixed(1) });
     try {
-      const r = await fetch(withKey(`/api/voices/${person}?name=${encodeURIComponent(speaker)}`), {
+      const r = await fetch(withKey(`/api/voices/${person}?name=${encodeURIComponent(speaker)}&take=${take}`), {
         method: 'POST', headers: { 'x-kavach-consent': 'yes', 'content-type': 'application/octet-stream' }, body: all.buffer,
       });
       const body = await r.json().catch(() => ({}));

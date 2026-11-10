@@ -45,8 +45,32 @@ import kotlin.math.abs
 /** Turned on once in Android's Accessibility settings. Every call is protected by itself: a small Kavach card floats over
  *  the dialer while the call lasts, and one tap on it turns protection off for that call, or back on. */
 class KavachListenerService : AccessibilityService() {
-    private val server = "__KAVACH_SERVER__"
-    private val key = "__KAVACH_KEY__"
+    private var server = "__KAVACH_SERVER__"
+    private var key = "__KAVACH_KEY__"
+    private var cfgStamp = 0L
+
+    /** The signed-in account's server and token, which the app writes to files/kavach-config.json. Without that file the
+     *  build-time values are used, so an older install keeps working. */
+    private fun loadConfig() {
+        try {
+            val f = java.io.File(filesDir, "kavach-config.json")
+            if (!f.exists()) return
+            cfgStamp = f.lastModified()
+            val o = JSONObject(f.readText())
+            o.optString("server").takeIf { it.isNotEmpty() }?.let { server = it }
+            o.optString("key").takeIf { it.isNotEmpty() }?.let { key = it }
+        } catch (_: Exception) {}
+    }
+
+    /** The account changed (signed in, or paired): use the new token and reconnect the always-on phone link. */
+    private fun reloadConfigIfChanged() {
+        val f = java.io.File(filesDir, "kavach-config.json")
+        if (!f.exists() || f.lastModified() == cfgStamp) return
+        loadConfig()
+        phone?.close(1000, null)
+        phone = null
+        if (serviceOn) connectPhone()
+    }
     private val main = Handler(Looper.getMainLooper())
     private val http = OkHttpClient.Builder().pingInterval(20, java.util.concurrent.TimeUnit.SECONDS).build()
     private var inCall = false  // protecting the current call: streaming it to Kavach
@@ -66,6 +90,7 @@ class KavachListenerService : AccessibilityService() {
 
     private val poll = object : Runnable {
         override fun run() {
+            reloadConfigIfChanged()
             val mode = (getSystemService(Context.AUDIO_SERVICE) as AudioManager).mode
             val active = mode == AudioManager.MODE_IN_CALL
             if (active && !callActive) { callActive = true; startCall(); showCard() }
@@ -83,6 +108,7 @@ class KavachListenerService : AccessibilityService() {
     }
 
     override fun onServiceConnected() {
+        loadConfig()
         main.post(poll)
         Shizuku.addBinderReceivedListenerSticky { askShizuku() }
         connectPhone()
@@ -169,6 +195,13 @@ class KavachListenerService : AccessibilityService() {
     }
 
     // Drops the real call, for the family's End button. Only reports success once the phone has really left the call.
+    @Suppress("DEPRECATION")
+    private fun telecomEndCall(): Boolean {
+        // Needs only the normal "answer phone calls" permission, not Shizuku
+        if (Build.VERSION.SDK_INT < 28 || checkSelfPermission(android.Manifest.permission.ANSWER_PHONE_CALLS) != PackageManager.PERMISSION_GRANTED) return false
+        return try { (getSystemService(Context.TELECOM_SERVICE) as android.telecom.TelecomManager).endCall() } catch (_: Exception) { false }
+    }
+
     private fun hangUpCall(): String {
         val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         fun gone(): Boolean {
@@ -177,6 +210,7 @@ class KavachListenerService : AccessibilityService() {
         }
         val shellWay = shellCall(KavachShell.HANG_UP)
         if (shellWay != null && gone()) return "ok $shellWay"
+        if (telecomEndCall() && gone()) return "ok telecom permission"
         if (Build.VERSION.SDK_INT >= 31 && performGlobalAction(GLOBAL_ACTION_KEYCODE_HEADSETHOOK) && gone()) return "ok headset key"
         return "failed " + (shellWay ?: "no Shizuku")
     }
@@ -331,6 +365,7 @@ class KavachListenerService : AccessibilityService() {
 
     private fun startCall() {
         inCall = true
+        loadConfig()
         risk = 0
         reportedRoute = ""
         showProtection()
@@ -388,7 +423,7 @@ class KavachListenerService : AccessibilityService() {
                 showWords("Shizuku could not start. Trying the mic.")
             } else {
                 askShizuku()
-                showWords("Shizuku is not on or not allowed. Trying the mic.")
+                showWords("Put the call on speaker so Kavach can hear it.")
                 Thread.sleep(2500)
             }
             val results = sources.map { it.first to "-" }.toMap(LinkedHashMap())

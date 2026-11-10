@@ -22,9 +22,7 @@ def test_health_ok_and_never_leaks_secrets(monkeypatch):
 def test_missing_secrets_listed_when_unset():
     s = Settings(_env_file=None, assemblyai_api_key="", kavach_warning_voice_id="",
                  telegram_bot_token="", telegram_chat_id="")
-    assert s.missing_secrets() == [
-        "ASSEMBLYAI_API_KEY", "KAVACH_WARNING_VOICE_ID", "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID",
-    ]
+    assert s.missing_secrets() == ["ASSEMBLYAI_API_KEY", "TELEGRAM_BOT_TOKEN"]
 
 
 def test_defaults_match_plan():

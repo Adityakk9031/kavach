@@ -44,12 +44,15 @@ module.exports = (config) => {
     fs.mkdirSync(path.join(res, 'values'), { recursive: true });
     fs.writeFileSync(path.join(res, 'values/kavach_strings.xml'),
       '<resources><string name="kavach_accessibility_description">Lets Kavach use the microphone during a call on speaker, to warn you about scams, and show its button over the dialer.</string></resources>');
-    if (!process.env.EXPO_PUBLIC_KAVACH_SERVER || !process.env.EXPO_PUBLIC_KAVACH_KEY) {
-      throw new Error('EXPO_PUBLIC_KAVACH_SERVER and EXPO_PUBLIC_KAVACH_KEY must be set: the app cannot reach the server without them.');
+    // The server address is built in. The key is optional: a public build signs in at run time and the app hands the
+    // account's token to this service through files/kavach-config.json.
+    if (!process.env.EXPO_PUBLIC_KAVACH_SERVER) {
+      throw new Error('EXPO_PUBLIC_KAVACH_SERVER must be set: the app cannot reach the server without it.');
     }
     const src = fs.readFileSync(path.join(c.modRequest.projectRoot, 'plugins/android/KavachListenerService.kt'), 'utf8')
       .replace('__KAVACH_SERVER__', process.env.EXPO_PUBLIC_KAVACH_SERVER || '')
-      .replace('__KAVACH_KEY__', process.env.EXPO_PUBLIC_KAVACH_KEY || '');
+      // A public build must never carry the operator's access key
+      .replace('__KAVACH_KEY__', process.env.EXPO_PUBLIC_KAVACH_PUBLIC === '1' ? '' : (process.env.EXPO_PUBLIC_KAVACH_KEY || ''));
     const dir = path.join(root, 'app/src/main/java/com/kavach/app');
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'KavachListenerService.kt'), src);

@@ -14,10 +14,11 @@ from zoneinfo import ZoneInfo
 
 import httpx
 
+from app import lang
 from app.config import Settings
 
 log = logging.getLogger("kavach.alerts")
-IST = ZoneInfo("Asia/Kolkata")
+IST = ZoneInfo("Asia/Kolkata")  # kept for the original single household's tests; families use their own time zone
 STAGE_NAMES = {"S1": "Authority", "S2": "Threat", "S3": "Secrecy", "S4": "Urgency", "S5": "Credential request",
                "S6": "Payment request", "S7": "Remote access"}
 ACTION = {"S5", "S6", "S7"}
@@ -25,6 +26,13 @@ ACTION = {"S5", "S6", "S7"}
 
 def ist_now(ts: float | None = None) -> str:
     return datetime.fromtimestamp(ts, IST).strftime("%d %b %Y, %H:%M IST") if ts else datetime.now(IST).strftime("%d %b %Y, %H:%M IST")
+
+
+def local_now(tz: str = "UTC", ts: float | None = None) -> str:
+    """The time in the family's own time zone, with its abbreviation (UTC, EST, IST…)."""
+    zone = ZoneInfo(tz or "UTC")
+    when = datetime.fromtimestamp(ts, zone) if ts else datetime.now(zone)
+    return when.strftime("%d %b %Y, %H:%M %Z")
 
 
 def snippet(text: str, limit: int = 140) -> str:
@@ -36,25 +44,27 @@ def snippet(text: str, limit: int = 140) -> str:
     return cut + "…"
 
 
-def stage_list(stages: list[str]) -> str:
-    return ", ".join(STAGE_NAMES.get(s, s) for s in sorted(stages)) or "none yet"
+def stage_list(stages: list[str], t: dict | None = None) -> str:
+    t = t or lang.EN.t
+    return ", ".join(t["stages"].get(s, s) for s in sorted(stages)) or t["none_yet"]
 
 
-def answer_keyboard(token: str, money: bool | None = None, otp: bool | None = None) -> dict:
+def answer_keyboard(token: str, money: bool | None = None, otp: bool | None = None, t: dict | None = None) -> dict:
     """Four buttons under the call-end message: the two questions only a person can answer. A ✅ marks the chosen
     answer. callback_data is `a:<token>:<m|o>:<y|n>` (well under Telegram's 64-byte limit)."""
     def btn(label: str, q: str, yes: bool, current: bool | None) -> dict:
         mark = "✅ " if current is yes else ""
         return {"text": f"{mark}{label}", "callback_data": f"a:{token}:{q}:{'y' if yes else 'n'}"}
 
+    t = t or {}
     return {"inline_keyboard": [
-        [btn("Money sent: Yes", "m", True, money), btn("Money sent: No", "m", False, money)],
-        [btn("OTP/PIN shared: Yes", "o", True, otp), btn("OTP/PIN shared: No", "o", False, otp)]]}
+        [btn(t.get("money_yes", "Money sent: Yes"), "m", True, money), btn(t.get("money_no", "Money sent: No"), "m", False, money)],
+        [btn(t.get("otp_yes", "OTP/PIN shared: Yes"), "o", True, otp), btn(t.get("otp_no", "OTP/PIN shared: No"), "o", False, otp)]]}
 
 
-def control_keyboard(token: str) -> dict:
+def control_keyboard(token: str, label: str = "☎️ End the call") -> dict:
     """Under the warning / takeover alerts: the family can end the call from Telegram."""
-    return {"inline_keyboard": [[{"text": "☎️ End the call", "callback_data": f"c:{token}:e"}]]}
+    return {"inline_keyboard": [[{"text": label, "callback_data": f"c:{token}:e"}]]}
 
 
 class AlertPolicy:
@@ -93,12 +103,27 @@ class AlertPolicy:
 class Alerter:
     def __init__(self, settings: Settings, client: httpx.AsyncClient | None = None):
         self.settings = settings
-        self.enabled = bool(settings.telegram_bot_token and settings.telegram_chat_id)
+        self.enabled = bool(settings.telegram_bot_token)  # which chats get an alert is decided per family
+        self._username: str | None = None
         self.client = client or httpx.AsyncClient(timeout=15)
         self.base = f"https://api.telegram.org/bot{settings.telegram_bot_token}"
 
-    async def send_message(self, text: str, reply_markup: dict | None = None) -> dict:
-        payload = {"chat_id": self.settings.telegram_chat_id, "text": text[:4000], "disable_web_page_preview": True}
+    @property
+    def has_token(self) -> bool:
+        return bool(self.settings.telegram_bot_token)
+
+    async def bot_username(self) -> str | None:
+        """The bot's @name, for the deep link that connects a chat to a family."""
+        if self._username is None and self.has_token:
+            try:
+                body = (await self.client.get(f"{self.base}/getMe")).json()
+                self._username = (body.get("result") or {}).get("username")
+            except Exception:
+                log.warning("could not read the bot's name")
+        return self._username
+
+    async def send_message(self, text: str, reply_markup: dict | None = None, chat_id: str | int | None = None) -> dict:
+        payload = {"chat_id": chat_id or self.settings.telegram_chat_id, "text": text[:4000], "disable_web_page_preview": True}
         if reply_markup:
             payload["reply_markup"] = reply_markup
         r = await self.client.post(f"{self.base}/sendMessage", json=payload)
@@ -153,10 +178,10 @@ class Alerter:
                 log.warning("telegram polling error: %s", e)
                 await asyncio.sleep(5)
 
-    async def send_document(self, path: Path, caption: str) -> dict:
+    async def send_document(self, path: Path, caption: str, chat_id: str | int | None = None) -> dict:
         with open(path, "rb") as f:
             r = await self.client.post(f"{self.base}/sendDocument", data={
-                "chat_id": self.settings.telegram_chat_id, "caption": caption[:900]}, files={"document": (path.name, f)})
+                "chat_id": chat_id or self.settings.telegram_chat_id, "caption": caption[:900]}, files={"document": (path.name, f)})
         body = r.json()
         if not body.get("ok"):
             raise RuntimeError(body.get("description", f"HTTP {r.status_code}"))
@@ -186,16 +211,35 @@ class CallAlerts:
         if turn["channel"] == "caller":
             self.last_caller_text = turn["text"]
 
+    @property
+    def family(self):
+        return getattr(self.room, "family", None)
+
+    @property
+    def t(self) -> dict:
+        return self.family.pack.t if self.family is not None else lang.EN.t
+
+    @property
+    def parent(self) -> str:
+        return self.family.parent_address if self.family is not None else self.alerter.settings.parent_address
+
+    def _chats(self) -> list:
+        """Every Telegram chat linked to this family. The original single household uses the configured chat."""
+        if self.family is None:
+            return [None] if self.alerter.settings.telegram_chat_id else []
+        return list(self.family.chat_ids)
+
     def _caller(self) -> str:
         row = self.room.store.query("SELECT caller_number FROM calls WHERE id=?", (self.room.call_id,))
-        return (row[0]["caller_number"] if row else None) or "unknown number"
+        return (row[0]["caller_number"] if row else None) or self.t["unknown"]
 
     def _body(self, headline: str, risk: float, stages: list[str]) -> str:
+        when = local_now(self.family.timezone) if self.family is not None else ist_now()
         return (f"{headline}\n"
-                f"Risk {round(risk)}/100 · {stage_list(stages)}\n"
-                f"Caller: {self._caller()}\n"
+                f"{self.t['risk'].format(risk=round(risk))} · {stage_list(stages, self.t)}\n"
+                f"{self.t['caller']}: {self._caller()}\n"
                 f"“{snippet(self.last_caller_text)}”\n"
-                f"{ist_now()}")
+                f"{when}")
 
     def token(self) -> str:
         """One short token per call, shared by every button we put in Telegram for it."""
@@ -205,20 +249,18 @@ class CallAlerts:
 
     async def on_trigger(self, pipeline, decision, info: dict) -> None:
         self.last_stages = decision.stages_all
-        await self._send("warning", self._body("🚨 Kavach: possible scam call detected",
-                                               decision.risk_cum, decision.stages_all) +
-                         "\nTap below to end the call, or send a voice note and it will play on Papa's phone.",
-                         decision.stages_all, control=True)
+        await self._send("warning", self._body(self.t["warn_head"], decision.risk_cum, decision.stages_all) +
+                         "\n" + self.t["warn_tail"].format(p=self.parent), decision.stages_all, control=True)
 
     async def on_new_stage(self, pipeline, decision, info: dict) -> None:
         self.last_stages = decision.stages_all
         if not pipeline.triggered:
             return
-        await self._send("stage_update", self._body("⚠️ Kavach: the call is escalating",
+        await self._send("stage_update", self._body(self.t["escalate_head"],
                                                     decision.risk_cum, decision.stages_all), decision.new_stages)
 
     async def on_takeover(self, persona) -> None:
-        await self._send("takeover", self._body("🛡️ Kavach has taken over the call (decoy persona is talking)",
+        await self._send("takeover", self._body(self.t["takeover_head"],
                                                 self.pipeline.max_risk, self.last_stages), None, control=True)
 
     async def call_ended(self, report_text: str, pdf_path: Path | None) -> None:
@@ -233,8 +275,9 @@ class CallAlerts:
         if room.ended and kind != "call_end":
             room.log_event("alert_suppressed", {"kind": kind, "reason": "call already ended"})
             return
-        if not self.alerter.enabled:
-            room.log_event("alert_skipped", {"kind": kind, "reason": "telegram not configured"})
+        chats = self._chats()
+        if not self.alerter.enabled or not chats:
+            room.log_event("alert_skipped", {"kind": kind, "reason": "telegram not configured" if not self.alerter.enabled else "no telegram chat linked"})
             return
         if not self.policy.allow(kind, stages):
             room.log_event("alert_suppressed", {"kind": kind, "sent": self.policy.sent})
@@ -243,12 +286,16 @@ class CallAlerts:
 
         async def go():
             try:
-                markup = (answer_keyboard(self.token()) if keyboard
-                          else control_keyboard(self.token()) if control else None)
-                body = await self.alerter.send_message(text, markup)
-                if document is not None and document.exists():
-                    await self.alerter.send_document(document, "1930 complaint draft (review before filing)")
-                room.log_event("alert_sent", {"kind": kind, "message_id": body["result"]["message_id"]})
+                markup = (answer_keyboard(self.token(), t=self.t) if keyboard
+                          else control_keyboard(self.token(), self.t["end_button"]) if control else None)
+                first = None
+                for chat in chats:
+                    kw = {"chat_id": chat} if chat is not None else {}
+                    body = await self.alerter.send_message(text, markup, **kw)
+                    first = first or body
+                    if document is not None and document.exists():
+                        await self.alerter.send_document(document, self.t["doc_caption"], **kw)
+                room.log_event("alert_sent", {"kind": kind, "message_id": first["result"]["message_id"]})
             except Exception as e:
                 room.log_event("alert_failed", {"kind": kind, "error": str(e)[:200]})
                 log.warning("alert %s failed: %s", kind, e)

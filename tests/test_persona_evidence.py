@@ -157,7 +157,7 @@ class OnePool:
     def __init__(self, s):
         self.s = s
 
-    async def get(self, voice, label="x"):
+    async def get(self, voice, label="x", language=None):
         return self.s
 
 

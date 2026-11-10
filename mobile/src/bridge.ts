@@ -15,8 +15,8 @@ export function bridgeUrl(s: Settings, opts: { call: string; role: Role; mode: '
 export type Command = { type: 'takeover' | 'takeback' | 'end_call' | 'barge_in' | 'sample' | 'stop' | 'rec_start' | 'rec_stop' | 'rec_cancel' };
 
 // The hidden recorder page that records a voice sample and uploads it with the speaker's consent.
-export function voiceRecorderUrl(s: Settings, person: 'papa' | 'son', speakerName: string): string {
-  const q = new URLSearchParams({ person, name: speakerName });
+export function voiceRecorderUrl(s: Settings, person: 'papa' | 'son', speakerName: string, take = 1): string {
+  const q = new URLSearchParams({ person, name: speakerName, take: String(take) });
   if (s.accessKey) q.set('key', s.accessKey);
   return `${normalizeUrl(s.serverUrl)}/web/voicerec.html?${q.toString()}`;
 }

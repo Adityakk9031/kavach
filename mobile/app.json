@@ -25,7 +25,10 @@
       "permissions": [
         "RECORD_AUDIO",
         "MODIFY_AUDIO_SETTINGS",
-        "INTERNET"
+        "INTERNET",
+        "READ_PHONE_STATE",
+        "ANSWER_PHONE_CALLS",
+        "POST_NOTIFICATIONS"
       ],
       "versionCode": 1
     },

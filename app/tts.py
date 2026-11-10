@@ -48,8 +48,9 @@ class Request:
 
 
 class TtsSession:
-    def __init__(self, settings: Settings, voice_id: str, label: str = "tts"):
+    def __init__(self, settings: Settings, voice_id: str, label: str = "tts", language: str | None = None):
         self.settings, self.voice_id, self.label = settings, voice_id, label
+        self.language = language or settings.language
         self.ws = None
         self.begin: dict = {}
         self._reader: asyncio.Task | None = None
@@ -70,7 +71,7 @@ class TtsSession:
 
     def _url(self) -> str:
         s = self.settings
-        q = {"voice_id": self.voice_id, "language": s.language, "sample_rate": s.sample_rate,
+        q = {"voice_id": self.voice_id, "language": self.language, "sample_rate": s.sample_rate,
              "encoding": "pcm_s16le", "word_boundaries": "false"}
         return f"{s.tts_ws_url}?{urlencode(q)}"
 
@@ -215,16 +216,17 @@ class TtsPool:
         self.sessions: dict[str, TtsSession] = {}
         self._locks: dict[str, asyncio.Lock] = {}
 
-    async def get(self, voice_id: str, label: str = "tts") -> TtsSession:
-        lock = self._locks.setdefault(voice_id, asyncio.Lock())
+    async def get(self, voice_id: str, label: str = "tts", language: str | None = None) -> TtsSession:
+        key = f"{voice_id}|{language or self.settings.language}"  # one session per voice and language
+        lock = self._locks.setdefault(key, asyncio.Lock())
         async with lock:
-            session = self.sessions.get(voice_id)
+            session = self.sessions.get(key)
             if session is None or not session.connected:
                 if session:
                     log.warning("%s session for %s ended (%s); reconnecting", label, voice_id, session.close_reason)
-                session = TtsSession(self.settings, voice_id, label)
+                session = TtsSession(self.settings, voice_id, label, language)
                 await session.start()
-                self.sessions[voice_id] = session
+                self.sessions[key] = session
             return session
 
     async def close(self) -> None:

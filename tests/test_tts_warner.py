@@ -182,7 +182,7 @@ class FakePool:
     def __init__(self, session):
         self.session = session
 
-    async def get(self, voice, label="x"):
+    async def get(self, voice, label="x", language=None):
         return self.session
 
 

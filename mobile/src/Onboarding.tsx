@@ -7,7 +7,7 @@ import type { Role } from './prefs';
 const PAGES = [
   { n: '1', title: 'Kavach listens, so you are never alone on a call', body: 'When someone pressures you about money, police or your bank, Kavach notices the signs of a scam as the call happens. Normal calls are left alone.' },
   { n: '2', title: 'It speaks up in a voice you trust', body: 'If a call sounds like a scam, Kavach quietly warns you in your family\'s voice. The caller cannot hear it. Scared? Tap once and Kavach talks to the caller for you, in your own voice, and keeps the evidence.' },
-  { n: '3', title: 'Your family is told at once', body: 'Your family gets a message straight away. They can end the call, or send you a voice note that plays on your phone. Kavach also prepares the complaint for 1930, for you to check and file.' },
+  { n: '3', title: 'Your family is told at once', body: 'Your family gets a message straight away. They can end the call, or send you a voice note that plays on your phone. Kavach also prepares a fraud report, for you to check and file.' },
 ];
 
 export function Onboarding({ onDone, startAtRoles = false, onCancel }: { onDone: (role: Role) => void; startAtRoles?: boolean; onCancel?: () => void }) {
@@ -43,7 +43,7 @@ export function Onboarding({ onDone, startAtRoles = false, onCancel }: { onDone:
           <Pressable onPress={() => onDone('papa')} accessibilityRole="button">
             <View style={{ backgroundColor: C.panel, borderColor: C.line, borderWidth: 1, borderRadius: 14, padding: 20, marginBottom: 12 }}>
               <Text style={{ color: C.ink, fontSize: 20, fontWeight: '700' }}>This phone is the one to protect</Text>
-              <Text style={{ color: C.muted, marginTop: 4, fontSize: 15 }}>For Papa, Mummy or anyone who gets scam calls. Kavach runs on this phone.</Text>
+              <Text style={{ color: C.muted, marginTop: 4, fontSize: 15 }}>For a parent, grandparent or anyone who gets scam calls. Kavach runs on this phone.</Text>
             </View>
           </Pressable>
           <Pressable onPress={() => onDone('family')} accessibilityRole="button">

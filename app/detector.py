@@ -20,24 +20,25 @@ STAGES = {
     "S2": "Threat or fear (arrest, warrant, case filed, account freeze, illegal parcel, SIM block)",
     "S3": "Isolation or secrecy (don't tell anyone, stay on the call, move to video call, don't disconnect)",
     "S4": "Urgency (within one hour, immediately, or else)",
-    "S5": "Credential request (OTP, PIN, CVV, card number, Aadhaar, PAN, password)",
-    "S6": "Payment request (UPI transfer, 'safe' or 'RBI verification' account, gift cards, fees or fines)",
+    "S5": "Credential request (one-time code, PIN, CVV, card number, national ID or Social Security number, bank login, password)",
+    "S6": "Payment request (bank or instant transfer, wire, crypto, 'safe account' or 'verification' account, gift cards, fees or fines)",
     "S7": "Remote access (AnyDesk, TeamViewer, screen share, installing an APK)",
 }
 PRESSURE = {"S1", "S2", "S3"}
 ACTION = {"S5", "S6", "S7"}
 
-SYSTEM_PROMPT = f"""You are a scam-call detector protecting an elderly person in India. You read a live phone
+SYSTEM_PROMPT = f"""You are a scam-call detector protecting an elderly person anywhere in the world. You read a live phone
 transcript and report which scam stages the CALLER has used so far.
 
 Stages:
 {chr(10).join(f"{k}: {v}" for k, v in STAGES.items())}
 
 Rules:
+- The call may be in English, Spanish or Portuguese. Judge it the same way in any of them and copy quotes exactly as spoken.
 - Tag a stage only when the CALLER does it in this call. The listener's own words never count.
 - Ordinary callers identify themselves: a bank, courier, clinic, shop or company saying who they are and why they
-  call is NOT S1. S1 means authority is used as LEVERAGE: claiming to be police, CBI, customs, RBI or the bank's
-  "head office" in order to frighten, pressure or control the listener.
+  call is NOT S1. S1 means authority is used as LEVERAGE: claiming to be police, a tax agency, customs, a central bank, a government office or the bank's
+  "fraud department" in order to frighten, pressure or control the listener.
 - S2 is a threat aimed at the listener (arrest, legal action, losing money unless they comply). A bank protecting
   the customer ("we blocked your card for your safety", "visit your branch") is NOT a threat.
 - S5 means the caller ASKS the listener to give, read out or enter a credential. A caller warning
@@ -50,8 +51,8 @@ Rules:
 - Strong signs of a genuine call: the caller warns about scams, tells the listener NOT to share codes, offers to
   verify through an official number or the branch, lets the listener hang up, and asks for nothing sensitive.
   Rate such calls 0-15 however many sensitive words (bank, police, OTP, block) appear.
-- Digital-arrest scams (fake police/CBI/customs claiming a parcel or Aadhaar crime, demanding the person stay on
-  the line and pay) are the most common. Rate them high once authority plus a threat or secrecy appears.
+- Impersonation scams (fake police, tax agency, customs, bank fraud department or tech support claiming a crime, a debt,
+  a frozen account or a parcel, and demanding the person stay on the line and pay) are the most common. Rate them high once authority plus a threat or secrecy appears.
 - risk is 0-100, your confidence that this call is a scam RIGHT NOW given everything so far:
   0-15 normal call; 20-40 something odd but no demand yet; 50-65 clear pressure tactics without a demand;
   70+ the caller demands money or credentials while using pressure, secrecy or a false identity.

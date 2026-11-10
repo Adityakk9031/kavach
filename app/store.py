@@ -46,6 +46,10 @@ class Store:
         self._lock = threading.Lock()
         with self._lock:
             self._db.executescript(SCHEMA)
+            try:  # older databases: calls now belong to a family
+                self._db.execute("ALTER TABLE calls ADD COLUMN family_id TEXT")
+            except sqlite3.OperationalError:
+                pass
 
     def _exec(self, sql: str, args: tuple = ()) -> sqlite3.Cursor:
         with self._lock:

@@ -27,7 +27,7 @@ log = logging.getLogger("kavach.stt")
 OnEvent = Callable[[dict], Awaitable[None]]
 
 
-def build_url(settings: Settings) -> str:
+def build_url(settings: Settings, language_codes: list[str] | None = None) -> str:
     params = {
         "speech_model": settings.stt_model,
         "sample_rate": settings.sample_rate,
@@ -35,7 +35,7 @@ def build_url(settings: Settings) -> str:
         "format_turns": "true",
     }
     if settings.stt_model.startswith("universal-3"):
-        params["language_codes"] = json.dumps(settings.stt_language_codes)
+        params["language_codes"] = json.dumps(language_codes or settings.stt_language_codes)
         params["mode"] = settings.stt_mode
     return f"{settings.stt_ws_url}?{urlencode(params)}"
 
@@ -62,7 +62,8 @@ def normalize(msg: dict) -> dict | None:
 
 
 class SttSession:
-    def __init__(self, channel: str, settings: Settings, on_event: OnEvent):
+    def __init__(self, channel: str, settings: Settings, on_event: OnEvent, language_codes: list[str] | None = None):
+        self.language_codes = language_codes
         self.channel = channel
         self.settings = settings
         self.on_event = on_event
@@ -74,7 +75,7 @@ class SttSession:
 
     async def start(self) -> None:
         self._ws = await websockets.connect(
-            build_url(self.settings),
+            build_url(self.settings, self.language_codes),
             additional_headers={"Authorization": self.settings.assemblyai_api_key},
             max_size=None,
         )

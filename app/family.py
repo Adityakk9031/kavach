@@ -14,6 +14,7 @@ import time
 
 import av
 
+from app import lang
 from app.call_room import CallRoom, RoomRegistry
 
 log = logging.getLogger("kavach.family")
@@ -50,8 +51,8 @@ def decode_voice_note(data: bytes, rate: int = 16000, max_seconds: int = MAX_SEC
 
 
 class FamilyDesk:
-    def __init__(self, alerter, store, rooms: RoomRegistry, settings):
-        self.alerter, self.store, self.rooms, self.settings = alerter, store, rooms, settings
+    def __init__(self, alerter, store, rooms: RoomRegistry, settings, accounts=None):
+        self.alerter, self.store, self.rooms, self.settings, self.accounts = alerter, store, rooms, settings, accounts
 
     def _log(self, type_: str, **payload) -> None:
         """What the family did in Telegram and what came of it, kept apart from any call so a test can be checked from
@@ -61,27 +62,56 @@ class FamilyDesk:
         except Exception:
             log.exception("could not log a family action")
 
-    def _authorized(self, chat_id) -> bool:
-        return str(chat_id) == str(self.settings.telegram_chat_id)
+    def _who(self, chat_id):
+        """(allowed, family, language texts, how the parent is addressed). Only a chat linked to a family, or the one
+        chat configured for the original household, may act."""
+        fam = self.accounts.family_for_chat(chat_id) if self.accounts is not None else None
+        if fam is not None:
+            return True, fam, fam.pack.t, fam.parent_address
+        ok = str(chat_id) == str(self.settings.telegram_chat_id)
+        return ok, None, lang.EN.t, self.settings.parent_address
 
-    async def _say(self, text: str) -> None:
+    def _authorized(self, chat_id) -> bool:
+        return self._who(chat_id)[0]
+
+    async def _say(self, text: str, chat_id=None, fam=None) -> None:
         try:
-            await self.alerter.send_message(text)
+            if fam is not None and chat_id is not None:
+                await self.alerter.send_message(text, chat_id=chat_id)
+            else:
+                await self.alerter.send_message(text)
         except Exception:
             log.exception("could not reply in Telegram")
 
-    # ---- Papa's cloned voice for the takeover ----------------------------------------------------------------------
+    def _own_call(self, room, fam) -> bool:
+        return fam is None or room is None or (room.family.id if room.family else "default") == fam.id
+
+    # ---- linking a chat to a family: /start <token> ----------------------------------------------------------
+
+    async def _start(self, chat_id, text: str) -> None:
+        parts = text.split(maxsplit=1)
+        if len(parts) < 2 or self.accounts is None:
+            await self._say(lang.EN.t["welcome"], chat_id, fam=True)
+            return
+        fam = self.accounts.link_chat(parts[1].strip(), chat_id)
+        if fam is None:
+            await self._say(lang.EN.t["link_bad"], chat_id, fam=True)
+            return
+        self._log("telegram_linked", family=fam.id)
+        await self._say(fam.pack.t["linked"].format(p=fam.parent_address), chat_id, fam=True)
+
+    # ---- Papa's cloned voice for the takeover (the original household; families record theirs in the app) -------
 
     async def _set_voice(self, text: str) -> None:
         """`/setvoice <voice id>`: the takeover persona speaks in this voice from the next takeover on (until a restart;
-        put PERSONA_VOICE_ID in .env to keep it). The clone itself is made in the AssemblyAI dashboard."""
+        put PERSONA_VOICE_ID in .env to keep it)."""
         parts = text.split()
         if len(parts) == 1:
             await self._say(f"The takeover voice is now: {self.settings.persona_voice_id}\n"
                             "To change it: /setvoice <voice id from the AssemblyAI dashboard>")
         elif len(parts) == 2 and VOICE_ID_RE.fullmatch(parts[1]):
             self.settings.persona_voice_id = parts[1]
-            await self._say(f"Done. Kavach will speak in voice {parts[1]} when it takes over a call.")
+            await self._say(lang.EN.t["voice_set"].format(voice=parts[1]))
         else:
             await self._say("That does not look like a voice id. Copy it exactly from the AssemblyAI dashboard.")
 
@@ -89,77 +119,88 @@ class FamilyDesk:
 
     async def handle_message(self, update: dict) -> None:
         msg = update.get("message") or {}
-        voice = msg.get("voice")
-        if not self._authorized((msg.get("chat") or {}).get("id")):
-            return
+        chat_id = (msg.get("chat") or {}).get("id")
         text = (msg.get("text") or "").strip()
-        if text.startswith("/setvoice"):
+        if text.startswith("/start"):
+            await self._start(chat_id, text)
+            return
+        allowed, fam, t, p = self._who(chat_id)
+        if not allowed:
+            return
+        voice = msg.get("voice")
+        if text.startswith("/setvoice") and (fam is None or fam.id == "default"):
             await self._set_voice(text)
             return
         if not voice:
             return
-        room = self.rooms.family_target()
+        say = lambda m: self._say(m, chat_id, fam)  # noqa: E731
+        fid = fam.id if fam is not None else None
+        room = self.rooms.family_target(family_id=fid) if fid else self.rooms.family_target()
         # With no call running, the phone's always-on link is surer than the socket of a call that has just ended.
-        phone = getattr(self.rooms, "phone", None) if room is None or room.ended else None
+        link = (self.rooms.phones.get(fid) if fid else getattr(self.rooms, "phone", None))
+        phone = link if room is None or room.ended else None
         self._log("voice_note", call=getattr(room, "call_id", None), call_running=bool(room and not room.ended),
-                  phone_link=getattr(self.rooms, "phone", None) is not None, seconds=voice.get("duration"))
+                  phone_link=link is not None, seconds=voice.get("duration"))
         if room is None and phone is None:
             self._log("voice_note_result", result="no phone")
-            await self._say("I could not send this. Papa's phone is not connected to Kavach right now.")
+            await say(t["no_phone"].format(p=p))
             return
         if voice.get("duration", 0) > MAX_SECONDS:
-            await self._say(f"That voice note is too long. Keep it under {MAX_SECONDS} seconds.")
+            await say(t["too_long"].format(n=MAX_SECONDS))
             return
         try:
             pcm = decode_voice_note(await self.alerter.download_file(voice["file_id"]), self.settings.sample_rate)
         except ValueError as e:
-            await self._say(f"I could not play that: {e}.")
+            await say(t["cannot_play"].format(why=e))
             return
         except Exception:
             log.exception("could not fetch the voice note")
-            await self._say("I could not download that voice note. Please try again.")
+            await say(t["cannot_download"])
             return
         seconds = round(len(pcm) / 2 / self.settings.sample_rate)
         if phone is not None:
-            delivered = await self.rooms.play_on_phone(pcm)
+            delivered = await (self.rooms.play_on_phone(pcm, family_id=fid) if fid else self.rooms.play_on_phone(pcm))
             self._log("voice_note_result", result="played" if delivered else "no ack", via="phone link")
-            await self._say(f"▶️ Playing on Papa's phone now ({seconds} s)." if delivered
-                            else "Papa's phone did not confirm it got this. It may have no internet right now.")
+            await say(t["playing"].format(p=p, n=seconds) if delivered else t["no_confirm"].format(p=p))
             return
-        # The family's voice comes first: stop a warning that is still playing in Papa's earpiece.
+        # The family's voice comes first: stop a warning that is still playing in the parent's earpiece.
         if room.warning is not None and room.warning.active:
             await room.warning.barge_in("family")
         delivered = await room.play_family(pcm)
         self._log("voice_note_result", result="played" if delivered else "no ack", via="call")
-        await self._say(f"▶️ Playing on Papa's phone now ({seconds} s)." if delivered
-                        else "Papa's app is not connected, so it could not be played.")
+        await say(t["playing"].format(p=p, n=seconds) if delivered else t["app_offline"].format(p=p))
 
     # ---- the End-the-call button ------------------------------------------------------------------------------
 
     async def handle_control(self, update: dict) -> None:
         cq = update.get("callback_query") or {}
         message = cq.get("message") or {}
-        if not self._authorized((message.get("chat") or {}).get("id")):
+        chat_id = (message.get("chat") or {}).get("id")
+        allowed, fam, t, p = self._who(chat_id)
+        if not allowed:
             log.warning("ignored a control press from an unexpected chat")
             return
         m = CONTROL_RE.fullmatch(cq.get("data", ""))
         if not m:
             return
+        say = lambda msg: self._say(msg, chat_id, fam)  # noqa: E731
         call_id = self.store.call_for_token(m.group(1))
         room = self.rooms.rooms.get(call_id) if call_id else None
+        if room is not None and not self._own_call(room, fam):
+            await self.alerter.answer_callback(cq["id"], t["already_ended"])  # never reveal or end another family's call
+            return
         self._log("end_pressed", call=call_id, running=bool(room and not room.ended))
         if room is None or room.ended:
-            await self.alerter.answer_callback(cq["id"], "That call has already ended.")
+            await self.alerter.answer_callback(cq["id"], t["already_ended"])
             return
         room.log_event("ended_from_telegram", {})
-        await self.alerter.answer_callback(cq["id"], "Ending the call.")
+        await self.alerter.answer_callback(cq["id"], t["ending"])
         if room.phone_call:
             result = await room.hang_up()
             self._log("end_result", call=call_id, result=result)
             if not (result or "").startswith("ok"):
                 room.log_event("hang_up_failed", {"result": result})
-                await self._say("⚠️ I could not cut Papa's phone call, so it is still on. Kavach is still protecting it. "
-                                "Please try ringing or messaging Papa.")
+                await say(t["could_not_cut"].format(p=p))
                 return
         await room.end()
-        await self._say("☎️ The call was ended. Send a voice note now and it will play on Papa's phone.")
+        await say(t["call_ended"].format(p=p))

@@ -9,7 +9,9 @@ export const normalizeUrl = (u: string) => u.trim().replace(/\/+$/, '');
 
 // Built-in defaults (EXPO_PUBLIC_* values from mobile/.env at bundle time) so a demo user opens straight onto Home.
 // A server and code saved in "Server and access code" take priority over the defaults.
-const DEFAULTS: Settings | null = process.env.EXPO_PUBLIC_KAVACH_SERVER
+// A public build (EXPO_PUBLIC_KAVACH_PUBLIC=1) never carries an access key: everyone signs in and gets their own token.
+const PUBLIC_BUILD = process.env.EXPO_PUBLIC_KAVACH_PUBLIC === '1';
+const DEFAULTS: Settings | null = process.env.EXPO_PUBLIC_KAVACH_SERVER && !PUBLIC_BUILD
   ? { serverUrl: normalizeUrl(process.env.EXPO_PUBLIC_KAVACH_SERVER), accessKey: (process.env.EXPO_PUBLIC_KAVACH_KEY ?? '').trim() }
   : null;
 

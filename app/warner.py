@@ -34,12 +34,13 @@ TEMPLATES = {
 PRIORITY = ["S7", "S5", "S6", "S3", "S2", "S1", "S4"]  # most dangerous action first
 
 
-def pick_template(stages: list[str], parent: str) -> tuple[str, str]:
-    """Returns (stage used, text)."""
+def pick_template(stages: list[str], parent: str, pack=None) -> tuple[str, str]:
+    """Returns (stage used, text), in the family's language when a language pack is given."""
+    templates = pack.warnings if pack is not None else TEMPLATES
     for s in PRIORITY:
-        if s in stages and s in TEMPLATES:
-            return s, TEMPLATES[s].format(p=parent)
-    return "default", TEMPLATES["default"].format(p=parent)
+        if s in stages and s in templates:
+            return s, templates[s].format(p=parent)
+    return "default", templates["default"].format(p=parent)
 
 
 class Warner:
@@ -61,13 +62,16 @@ class Warner:
         room.warning = w
         return w
 
-    async def session(self) -> tuple[TtsSession, bool]:
-        """The warning TTS session; falls back to a library voice (never silently: the UI is told)."""
-        try:
-            return await self.pool.get(self.settings.kavach_warning_voice_id, "warning"), True
-        except (TtsError, OSError) as e:
-            log.error("cloned voice unavailable (%s); using fallback voice", e)
-            return await self.pool.get(self.settings.fallback_warning_voice_id, "warning-fallback"), False
+    async def session(self, family=None) -> tuple[TtsSession, bool]:
+        """The warning TTS session, in the son's cloned voice. Falls back to a library voice, and says so (the UI is told)."""
+        language = family.pack.tts if family is not None else None
+        voice = family.son_voice_id if family is not None and family.id != "default" else self.settings.kavach_warning_voice_id
+        if voice:
+            try:
+                return await self.pool.get(voice, "warning", language), True
+            except (TtsError, OSError) as e:
+                log.error("cloned voice unavailable (%s); using fallback voice", e)
+        return await self.pool.get(self.settings.fallback_warning_voice_id, "warning-fallback", language), False
 
 
 class CallWarning:
@@ -95,7 +99,9 @@ class CallWarning:
         return self.delivering or time.monotonic() < self.play_until
 
     async def on_trigger(self, pipeline: CallPipeline, decision, info: dict) -> None:
-        stage, text = pick_template(decision.stages_all, self.warner.settings.parent_address)
+        fam = self.room.family
+        stage, text = pick_template(decision.stages_all, fam.parent_address if fam else self.warner.settings.parent_address,
+                                    fam.pack if fam else None)
         await self.speak(text, stage, trigger_at=time.monotonic(), turn_end_at=info.get("turn_end_at"))
 
     async def speak(self, text: str, stage: str, trigger_at: float, turn_end_at: float | None) -> None:
@@ -109,7 +115,7 @@ class CallWarning:
             room.log_event("warn_skipped", {"reason": "receiver not connected"})
             return
         try:
-            session, cloned = await self.warner.session()
+            session, cloned = await self.warner.session(room.family)
         except Exception as e:
             room.log_event("warn_error", {"error": str(e)})
             await room.broadcast({"type": "warning", "state": "error", "error": str(e)})

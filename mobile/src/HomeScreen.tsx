@@ -6,6 +6,7 @@ import { Btn, C, Logo, Panel, Pill, Screen, SectionLabel, T, Toggle } from './ui
 import { api, type Settings } from './config';
 import type { Role } from './prefs';
 
+const P = PermissionsAndroid.PERMISSIONS;
 const rand = () => Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('');
 
 function Step({ n, title, body, done, children }: { n: number; title: string; body: string; done?: boolean; children?: React.ReactNode }) {
@@ -24,8 +25,8 @@ function Step({ n, title, body, done, children }: { n: number; title: string; bo
   );
 }
 
-export function HomeScreen({ role, settings, onProtect, onCaller, onSettings, onVoice, onReset, onSwitch }: {
-  role: Role; settings: Settings;
+export function HomeScreen({ role, settings, onProtect, onCaller, onSettings, onVoice, onReset, onSwitch, signedIn }: {
+  role: Role; settings: Settings; signedIn?: boolean;
   onProtect: (code: string, rehearsal: boolean, listen?: boolean) => void;
   onCaller: (code: string, rehearsal: boolean) => void;
   onSettings: () => void;
@@ -39,6 +40,16 @@ export function HomeScreen({ role, settings, onProtect, onCaller, onSettings, on
   const [voice, setVoice] = useState<'unknown' | 'yes' | 'no'>('unknown');
   const [linked, setLinked] = useState<boolean | null>(null);
   const papa = role === 'papa';
+  const [allowed, setAllowed] = useState(false);
+  const wanted = () => [P.RECORD_AUDIO, P.READ_PHONE_STATE, P.ANSWER_PHONE_CALLS, ...(Number(Platform.Version) >= 33 ? [P.POST_NOTIFICATIONS] : [])].filter(Boolean) as any[];
+  useEffect(() => {
+    if (Platform.OS !== 'android' || !papa) return;
+    Promise.all(wanted().map((x) => PermissionsAndroid.check(x))).then((r) => setAllowed(r.every(Boolean))).catch(() => {});
+  }, [papa]);
+  async function allow() {
+    const r = await PermissionsAndroid.requestMultiple(wanted());
+    setAllowed(Object.values(r).every((v) => v === 'granted'));
+  }
 
   useEffect(() => {
     const { base, headers } = api(settings);
@@ -73,17 +84,17 @@ export function HomeScreen({ role, settings, onProtect, onCaller, onSettings, on
 
           <SectionLabel>Set up once</SectionLabel>
           <Panel>
-            <Step n={1} title="Turn on Kavach" body={'In Accessibility, open "Kavach call protection" and switch it on.'}>
-              {Platform.OS === 'android' ? <Btn label="Open Accessibility" kind="primary" onPress={async () => {
-                await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
-                Linking.sendIntent('android.settings.ACCESSIBILITY_SETTINGS');
-              }} /> : null}
+            <Step n={1} title="Allow Kavach" done={allowed} body="Kavach needs the microphone, to know when a call is on, and to end a scam call when your family asks.">
+              {Platform.OS === 'android' && !allowed ? <Btn label="Allow" kind="primary" onPress={allow} /> : null}
             </Step>
-            <Step n={2} title="Start Shizuku" body="Open the Shizuku app, start it, and allow Kavach. This lets Kavach hear the call without the speaker." />
+            <Step n={2} title="Turn on Kavach" body={'In Accessibility, open "Kavach call protection" and switch it on.'}>
+              {Platform.OS === 'android' ? <Btn label="Open Accessibility" kind="primary" onPress={() => Linking.sendIntent('android.settings.ACCESSIBILITY_SETTINGS')} /> : null}
+            </Step>
             <Step n={3} title="Record your voice" done={voice === 'yes'}
-              body="20 seconds. If you hand a call over, Kavach talks to the caller in your voice.">
+              body="Up to three short takes. If you hand a call over, Kavach talks to the caller in your own voice, so the caller does not know.">
               <Btn label={voice === 'yes' ? 'Record again' : 'Record my voice'} onPress={onVoice} />
             </Step>
+            <Step n={4} title="During a call" body="Tap Speaker on the call screen so Kavach can hear the caller. A small Kavach card shows it is listening." />
           </Panel>
         </View>
       ) : (
@@ -117,7 +128,7 @@ export function HomeScreen({ role, settings, onProtect, onCaller, onSettings, on
           <Panel>
             {[['End the call', 'Tap the button under the alert. The call on Papa\'s phone is cut.'],
               ['Send a voice note', 'It plays on Papa\'s phone straight away, during the call or after it.'],
-              ['Get the complaint draft', 'A PDF for 1930 arrives after the call, for you to check and file.']].map(([t, b], k) => (
+              ['Get the report draft', 'A PDF arrives after the call, for you to check and file.']].map(([t, b], k) => (
               <View key={t} style={{ marginTop: k ? 14 : 0 }}>
                 <Text style={[T.body, { fontWeight: '600' }]}>{t}</Text>
                 <Text style={T.muted}>{b}</Text>
@@ -129,7 +140,7 @@ export function HomeScreen({ role, settings, onProtect, onCaller, onSettings, on
 
       <View style={{ flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', marginTop: 8 }}>
         <Pressable onPress={onSwitch} style={{ padding: 12 }} accessibilityRole="button">
-          <Text style={T.muted}>{papa ? 'Not Papa? Switch to family' : 'Switch to the protected phone'}</Text>
+          <Text style={T.muted}>{signedIn ? 'Leave this family' : papa ? 'Not Papa? Switch to family' : 'Switch to the protected phone'}</Text>
         </Pressable>
         <Pressable onPress={() => setTools(!tools)} style={{ padding: 12 }} accessibilityRole="button">
           <Text style={T.muted}>{tools ? 'Hide tester tools' : 'Tester tools'}</Text>

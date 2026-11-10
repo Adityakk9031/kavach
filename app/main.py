@@ -15,6 +15,8 @@ from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Red
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
 
+from app import lang
+from app.accounts import DEFAULT_FAMILY, AccountError, Accounts, Identity
 from app.call_room import ROLES, Peer, RoomRegistry
 from app.config import get_settings
 from app.detector import Detector
@@ -39,12 +41,13 @@ for _noisy in ("httpx", "httpcore"):
 
 settings = get_settings()
 store = Store(settings.db_path)
+accounts = Accounts(store, settings)
 
 
-def stt_factory(channel: str, on_event):
+def stt_factory(channel: str, on_event, family=None):
     if not settings.assemblyai_api_key:
         return NullStt(channel, on_event)
-    return SttSession(channel, settings, on_event)
+    return SttSession(channel, settings, on_event, [family.pack.stt] if family is not None else None)
 
 
 llm = LLM(settings)
@@ -60,10 +63,10 @@ alerter = Alerter(settings)
 def attach_pipeline(room) -> None:
     if settings.assemblyai_api_key:
         room.pipeline = CallPipeline(room, detector)
-        if settings.kavach_warning_voice_id:
-            warner.attach(room, room.pipeline)
+        warner.attach(room, room.pipeline)  # with no cloned voice yet it warns in a library voice, and says so
         persona.attach(room)
-        room.evidence = EvidenceCollector(room, llm, settings.persona_model, room.pipeline, (settings.decoy.name,))
+        decoys = tuple({settings.decoy.name} | {p.decoy_name for p in lang.PACKS.values()})
+        room.evidence = EvidenceCollector(room, llm, settings.persona_model, room.pipeline, decoys)
         room.alerts = CallAlerts(alerter, room, room.pipeline, room.persona, settings.max_alerts_per_call)
 
         room.finalize_hooks.append(make_finalize(room, store, settings))
@@ -85,7 +88,7 @@ async def loop_lag_monitor(threshold_ms: int = 300) -> None:
                     room.log_event("loop_lag", {"ms": round(lag)})
 
 
-desk = FamilyDesk(alerter, store, rooms, settings)
+desk = FamilyDesk(alerter, store, rooms, settings, accounts)
 
 
 async def telegram_update(update: dict) -> None:
@@ -94,7 +97,7 @@ async def telegram_update(update: dict) -> None:
     if data.startswith("c:"):
         await desk.handle_control(update)
     elif data.startswith("a:"):
-        await handle_answer_callback(update, alerter, store, settings)
+        await handle_answer_callback(update, alerter, store, settings, accounts)
     elif "message" in update:
         await desk.handle_message(update)
 
@@ -125,6 +128,37 @@ async def lifespan(_app):
 app = FastAPI(title="Kavach", version="0.1.0", lifespan=lifespan)
 
 
+PUBLIC_API = {"/api/account/signup", "/api/account/login", "/api/pair", "/api/languages"}
+
+
+def ident_of(request: Request) -> Identity:
+    return request.state.identity
+
+
+def family_of(ident: Identity):
+    """The family record for a request. The original household (the shared access key) keeps its .env settings: None."""
+    return None if ident.family_id == DEFAULT_FAMILY else accounts.family(ident.family_id)
+
+
+def call_owner(call_id: str) -> str | None:
+    rows = store.query("SELECT family_id FROM calls WHERE id=?", (call_id,))
+    return None if not rows else (rows[0]["family_id"] or DEFAULT_FAMILY)
+
+
+def own_call(request: Request, call_id: str) -> None:
+    """404 unless the call belongs to the caller's family (the admin key sees all). Never confirms another family's call."""
+    ident = ident_of(request)
+    if ident.role != "admin" and call_owner(call_id) != ident.family_id:
+        raise HTTPException(404, "unknown call")
+
+
+def need_son(request: Request) -> Identity:
+    ident = ident_of(request)
+    if ident.role not in ("son", "admin"):
+        raise HTTPException(403, "Only the family member who set this up can do that.")
+    return ident
+
+
 def key_ok(supplied: str | None) -> bool:
     """True if no access key is configured, or the supplied one matches (constant-time compare)."""
     required = settings.kavach_access_key
@@ -135,9 +169,11 @@ def key_ok(supplied: str | None) -> bool:
 async def require_access_key(request, call_next):
     """The pages themselves are public (they hold no data); everything that returns or changes data needs the key."""
     path = request.url.path
-    if (path.startswith("/api/") or path.startswith("/eval-audio/")) and not key_ok(
-            request.query_params.get("key") or request.headers.get("x-kavach-key")):
-        return JSONResponse({"error": "access key required"}, status_code=401)
+    if (path.startswith("/api/") or path.startswith("/eval-audio/")) and path not in PUBLIC_API:
+        ident = accounts.identify(request.query_params.get("key") or request.headers.get("x-kavach-key"))
+        if ident is None:
+            return JSONResponse({"error": "access key required"}, status_code=401)
+        request.state.identity = ident
     return await call_next(request)
 # The Kavach web app (a Mac browser) runs on another origin. Access is by the key header, not cookies, so any origin may
 # ask; without the key the answer is still 401. Added last, so it is outermost and answers the browser's preflight first.
@@ -169,38 +205,197 @@ def health() -> dict:
     }
 
 
+class SignupBody(BaseModel):
+    email: str
+    password: str
+    language: str = "en"
+    timezone: str = "UTC"
+    parent_address: str = "Mom"
+    son_name: str = ""
+
+
+class LoginBody(BaseModel):
+    email: str
+    password: str
+
+
+class PairBody(BaseModel):
+    code: str
+
+
+class FamilyBody(BaseModel):
+    language: str | None = None
+    timezone: str | None = None
+    parent_address: str | None = None
+    son_name: str | None = None
+    report_hint: str | None = None
+
+
+def family_json(fam) -> dict:
+    return {"id": fam.id, "language": fam.language, "timezone": fam.timezone, "parent_address": fam.parent_address,
+            "son_name": fam.son_name, "report_hint": fam.report_hint, "telegram_linked": bool(fam.chat_ids)}
+
+
+@app.get("/api/languages")
+def languages() -> dict:
+    """The languages a family can choose now. Hindi is not offered yet: AssemblyAI speech-to-text covers it, text-to-speech
+    does not, and a family warning has to be spoken."""
+    return {"languages": lang.available(), "coming": ["de", "fr", "it", "hi"]}
+
+
+@app.post("/api/account/signup")
+def signup(body: SignupBody) -> dict:
+    try:
+        fam, token = accounts.signup(body.email, body.password, body.language, body.timezone, body.parent_address, body.son_name)
+    except AccountError as e:
+        raise HTTPException(400, str(e))
+    return {"token": token, "role": "son", "family": family_json(fam)}
+
+
+@app.post("/api/account/login")
+def login(body: LoginBody) -> dict:
+    try:
+        fam, token = accounts.login(body.email, body.password)
+    except AccountError as e:
+        raise HTTPException(400, str(e))
+    return {"token": token, "role": "son", "family": family_json(fam)}
+
+
+@app.post("/api/pair")
+def pair(body: PairBody, request: Request) -> dict:
+    """The protected phone enters the 6-digit code its family showed, and gets its own token (no email or password)."""
+    try:
+        fam, token = accounts.redeem_pair_code(body.code, request.client.host if request.client else "?")
+    except AccountError as e:
+        raise HTTPException(400, str(e))
+    return {"token": token, "role": "parent", "family": family_json(fam)}
+
+
+@app.get("/api/me")
+def me(request: Request) -> dict:
+    """Everything the app needs to draw its screens for this person: role, family, voices, Telegram, the parent's phone."""
+    ident = ident_of(request)
+    fam = accounts.family(ident.family_id)
+    return {"role": ident.role, "family": family_json(fam), "voices": accounts.voice_state(fam.id),
+            "phone_connected": fam.id in rooms.phones, "telegram_bot_ready": alerter.has_token,
+            "languages": lang.available()}
+
+
+@app.put("/api/family")
+def update_family(body: FamilyBody, request: Request) -> dict:
+    ident = need_son(request)
+    try:
+        fam = accounts.update_family(ident.family_id, **body.model_dump())
+    except AccountError as e:
+        raise HTTPException(400, str(e))
+    return family_json(fam)
+
+
+@app.post("/api/family/pair-code")
+def family_pair_code(request: Request) -> dict:
+    ident = need_son(request)
+    try:
+        return accounts.new_pair_code(ident.family_id)
+    except AccountError as e:
+        raise HTTPException(503, str(e))
+
+
+@app.post("/api/family/telegram-link")
+async def family_telegram_link(request: Request) -> dict:
+    """A one-time link that opens the Kavach bot with a token, so the bot knows which family a chat belongs to."""
+    ident = need_son(request)
+    username = await alerter.bot_username()
+    if not username:
+        raise HTTPException(503, "The Telegram bot is not set up on this server.")
+    return {"url": f"https://t.me/{username}?start={accounts.new_telegram_link(ident.family_id)}", "bot": username}
+
+
+def voice_dir(ident: Identity) -> Path:
+    base = Path(get_settings().voices_dir)
+    return base if ident.family_id == DEFAULT_FAMILY else base / ident.family_id
+
+
+CLONE_JOBS: dict[tuple[str, str], dict] = {}
+
+
 @app.get("/api/voices")
-def voice_samples() -> dict:
+def voice_samples(request: Request) -> dict:
     """Which people have a consented voice sample on the server, and the consent wording the app shows."""
     s = get_settings()
-    return {"samples": voices_mod.list_samples(s.voices_dir), "consent_text": voices_mod.CONSENT_TEXT,
-            "min_seconds": voices_mod.MIN_SECONDS, "max_seconds": voices_mod.MAX_SECONDS,
-            "persona_voice_id": s.persona_voice_id}
+    ident = ident_of(request)
+    return {"samples": voices_mod.list_samples(voice_dir(ident)), "consent_text": voices_mod.CONSENT_TEXT,
+            "min_seconds": voices_mod.MIN_SECONDS, "max_seconds": voices_mod.MAX_SECONDS, "max_takes": 3,
+            "persona_voice_id": s.persona_voice_id, "state": accounts.voice_state(ident.family_id),
+            "jobs": {p: CLONE_JOBS.get((ident.family_id, p)) for p in voices_mod.PEOPLE if CLONE_JOBS.get((ident.family_id, p))}}
 
 
 @app.post("/api/voices/{person}")
-async def upload_voice_sample(person: str, request: Request, name: str = "") -> dict:
-    """Body: raw 16 kHz mono signed 16-bit PCM. Header `x-kavach-consent: yes` records the speaker's consent."""
+async def upload_voice_sample(person: str, request: Request, name: str = "", take: int = 1) -> dict:
+    """Body: raw 16 kHz mono signed 16-bit PCM. Header `x-kavach-consent: yes` records the speaker's consent. `take` 1-3:
+    a few natural takes make a clearer clone than one."""
     s = get_settings()
     consent = request.headers.get("x-kavach-consent", "").lower() == "yes"
     body = await request.body()
     try:
-        return voices_mod.save_sample(s.voices_dir, person, name, body, s.sample_rate, consent)
+        return voices_mod.save_sample(voice_dir(ident_of(request)), person, name, body, s.sample_rate, consent, take)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
+@app.post("/api/voices/{person}/clone")
+async def clone_voice(person: str, request: Request) -> dict:
+    """Make the cloned voice from the saved takes, in the background. Poll GET /api/voices for the result."""
+    ident = ident_of(request)
+    s = get_settings()
+    if person not in voices_mod.PEOPLE:
+        raise HTTPException(400, "person must be papa or son")
+    wav = voice_dir(ident) / f"{person}.wav"
+    if not wav.exists():
+        raise HTTPException(400, "Record the sample first.")
+    if not s.assemblyai_api_key:
+        raise HTTPException(503, "Voice cloning is not set up on this server.")
+    key = (ident.family_id, person)
+    if CLONE_JOBS.get(key, {}).get("state") == "working":
+        return CLONE_JOBS[key]
+    fam = accounts.family(ident.family_id)
+    CLONE_JOBS[key] = job = {"state": "working", "error": None}
+
+    async def run() -> None:
+        try:
+            made = await voices_mod.clone_voice(s, wav, f"{ident.family_id}-{person}", fam.pack.tts)
+            if ident.family_id == DEFAULT_FAMILY:  # the original household keeps its voices in settings
+                if person == "son":
+                    s.kavach_warning_voice_id = made["voice_id"]
+                else:
+                    s.persona_voice_id = made["voice_id"]
+            accounts.set_voice(ident.family_id, person, made["voice_id"], made["expires"])
+            job.update(state="ready")
+        except Exception as e:  # shown to the person, so it is plain words
+            logging.getLogger("kavach.voices").warning("voice clone failed: %s", e)
+            job.update(state="failed", error=str(e)[:200])
+
+    asyncio.create_task(run())
+    return job
+
+
 @app.get("/api/voices/{person}.wav")
-def download_voice_sample(person: str) -> FileResponse:
-    path = Path(get_settings().voices_dir) / f"{person}.wav"
+def download_voice_sample(person: str, request: Request) -> FileResponse:
+    path = voice_dir(ident_of(request)) / f"{person}.wav"
     if person not in voices_mod.PEOPLE or not path.exists():
         raise HTTPException(status_code=404, detail="no sample")
     return FileResponse(path, media_type="audio/wav", filename=f"kavach-{person}-voice-sample.wav")
 
 
 @app.delete("/api/voices/{person}")
-def delete_voice_sample(person: str) -> dict:
-    return {"deleted": voices_mod.delete_sample(get_settings().voices_dir, person)}
+async def delete_voice_sample(person: str, request: Request) -> dict:
+    """Withdraws consent: the recording is deleted here, and the cloned voice is deleted at AssemblyAI."""
+    ident = ident_of(request)
+    if person in voices_mod.PEOPLE:
+        old = accounts.voice_id(ident.family_id, person)
+        accounts.set_voice(ident.family_id, person, None, None)
+        if old and get_settings().assemblyai_api_key:
+            asyncio.create_task(voices_mod.delete_remote_voice(get_settings(), old))
+    return {"deleted": voices_mod.delete_sample(voice_dir(ident), person)}
 
 
 @app.get("/api/config")
@@ -238,18 +433,22 @@ class ReportAnswers(BaseModel):
 
 
 @app.post("/api/calls/{call_id}/report")
-def update_report(call_id: str, answers: ReportAnswers):
+def update_report(call_id: str, answers: ReportAnswers, request: Request):
     """The user answers the two questions only they can answer; the draft is rebuilt with their answers."""
     if not store.query("SELECT 1 FROM calls WHERE id=?", (call_id,)):
         raise HTTPException(404, "unknown call")
+    own_call(request, call_id)
     store.update_call(call_id, money_shared=None if answers.money_shared is None else int(answers.money_shared),
                       otp_shared=None if answers.otp_shared is None else int(answers.otp_shared))
-    r, md, pdf = report_mod.generate(store, call_id, settings.reports_dir, notes=answers.notes[:1000])
+    fam = accounts.family(call_owner(call_id) or DEFAULT_FAMILY)
+    extra = {"tz": fam.timezone, "hint": fam.report_hint} if fam is not None and fam.id != DEFAULT_FAMILY else {}
+    r, md, pdf = report_mod.generate(store, call_id, settings.reports_dir, notes=answers.notes[:1000], **extra)
     return {"md": f"/api/calls/{call_id}/report.md", "pdf": f"/api/calls/{call_id}/report.pdf", "missing": r.missing}
 
 
 @app.get("/api/calls/{call_id}/report.md")
-def report_md(call_id: str):
+def report_md(call_id: str, request: Request):
+    own_call(request, call_id)
     row = store.query("SELECT report_md_path FROM calls WHERE id=?", (call_id,))
     if not row or not row[0]["report_md_path"]:
         raise HTTPException(404, "no report for this call")
@@ -257,7 +456,8 @@ def report_md(call_id: str):
 
 
 @app.get("/api/calls/{call_id}/report.pdf")
-def report_pdf(call_id: str):
+def report_pdf(call_id: str, request: Request):
+    own_call(request, call_id)
     row = store.query("SELECT report_pdf_path FROM calls WHERE id=?", (call_id,))
     if not row or not row[0]["report_pdf_path"]:
         raise HTTPException(404, "no report for this call")
@@ -265,37 +465,44 @@ def report_pdf(call_id: str):
 
 
 @app.get("/api/calls/{call_id}/evidence")
-def call_evidence(call_id: str) -> list[dict]:
+def call_evidence(call_id: str, request: Request) -> list[dict]:
+    own_call(request, call_id)
     return store.query("SELECT type, value, normalized, quote, ts_ms FROM evidence WHERE call_id=? AND valid=1 ORDER BY id", (call_id,))
 
 
 @app.get("/api/calls/{call_id}/events")
-def call_events(call_id: str) -> list[dict]:
+def call_events(call_id: str, request: Request) -> list[dict]:
+    own_call(request, call_id)
     return store.events(call_id)
 
 
 @app.get("/api/calls/{call_id}/turns")
-def call_turns(call_id: str) -> list[dict]:
+def call_turns(call_id: str, request: Request) -> list[dict]:
+    own_call(request, call_id)
     return store.turns(call_id)
 
 
 @app.get("/api/calls/live")
-def live_call() -> dict:
+def live_call(request: Request) -> dict:
     """The call the phone's background listener is streaming now, so the app can open onto it."""
-    running = [r for r in rooms.rooms.values() if not r.ended and r.call_id.startswith("apk-")]
+    ident = ident_of(request)
+    running = [r for r in rooms.rooms.values() if not r.ended and r.call_id.startswith("apk-")
+               and (ident.role == "admin" or (r.family.id if r.family else DEFAULT_FAMILY) == ident.family_id)]
     room = max(running, key=lambda r: r.started_wall, default=None)
     return {"call_id": room.call_id if room else None}
 
 
 @app.get("/api/phone")
-def phone_status() -> dict:
+def phone_status(request: Request) -> dict:
     """Whether the protected person's phone is linked to Kavach right now (its always-on connection), for the family's app."""
-    return {"connected": rooms.phone is not None}
+    return {"connected": ident_of(request).family_id in rooms.phones}
 
 
 @app.get("/api/calls/takeover-check")
-def takeover_check() -> dict:
+def takeover_check(request: Request) -> dict:
     """What the latest background-listener call did: Kavach's lines and voice sent, and what the phone reported back."""
+    if ident_of(request).role != "admin":
+        raise HTTPException(403, "Operators only.")
     latest = store.query("SELECT id FROM calls WHERE id LIKE 'apk-%' ORDER BY rowid DESC LIMIT 1")
     if not latest:
         return {"call_id": None}
@@ -316,10 +523,10 @@ def takeover_check() -> dict:
 
 
 @app.post("/api/calls/{call_id}/control")
-async def call_control(call_id: str, body: dict):
+async def call_control(call_id: str, body: dict, request: Request):
     """Hand over, take back or end from the app, which watches the call instead of being a party on it."""
     room = rooms.rooms.get(call_id)
-    if room is None or room.ended:
+    if room is None or room.ended or (ident_of(request).role != "admin" and (room.family.id if room.family else DEFAULT_FAMILY) != ident_of(request).family_id):
         raise HTTPException(404, "No such running call")
     if body.get("type") not in ("takeover", "takeback", "end_call"):
         raise HTTPException(400, "Unknown command")
@@ -335,7 +542,8 @@ async def call_control(call_id: str, body: dict):
 @app.websocket("/ws/call/{call_id}/{role}")
 async def call_socket(ws: WebSocket, call_id: str, role: str, caller_number: str | None = None, mode: str | None = None):
     """One tab of the call. Binary in = PCM from the mic; text in = JSON control messages."""
-    if not key_ok(ws.query_params.get("key")):
+    ident = accounts.identify(ws.query_params.get("key"))
+    if ident is None:
         await ws.close(code=4403)  # refused before the handshake completes
         return
     if role not in ROLES:
@@ -346,7 +554,11 @@ async def call_socket(ws: WebSocket, call_id: str, role: str, caller_number: str
     if done:  # reusing an id would mix two calls in one report
         await ws.close(code=4409, reason="This call has ended. Use a new call id.")
         return
-    room = rooms.get(call_id)
+    owner = call_owner(call_id)
+    if owner is not None and owner != ident.family_id and ident.role != "admin":
+        await ws.close(code=4403, reason="not your call")  # a call id never lets another family in
+        return
+    room = rooms.get(call_id, family_of(ident))
     await room.join(role, ws, caller_number=caller_number, mode=mode)
     try:
         while True:
@@ -386,12 +598,14 @@ async def handle_control(room, role: str, msg: dict) -> None:
 @app.websocket("/ws/phone")
 async def phone_socket(ws: WebSocket):
     """Held open all the time by the phone's background service, so a family voice note reaches it with no call on."""
-    if not key_ok(ws.query_params.get("key")):
+    ident = accounts.identify(ws.query_params.get("key"))
+    if ident is None:
         await ws.close(code=4403)
         return
     await ws.accept()
     peer = Peer(ws)
-    rooms.phone = peer
+    fid = ident.family_id
+    rooms.phones[fid] = peer
     log = logging.getLogger("kavach.phone")
     log.info("PHONE link up")
     try:
@@ -404,15 +618,17 @@ async def phone_socket(ws: WebSocket):
     except WebSocketDisconnect:
         pass
     finally:
-        if rooms.phone is peer:
-            rooms.phone = None
+        if rooms.phones.get(fid) is peer:
+            rooms.phones.pop(fid, None)
             log.info("PHONE link down")
 
 
 @app.websocket("/ws/events/{call_id}")
 async def events_socket(ws: WebSocket, call_id: str):
     """Read-only event stream for the dashboard."""
-    if not key_ok(ws.query_params.get("key")):
+    ident = accounts.identify(ws.query_params.get("key"))
+    owner = call_owner(call_id)
+    if ident is None or (owner is not None and owner != ident.family_id and ident.role != "admin"):
         await ws.close(code=4403)
         return
     await ws.accept()

@@ -163,7 +163,7 @@ def seeded_store():
 
 def test_every_report_field_is_filled_from_the_call():
     r = report.build(seeded_store(), "r1")
-    assert r.caller_number == "+91 98201 33456" and "IST" in r.incident_time and r.duration == "95 seconds"
+    assert r.caller_number == "+91 98201 33456" and "UTC" in r.incident_time and r.duration == "95 seconds"
     assert r.stages == ["S1", "S6", "S7"] and r.peak_risk == 91.5
     assert r.warned_at and r.takeover_at
     for key, label in report.EVIDENCE_LABELS:
@@ -182,13 +182,13 @@ def test_markdown_and_pdf_contain_the_banner_fields_and_next_steps(tmp_path):
     text = md.read_text()
     for needle in ["DRAFT — review before filing", "+91 98201 33456", "pay.now@okbank", "SBIN0001234", "123456789012",
                    "AnyDesk", "Vikram Rathore", "fifty thousand rupees", "www.rbi-verify.in", "BX 4471",
-                   "Money sent:** No", "OTP / PIN / card details shared:** YES", "1930", "cybercrime.gov.in",
-                   "Sanchar Saathi", "freeze or dispute", "Caller sounded rehearsed", "decoy persona"]:
+                   "Money sent:** No", "OTP / PIN / card details shared:** YES", "your local police or national fraud reporting service",
+                   "spam-reporting service", "freeze or dispute", "Caller sounded rehearsed", "decoy persona"]:
         assert needle in text, needle
     pages = pypdf.PdfReader(str(pdf))
     pdf_text = " ".join(p.extract_text() for p in pages.pages)
     for needle in ["DRAFT", "review before filing", "+91 98201 33456", "pay.now@okbank", "SBIN0001234", "AnyDesk",
-                   "1930", "cybercrime.gov.in", "Sanchar Saathi", "Vikram Rathore"]:
+                   "your local police", "spam-reporting service", "Vikram Rathore"]:
         assert needle in pdf_text.replace("\n", " "), needle
     assert all("DRAFT" in (p.extract_text() or "") for p in pages.pages)  # banner/footer on every page
     row = st.query("SELECT report_md_path, report_pdf_path FROM calls WHERE id='r1'")[0]

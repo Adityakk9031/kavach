@@ -62,7 +62,7 @@ class FakeAlerter:
     async def edit_markup(self, chat_id, message_id, markup):
         self.edits.append((chat_id, message_id, markup))
 
-    async def send_document(self, path, caption):
+    async def send_document(self, path, caption, chat_id=None):
         self.docs.append((Path(path), caption))
 
 

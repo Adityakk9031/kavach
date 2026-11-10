@@ -48,7 +48,7 @@ async def test_triggered_call_gets_a_report_a_link_and_one_call_end_message(tmp_
     room, store, settings, sent = build(tmp_path, triggered=True)
     out = await make_finalize(room, store, settings)()
     assert out["report"]["pdf"] == "/api/calls/f1/report.pdf" and out["report"]["md"].endswith("/report.md")
-    assert len(sent) == 1 and "Complaint draft ready" in sent[0][0] and sent[0][1].suffix == ".pdf"
+    assert len(sent) == 1 and "Report draft ready" in sent[0][0] and sent[0][1].suffix == ".pdf"
     assert sent[0][1].exists() and (tmp_path / "f1.md").exists()
     assert "report_ready" in [e["type"] for e in store.events("f1")]
 

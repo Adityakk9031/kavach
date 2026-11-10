@@ -1,6 +1,25 @@
 {
-  "cli": { "version": ">= 12.0.0", "appVersionSource": "local" },
+  "cli": {
+    "version": ">= 12.0.0",
+    "appVersionSource": "local"
+  },
   "build": {
-    "test": { "environment": "preview", "distribution": "internal", "android": { "buildType": "apk" } }
+    "test": {
+      "environment": "preview",
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "beta": {
+      "environment": "preview",
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_KAVACH_PUBLIC": "1"
+      }
+    }
   }
 }

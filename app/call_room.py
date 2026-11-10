@@ -120,6 +120,7 @@ class CallRoom:
         self.warning = None
         self.persona = None
         self.evidence = None
+        self.family = None  # whose call this is (None: the original single household)
         self.store.start_call(call_id)
 
     # ---- lifecycle -------------------------------------------------------------------------------
@@ -364,13 +365,24 @@ class RoomRegistry:
         self.stt_factory = stt_factory
         self.store = store
         self.sample_rate = sample_rate
-        self.phone: Peer | None = None  # the phone's always-on link, for family voice notes with no call on
+        self.phones: dict[str, Peer] = {}  # each family's protected phone: its always-on link, for voice notes with no call on
         self.phone_heard = asyncio.Event()
 
-    async def play_on_phone(self, pcm: bytes, wait_s: float = 5.0) -> bool:
+    @property
+    def phone(self) -> "Peer | None":  # the original single household
+        return self.phones.get("default")
+
+    @phone.setter
+    def phone(self, peer: "Peer | None") -> None:
+        if peer is None:
+            self.phones.pop("default", None)
+        else:
+            self.phones["default"] = peer
+
+    async def play_on_phone(self, pcm: bytes, wait_s: float = 5.0, family_id: str = "default") -> bool:
         """Send a family voice note over the phone's always-on link. True only once the phone says the note arrived, since
         a link that has quietly died still accepts what is written to it."""
-        peer = self.phone
+        peer = self.phones.get(family_id)
         if peer is None:
             return False
         self.phone_heard.clear()
@@ -384,19 +396,24 @@ class RoomRegistry:
         except asyncio.TimeoutError:
             return False
 
-    def family_target(self, grace_s: float = 900.0) -> "CallRoom | None":
+    def family_target(self, grace_s: float = 900.0, family_id: str | None = None) -> "CallRoom | None":
         """The call a family message goes to: a running call whose person's app is connected, else (the 'cut the call, then
         speak to Papa' case) the most recently ended call whose app is still connected within `grace_s` seconds."""
         now = time.time()
-        connected = [r for r in self.rooms.values() if "receiver" in r.parties]
+        connected = [r for r in self.rooms.values() if "receiver" in r.parties
+                     and (family_id is None or (r.family.id if r.family else "default") == family_id)]
         running = [r for r in connected if not r.ended]
         pool = running or [r for r in connected if r.ended and r.ended_wall and now - r.ended_wall <= grace_s]
         return max(pool, key=lambda r: r.started_wall, default=None)
 
-    def get(self, call_id: str) -> CallRoom:
+    def get(self, call_id: str, family=None) -> CallRoom:
         room = self.rooms.get(call_id)
         if room is None or room.ended:
-            room = CallRoom(call_id, self.stt_factory, self.store, self.sample_rate)
+            factory = (lambda ch, cb, f=family: self.stt_factory(ch, cb, f)) if family is not None else self.stt_factory
+            room = CallRoom(call_id, factory, self.store, self.sample_rate)
+            room.family = family
+            if family is not None:
+                self.store.update_call(call_id, family_id=family.id)
             self.rooms[call_id] = room
             room.listeners |= self.waiting.pop(call_id, set())
             if self.on_new_room:

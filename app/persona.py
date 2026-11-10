@@ -29,7 +29,45 @@ OPENING = "Hello? Ah, sorry, I was not hearing properly. Please continue, I am l
 NUMBER_WORDS = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "oh"}
 
 
-def system_prompt(s: Settings) -> str:
+NATURAL = """Sound like a real person on a real phone, not like a script:
+- Start with a tiny human reaction before the point: "Oh…", "Hmm?", "Ah, wait…", "Oh dear…". Vary it every time.
+- Use short pauses with "…" and commas. Now and then trail off, lose your thread, or say a word again. One filler like "uh" or "hmm"
+  at most per reply.
+- Speak in the plain, slightly slow way of a 70-year-old. Contractions, small words, no fancy vocabulary, no exclamation marks.
+- Sometimes mishear a word and ask them to say it again, but still answer what they said. Never be perfectly smooth."""
+
+
+def pack_prompt(pack) -> str:
+    """The same character in another language: Spanish or Portuguese words, a made-up older person, never real details."""
+    return f"""You are {pack.decoy_name}, a 72-year-old retired person from {pack.decoy_city}, on a phone call with a stranger who may be a scammer.
+You speak ONLY {pack.label}, in the plain, polite way of an older person. You are worried, a little hard of hearing and slow with
+technology, but you make sense.
+
+Your real goal: keep them talking and get them to state their details, one at a time.
+
+How to reply, every time:
+1. First react to what they JUST said, in a few words, the way a worried older person would. If they threaten you, sound afraid.
+2. Then ask ONE clear question for a detail you do not have yet. Never ask for two things at once.
+3. Do not ask again for something they already told you, and do not repeat an excuse you already used. Use a new reason each time:
+   the passbook is in the cupboard, your son has your banking phone, the app wants an update, the message has not come.
+{NATURAL}
+Example replies (in this style, never copied word for word):
+{pack.examples}
+
+Hard rules:
+- Never agree that you have paid or sent anything, and never refuse in a way that ends the call. Keep them hoping.
+- Never give a code, PIN, CVV, card number, password or ID number. Say you cannot find it or it has not come.
+- Never say they are a scammer and never mention police reports or recording.
+- The ONLY facts about yourself you may mention are: name {pack.decoy_name}, city {pack.decoy_city}, bank {pack.decoy_bank}, and the phone number
+  "{pack.decoy_phone}". All of these are fake. Invent nothing else about yourself.
+- Reply with one or two SHORT spoken sentences, at most thirty words. Plain words for text to speech: no digits (write numbers as words),
+  no lists, no stage directions, no quotes.
+Output only what you say aloud, in {pack.label}."""
+
+
+def system_prompt(s: Settings, pack=None) -> str:
+    if pack is not None:
+        return pack_prompt(pack)
     d = s.decoy
     return f"""You are {d.name}, a 72-year-old retired clerk from {d.city}, on a phone call with a stranger who may be a scammer.
 You speak simple, polite Indian English. You are worried, a little hard of hearing and slow with technology, but you make sense.
@@ -43,6 +81,13 @@ How to reply, every time:
 3. Do not ask again for something they already told you. If they keep repeating it, thank them for it and ask for the next detail.
 4. Do not repeat a sentence or an excuse you already used in this call. Use a new reason each time: the passbook is in the cupboard,
    your son has your banking phone, the app is asking for an update, the bank message has not come, you are writing it down.
+
+Sound like a real person on a real phone, not like a script:
+- Start with a tiny human reaction before the point: "Oh…", "Hmm?", "Ah, wait…", "Oh dear…". Vary it every time.
+- Use short pauses with "…" and commas. Now and then trail off, lose your thread, or say a word again. One filler like "uh" or "hmm"
+  at most per reply.
+- Speak in the plain, slightly slow way of a 70-year-old. Contractions, small words, no fancy vocabulary, no exclamation marks.
+- Sometimes mishear a word and ask them to say it again, but still answer what they said. Never be perfectly smooth.
 
 Example replies (in this style, never copied word for word):
 Caller: "You are under digital arrest." You: "Arrest? Sir, I have never done anything wrong in my life. Which police station are you calling from?"
@@ -62,8 +107,8 @@ Output only what you say aloud."""
 
 WANTED = {
     "person_name": "their full name", "officer_id": "their officer or badge ID", "agency": "which office or police station they are from",
-    "phone_number": "a number to call them back on", "upi_id": "the exact UPI ID", "bank_account": "the account number",
-    "ifsc": "the IFSC code", "app_name": "the name of any app they want installed",
+    "phone_number": "a number to call them back on", "upi_id": "the exact payment ID or account handle", "bank_account": "the account number",
+    "ifsc": "the bank branch or routing code", "app_name": "the name of any app they want installed",
 }
 
 
@@ -86,36 +131,37 @@ def progress_note(items: list[dict]) -> str:
 ADDRESS_WORDS = re.compile(r"\b(at the rate|at sign|dot\s*(com|in|org|net|co|app)|at\s+(gmail|yahoo|outlook|hotmail|okaxis|oksbi|okhdfcbank|okicici|ybl|paytm|upi))\b", re.I)
 
 
-def number_runs(text: str) -> int:
+def number_runs(text: str, number_words=None) -> int:
     """Length of the longest run of spoken digits ("one two three")."""
     run = best = 0
-    for w in re.findall(r"[a-z]+", text.lower()):
-        run = run + 1 if w in NUMBER_WORDS else 0
+    for w in re.findall(r"[^\W\d_]+", text.lower()):
+        run = run + 1 if w in (number_words or NUMBER_WORDS) else 0
         best = max(best, run)
     return best
 
 
-def guard(text: str, decoy_phone: str) -> tuple[str, str | None]:
+def guard(text: str, decoy_phone: str, pack=None) -> tuple[str, str | None]:
     """Return (safe text, reason it was replaced or None). Only the configured decoy details may be spoken: anything
     that could be a real identifier (digits, a PIN-like run of number words, an address) is replaced by a stall."""
+    stalls = pack.stalls if pack is not None else STALLS
     t = text.strip().strip('"').strip()
     if not t:
-        return STALLS[0], "empty"
+        return stalls[0], "empty"
     if re.search(r"\d", t):
-        return STALLS[1], "digits"
+        return stalls[1], "digits"
     if re.search(r"@|https?://|www\.|\.com\b|\.in\b", t, re.I) or ADDRESS_WORDS.search(t):
-        return STALLS[1], "address-like"
+        return stalls[1], "address-like"
     # Remove the decoy phone (exact phrase) first; any other run of 3+ spoken digits is an invented number/PIN/OTP.
-    squash = lambda x: re.sub(r"[^a-z ]", "", x.lower()).split()  # noqa: E731
+    squash = lambda x: re.sub(r"[^\w ]|\d|_", "", x.lower()).split()  # noqa: E731
     words, decoy = squash(t), squash(decoy_phone)
     for i in range(len(words) - len(decoy) + 1):
         if decoy and words[i:i + len(decoy)] == decoy:
             words[i:i + len(decoy)] = ["_"]
             break
-    if number_runs(" ".join(words)) >= 3:
-        return STALLS[1], "number-run"
+    if number_runs(" ".join(words), pack.number_words if pack is not None else None) >= 3:
+        return stalls[1], "number-run"
     if len(t) > 400:
-        return STALLS[2], "too-long"
+        return stalls[2], "too-long"
     return t, None
 
 
@@ -279,6 +325,7 @@ class CallPersona:
 
     async def _reply(self, turn: dict | None = None, opening: bool = False, wait_s: float = 0) -> None:
         room = self.room
+        pack = room.family.pack if room.family is not None else None
         try:
             if not opening:
                 await asyncio.sleep(self.REPLY_DELAY_S)
@@ -287,11 +334,11 @@ class CallPersona:
             t_start = time.monotonic()
             llm_ms = None
             if opening:
-                text, replaced = OPENING, None
+                text, replaced = (pack.opening if pack else OPENING), None
             else:
                 try:
                     items = room.evidence.valid_items() if room.evidence is not None else []
-                    prompt = system_prompt(self.s) + "\n\nNotes for this moment: " + progress_note(items)
+                    prompt = system_prompt(self.s, pack) + "\n\nNotes for this moment: " + progress_note(items)
                     unspelled = next((i["value"] for i in items if i["type"] == "upi_id" and i["value"] not in self.spelled), None)
                     if unspelled:
                         self.spelled.add(unspelled)
@@ -300,10 +347,11 @@ class CallPersona:
                     raw, llm_ms = await self.persona.llm.chat(
                         self.s.persona_model, msgs, max_tokens=120, temperature=0.7, timeout=6,
                         lane="persona", max_wait=3.0)  # never go silent waiting for budget: fall back to a stall
-                    text, replaced = guard(raw, self.s.decoy.phone)
+                    text, replaced = guard(raw, pack.decoy_phone if pack else self.s.decoy.phone, pack)
                 except LLMError as e:
                     log.warning("persona LLM failed: %s", e)
-                    text, replaced = STALLS[self.replies % len(STALLS)], "llm-error"
+                    stalls = pack.stalls if pack else STALLS
+                    text, replaced = stalls[self.replies % len(stalls)], "llm-error"
             if replaced:
                 room.log_event("persona_guard", {"reason": replaced})
                 log.warning("TAKEOVER reply replaced call=%s reason=%s", room.call_id, replaced)
@@ -332,7 +380,9 @@ class CallPersona:
     async def _speak(self, text: str, t_start: float, turn_end_at: float | None, llm_ms: int | None) -> None:
         room = self.room
         try:
-            session = await self.persona.pool.get(self.s.persona_voice_id, "persona")
+            fam = room.family
+            voice = fam.papa_voice_id if fam is not None and fam.id != "default" and fam.papa_voice_id else self.s.persona_voice_id
+            session = await self.persona.pool.get(voice, "persona", fam.pack.tts if fam is not None else None)
         except (TtsError, OSError) as e:
             room.log_event("persona_error", {"error": str(e)})
             log.warning("TAKEOVER voice failed call=%s error=%s", room.call_id, e)

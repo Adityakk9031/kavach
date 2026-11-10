@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     # it on whenever the server is reachable from the internet (a tunnel for the phone app). Empty = open (local only).
     kavach_access_key: str = ""
 
-    # --- language (English only in v1; Hindi planned once TTS-1 ships it) ---
+    # --- language of the original single household. Families choose theirs at sign-up (see app/lang.py) ---
     language: str = "english"  # TTS `language` takes the full name
     stt_language_codes: list[str] = Field(default_factory=lambda: ["en"])
 
@@ -79,11 +79,10 @@ class Settings(BaseSettings):
 
     def missing_secrets(self) -> list[str]:
         """Names of required secrets that are not set yet."""
+        # A public server needs only these two: every family brings its own voices and Telegram chat.
         required = {
             "ASSEMBLYAI_API_KEY": self.assemblyai_api_key,
-            "KAVACH_WARNING_VOICE_ID": self.kavach_warning_voice_id,
             "TELEGRAM_BOT_TOKEN": self.telegram_bot_token,
-            "TELEGRAM_CHAT_ID": self.telegram_chat_id,
         }
         return [name for name, value in required.items() if not value]
 
