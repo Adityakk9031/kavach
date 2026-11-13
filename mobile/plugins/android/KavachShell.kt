@@ -50,10 +50,22 @@ class KavachShell : Binder() {
                 audio.isMicrophoneMute.toString()
             } catch (e: Throwable) { e.javaClass.simpleName })
             HANG_UP -> reply?.writeString(hangUp())
+            GRANT -> reply?.writeString(grantSelf(data.readString() ?: ""))
             DESTROY -> { running = false; System.exit(0) }
             else -> return super.onTransact(code, data, reply, flags)
         }
         return true
+    }
+
+    // Lets Kavach change the two phone settings it needs to restart full protection itself (Wireless debugging, and its own
+    // call-protection switch). Only Kavach's own package is ever accepted.
+    private fun grantSelf(pkg: String): String {
+        if (pkg != "com.kavach.app") return "refused"
+        return try {
+            val p = Runtime.getRuntime().exec(arrayOf("/system/bin/pm", "grant", pkg, "android.permission.WRITE_SECURE_SETTINGS"))
+            val code = p.waitFor()
+            if (code == 0) "ok" else "exit $code"
+        } catch (e: Throwable) { reason(e) }
     }
 
     // Telecom's own hang-up as the shell, then the phone's end-call key, which the system handles for itself.
@@ -203,6 +215,7 @@ class KavachShell : Binder() {
         const val MUTE = 5
         const val SILENCE = 6
         const val HANG_UP = 7
+        const val GRANT = 8
         const val USAGE_CALL_ASSISTANT = 17
         const val CALL_REDIRECT_PSTN = 1
         const val DESTROY = 16777115 // Shizuku's own code for ending a user service

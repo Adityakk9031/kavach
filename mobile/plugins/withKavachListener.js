@@ -15,6 +15,14 @@ const XML = `<?xml version="1.0" encoding="utf-8"?>
 module.exports = (config) => {
   config = withAndroidManifest(config, (c) => {
     AndroidConfig.Permissions.addPermission(c.modResults, 'android.permission.MODIFY_AUDIO_SETTINGS');
+    // Full protection: given to Kavach once through Shizuku (a normal install never has it), then used to restart itself
+    AndroidConfig.Permissions.addPermission(c.modResults, 'android.permission.WRITE_SECURE_SETTINGS');
+    AndroidConfig.Permissions.addPermission(c.modResults, 'android.permission.RECEIVE_BOOT_COMPLETED');
+    const manifest = c.modResults.manifest;
+    manifest.queries = manifest.queries && manifest.queries.length ? manifest.queries : [{}];
+    const q = manifest.queries[0];
+    q.package = (q.package || []).filter((x) => x.$['android:name'] !== 'moe.shizuku.privileged.api');
+    q.package.push({ $: { 'android:name': 'moe.shizuku.privileged.api' } });
     const app = AndroidConfig.Manifest.getMainApplicationOrThrow(c.modResults);
     app.service = (app.service || []).filter((s) => s.$['android:name'] !== '.KavachListenerService');
     app.service.push({
@@ -22,6 +30,11 @@ module.exports = (config) => {
            'android:permission': 'android.permission.BIND_ACCESSIBILITY_SERVICE', 'android:label': 'Kavach call protection' },
       'intent-filter': [{ action: [{ $: { 'android:name': 'android.accessibilityservice.AccessibilityService' } }] }],
       'meta-data': [{ $: { 'android:name': 'android.accessibilityservice', 'android:resource': '@xml/kavach_accessibility' } }],
+    });
+    app.receiver = (app.receiver || []).filter((r) => r.$['android:name'] !== '.KavachBoot');
+    app.receiver.push({
+      $: { 'android:name': '.KavachBoot', 'android:exported': 'true' },
+      'intent-filter': [{ action: [{ $: { 'android:name': 'android.intent.action.BOOT_COMPLETED' } }] }],
     });
     app.provider = (app.provider || []).filter((p) => p.$['android:name'] !== 'rikka.shizuku.ShizukuProvider');
     app.provider.push({
@@ -56,7 +69,7 @@ module.exports = (config) => {
     const dir = path.join(root, 'app/src/main/java/com/kavach/app');
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'KavachListenerService.kt'), src);
-    fs.copyFileSync(path.join(c.modRequest.projectRoot, 'plugins/android/KavachShell.kt'), path.join(dir, 'KavachShell.kt'));
+    for (const f of ['KavachShell.kt', 'KavachBoot.kt']) fs.copyFileSync(path.join(c.modRequest.projectRoot, 'plugins/android', f), path.join(dir, f));
     // Shizuku starts KavachShell by name in another process, so the shrinker must leave it whole.
     fs.appendFileSync(path.join(root, 'app/proguard-rules.pro'),
       '\n-keep class com.kavach.app.KavachShell { *; }\n-keep class com.kavach.app.KavachShell$* { *; }\n-keep class rikka.shizuku.** { *; }\n-keep class moe.shizuku.** { *; }\n');

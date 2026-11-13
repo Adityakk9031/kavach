@@ -59,14 +59,26 @@ class KavachListenerService : AccessibilityService() {
             val o = JSONObject(f.readText())
             o.optString("server").takeIf { it.isNotEmpty() }?.let { server = it }
             o.optString("key").takeIf { it.isNotEmpty() }?.let { key = it }
+            o.optJSONObject("strings")?.let { st ->
+                val next = HashMap<String, String>()
+                for (k in st.keys()) st.optString(k).takeIf { it.isNotEmpty() }?.let { next[k] = it }
+                strings = next
+            }
         } catch (_: Exception) {}
     }
+
+    /** The card's words in the app's language (written by the app next to the account); English until the app has run. */
+    @Volatile private var strings: Map<String, String> = emptyMap()
+    private fun tr(key: String, fallback: String): String = strings[key] ?: fallback
 
     /** The account changed (signed in, or paired): use the new token and reconnect the always-on phone link. */
     private fun reloadConfigIfChanged() {
         val f = java.io.File(filesDir, "kavach-config.json")
         if (!f.exists() || f.lastModified() == cfgStamp) return
+        val before = server to key
         loadConfig()
+        if (card != null) showProtection()
+        if (before == server to key) return  // only the language changed: the phone link stays up
         phone?.close(1000, null)
         phone = null
         if (serviceOn) connectPhone()
@@ -91,6 +103,8 @@ class KavachListenerService : AccessibilityService() {
     private val poll = object : Runnable {
         override fun run() {
             reloadConfigIfChanged()
+            handleCommand()
+            writeStatus(false)
             val mode = (getSystemService(Context.AUDIO_SERVICE) as AudioManager).mode
             val active = mode == AudioManager.MODE_IN_CALL
             if (active && !callActive) { callActive = true; startCall(); showCard() }
@@ -102,16 +116,108 @@ class KavachListenerService : AccessibilityService() {
                 current = "Direct " + state[0] + if (state.size > 1) "  |  voice " + state[1].take(44) else ""
             }
             if (silenced && System.currentTimeMillis() > playingUntil + 400) setSilenced(false)
-            if (inCall) { statusText?.text = if (risk > 0) "Listening  ·  scam risk $risk" else "Listening"; peak = 0 }
+            if (inCall) { statusText?.text = if (risk > 0) tr("k_listening", "Listening") + "  ·  " + tr("k_risk", "scam risk") + " $risk" else tr("k_listening", "Listening"); peak = 0 }
             main.postDelayed(this, 1000)
         }
     }
 
     override fun onServiceConnected() {
         loadConfig()
+        // The person switched call protection on themselves: from now on Kavach may put it back if a phone's battery manager turns it off
+        try { java.io.File(filesDir, "kavach-pro.flag").writeText("1") } catch (_: Exception) {}
         main.post(poll)
         Shizuku.addBinderReceivedListenerSticky { askShizuku() }
         connectPhone()
+    }
+
+    // ---- Full protection setup. The app writes kavach-cmd.json; this service answers in kavach-status.json.
+    private var cmdStamp = 0L
+    private var lastId = ""
+    @Volatile private var cmdResult = ""
+    private var statusWritten = 0L
+    private var statusLast = ""
+
+    private fun shizukuRunning() = try { Shizuku.pingBinder() } catch (_: Exception) { false }
+    private fun shizukuAllowed() = try { Shizuku.pingBinder() && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED } catch (_: Exception) { false }
+    private fun shizukuInstalled() = try { packageManager.getPackageInfo("moe.shizuku.privileged.api", 0); true } catch (_: Exception) { false }
+
+    private fun writeStatus(force: Boolean) {
+        val o = JSONObject()
+        o.put("installed", shizukuInstalled()); o.put("running", shizukuRunning()); o.put("allowed", shizukuAllowed())
+        o.put("secure", KavachSecure.granted(this)); o.put("wireless", KavachSecure.wirelessIsOn(this))
+        o.put("cmd_id", lastId); o.put("cmd_result", cmdResult)
+        val body = o.toString()
+        val now = System.currentTimeMillis()
+        // Rewritten when something changed, and at least every 5 seconds so the app can tell this service is alive
+        if (!force && body == statusLast && now - statusWritten < 5000) return
+        statusLast = body; statusWritten = now
+        o.put("t", now)
+        try { java.io.File(filesDir, "kavach-status.json").writeText(o.toString()) } catch (_: Exception) {}
+    }
+
+    private fun handleCommand() {
+        val f = java.io.File(filesDir, "kavach-cmd.json")
+        if (!f.exists() || f.lastModified() == cmdStamp) return
+        cmdStamp = f.lastModified()
+        try {
+            val o = JSONObject(f.readText())
+            val id = o.optString("id")
+            if (id.isEmpty() || id == lastId) return
+            lastId = id; cmdResult = "working"
+            when (o.optString("cmd")) {
+                "open_shizuku" -> { openShizuku(); cmdResult = "ok" }
+                "pro_wake" -> {
+                    // After a restart: turn Wireless debugging on, so starting Shizuku is a single tap
+                    cmdResult = if (shizukuRunning()) "ok" else if (KavachSecure.wirelessOn(this)) "wireless" else "no_secure"
+                    if (!shizukuRunning()) openShizuku()
+                }
+                "pro_setup" -> proSetup()
+                else -> cmdResult = "unknown"
+            }
+        } catch (_: Exception) { cmdResult = "error" }
+        writeStatus(true)
+    }
+
+    private fun openShizuku() {
+        try {
+            packageManager.getLaunchIntentForPackage("moe.shizuku.privileged.api")?.let {
+                it.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK); startActivity(it)
+            }
+        } catch (_: Exception) {}
+    }
+
+    // One tap for the family: needs Shizuku running and allowed, then gives Kavach the permission it needs to look after itself.
+    private fun proSetup() {
+        when {
+            KavachSecure.granted(this) -> cmdResult = "ok"
+            !shizukuRunning() -> cmdResult = "shizuku_off"
+            !shizukuAllowed() -> { cmdResult = "need_allow"; try { Shizuku.requestPermission(2) } catch (_: Exception) {} }
+            else -> main.post { try { Shizuku.bindUserService(setupArgs, setupConnection) } catch (_: Exception) { cmdResult = "grant_failed"; writeStatus(true) } }
+        }
+    }
+
+    // A second, short-lived shell process just for the one-time grant, so a call being protected is never disturbed
+    private val setupArgs by lazy {
+        Shizuku.UserServiceArgs(ComponentName(packageName, KavachShell::class.java.name))
+            .processNameSuffix("setup").debuggable(false).version(1).daemon(false)
+    }
+    private val setupConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
+            val conn = this
+            thread {
+                val data = Parcel.obtain()
+                val reply = Parcel.obtain()
+                val result = try {
+                    data.writeString(packageName)
+                    binder?.transact(KavachShell.GRANT, data, reply, 0)
+                    reply.readString() ?: "no reply"
+                } catch (e: Exception) { e.javaClass.simpleName } finally { data.recycle(); reply.recycle() }
+                cmdResult = if (result == "ok" && KavachSecure.granted(this@KavachListenerService)) "ok" else "grant_failed"
+                try { Shizuku.unbindUserService(setupArgs, conn, true) } catch (_: Exception) {}
+                writeStatus(true)
+            }
+        }
+        override fun onServiceDisconnected(name: ComponentName?) {}
     }
 
     private fun askShizuku() {
@@ -127,7 +233,7 @@ class KavachListenerService : AccessibilityService() {
 
     private fun setTakeover(on: Boolean) {
         takenOver = on
-        takeButton?.text = if (on) "Take the call back" else "Let Kavach talk to the caller"
+        takeButton?.text = if (on) tr("k_takeBack", "Take the call back") else tr("k_take", "Let Kavach talk to the caller")
         // Without a way into the call itself, the phone's speaker is the only way the caller can hear Kavach.
         // The mic mixes into the call, so the user's own voice is cut while Kavach talks directly
         if (voiceInCall) shellCall(KavachShell.MUTE) { it.writeInt(if (on) 1 else 0) }
@@ -423,7 +529,7 @@ class KavachListenerService : AccessibilityService() {
                 showWords("Shizuku could not start. Trying the mic.")
             } else {
                 askShizuku()
-                showWords("Put the call on speaker so Kavach can hear it.")
+                showWords(tr("k_speaker", "Put the call on speaker so Kavach can hear it."))
                 Thread.sleep(2500)
             }
             val results = sources.map { it.first to "-" }.toMap(LinkedHashMap())
@@ -535,12 +641,12 @@ class KavachListenerService : AccessibilityService() {
                 }
                 "takeover" -> { val on = ev.optString("state") == "on"; main.post { setTakeover(on) } }
                 "hang_up" -> thread { report("hang_up", "result", hangUpCall()) }
-                "persona" -> if (ev.optString("text").isNotEmpty()) showWords("Kavach says: " + ev.optString("text"))
-                "warning" -> if (ev.optString("state") == "speaking") showWords("This looks like a scam. " + ev.optString("text"))
+                "persona" -> if (ev.optString("text").isNotEmpty()) showWords(tr("k_says", "Kavach says:") + " " + ev.optString("text"))
+                "warning" -> if (ev.optString("state") == "speaking") showWords(tr("k_scam", "This looks like a scam.") + " " + ev.optString("text"))
             }
         }
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-            if (inCall) showWords("Cannot reach Kavach: " + t.javaClass.simpleName)
+            if (inCall) showWords(tr("k_noReach", "Cannot reach Kavach") + ": " + t.javaClass.simpleName)
         }
     }
 
@@ -564,12 +670,12 @@ class KavachListenerService : AccessibilityService() {
         dot = light
         row.addView(light, LinearLayout.LayoutParams((12 * dp).toInt(), (12 * dp).toInt()).apply { rightMargin = (10 * dp).toInt() })
         val texts = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        stateText = TextView(this).apply { setTextColor(Color.WHITE); textSize = 17f; typeface = Typeface.DEFAULT_BOLD; text = "Kavach is on" }
-        statusText = TextView(this).apply { setTextColor(Color.parseColor("#C9C3B8")); textSize = 13f; text = "Starting" }
+        stateText = TextView(this).apply { setTextColor(Color.WHITE); textSize = 17f; typeface = Typeface.DEFAULT_BOLD; text = tr("k_on", "Kavach is on") }
+        statusText = TextView(this).apply { setTextColor(Color.parseColor("#C9C3B8")); textSize = 13f; text = tr("k_starting", "Starting") }
         texts.addView(stateText); texts.addView(statusText)
         row.addView(texts, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
         val toggle = Button(this).apply {
-            isAllCaps = false; textSize = 15f; setTextColor(Color.WHITE); background = round("#3A3631", 10f); text = "Turn off"
+            isAllCaps = false; textSize = 15f; setTextColor(Color.WHITE); background = round("#3A3631", 10f); text = tr("k_turnOff", "Turn off")
             setOnClickListener { v ->
                 v.isEnabled = false  // one switch at a time: the last one must finish closing first
                 main.postDelayed({ v.isEnabled = true }, 2000)
@@ -581,7 +687,7 @@ class KavachListenerService : AccessibilityService() {
         wordsText = TextView(this).apply { setTextColor(Color.WHITE); textSize = 14f; setPadding(0, (8 * dp).toInt(), 0, 0) }
         val take = Button(this).apply {
             isAllCaps = false; textSize = 17f; typeface = Typeface.DEFAULT_BOLD; setTextColor(Color.WHITE); background = round("#B3261E", 12f)
-            text = "Let Kavach talk to the caller"
+            text = tr("k_take", "Let Kavach talk to the caller")
             setOnClickListener { receiver?.send(if (takenOver) "{\"type\":\"takeback\"}" else "{\"type\":\"takeover\"}") }
         }
         takeButton = take
@@ -602,12 +708,12 @@ class KavachListenerService : AccessibilityService() {
     private fun showProtection() {
         main.post {
             val on = inCall
-            stateText?.text = if (on) "Kavach is on" else "Kavach is off"
+            stateText?.text = if (on) tr("k_on", "Kavach is on") else tr("k_off", "Kavach is off")
             (dot?.background as? GradientDrawable)?.setColor(Color.parseColor(if (on) "#3FAE6A" else "#8A847B"))
-            toggleButton?.text = if (on) "Turn off" else "Turn on"
+            toggleButton?.text = if (on) tr("k_turnOff", "Turn off") else tr("k_turnOn", "Turn on")
             takeButton?.visibility = if (on) View.VISIBLE else View.GONE
-            if (!on) { statusText?.text = "Not listening to this call"; wordsText?.text = "Tap Turn on to protect this call." }
-            else wordsText?.text = ""
+            if (!on) { statusText?.text = tr("k_notListening", "Not listening to this call"); wordsText?.text = tr("k_tapOn", "Tap Turn on to protect this call.") }
+            else if (wordsText?.text?.toString() == tr("k_tapOn", "Tap Turn on to protect this call.")) wordsText?.text = ""
         }
     }
 
@@ -617,6 +723,6 @@ class KavachListenerService : AccessibilityService() {
     }
 
     private companion object {
-        val READS_REPLY = setOf(KavachShell.STATUS, KavachShell.SILENCE, KavachShell.MUTE, KavachShell.HANG_UP)
+        val READS_REPLY = setOf(KavachShell.STATUS, KavachShell.SILENCE, KavachShell.MUTE, KavachShell.HANG_UP, KavachShell.GRANT)
     }
 }

@@ -104,6 +104,70 @@ export function Meter({ value, color }: { value: number; color: string }) {
   );
 }
 
+export function BackLink({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <Pressable onPress={onPress} hitSlop={12} accessibilityRole="button" style={{ paddingBottom: 18, alignSelf: 'flex-start' }}>
+      <Text style={{ color: C.ink, fontSize: 16, fontWeight: '600' }}>‹ {label}</Text>
+    </Pressable>
+  );
+}
+
+// A row of rounded choices where one is picked (languages)
+export function Choices({ items, value, onPick }: { items: { code: string; native: string }[]; value: string; onPick: (code: string) => void }) {
+  return (
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+      {items.map((l) => {
+        const on = value === l.code;
+        return (
+          <Pressable key={l.code} onPress={() => onPick(l.code)} accessibilityRole="button" accessibilityState={{ selected: on }}
+            style={{ borderRadius: 999, borderWidth: 1, borderColor: on ? C.accent : C.line, backgroundColor: on ? C.accentSoft : C.panel,
+              paddingHorizontal: 16, minHeight: 44, justifyContent: 'center', marginRight: 8, marginBottom: 8 }}>
+            <Text style={{ color: C.ink, fontSize: 15, fontWeight: on ? '700' : '500' }}>{l.native}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+// The big card at the top of a home screen: green when everything is working, amber while something is still to do
+export function Hero({ good, pill, title, body, children }: { good: boolean; pill: string; title: string; body: string; children?: React.ReactNode }) {
+  const col = good ? C.accent : C.warn;
+  return (
+    <View style={{ borderRadius: 20, padding: 20, marginBottom: 18, backgroundColor: good ? C.accent : C.panel, borderWidth: 1, borderColor: good ? C.accent : col + '66' }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6,
+        backgroundColor: good ? '#ffffff26' : col + '18', marginBottom: 14 }}>
+        <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: good ? C.onDark : col, marginRight: 8 }} />
+        <Text style={{ color: good ? C.onDark : col, fontSize: 13, fontWeight: '700' }}>{pill}</Text>
+      </View>
+      <Text style={[T.h1, { color: good ? C.onDark : C.ink }]}>{title}</Text>
+      <Text style={{ color: good ? C.onDark : C.muted, opacity: good ? 0.9 : 1, fontSize: 16, lineHeight: 23, marginTop: 8 }}>{body}</Text>
+      {children}
+    </View>
+  );
+}
+
+// One numbered step: a round badge (a tick when done), a title, a line of help and whatever the step needs
+export function Step({ n, title, body, done, first, children }: { n: number; title: string; body: string; done?: boolean; first?: boolean; children?: React.ReactNode }) {
+  return (
+    <View style={{ flexDirection: 'row', marginTop: first ? 0 : 20 }}>
+      <View style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 2, borderColor: done ? C.accent : C.line,
+        backgroundColor: done ? C.accent : C.panel, alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+        <Text style={{ color: done ? C.onDark : C.muted, fontWeight: '700' }}>{done ? '✓' : n}</Text>
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={[T.body, { fontWeight: '600' }]}>{title}</Text>
+        <Text style={[T.muted, { marginTop: 2, marginBottom: children ? 10 : 0 }]}>{body}</Text>
+        {children}
+      </View>
+    </View>
+  );
+}
+
+export function ErrorText({ children }: { children: string }) {
+  return <Text accessibilityRole="alert" style={{ color: C.danger, fontSize: 15, lineHeight: 21, marginBottom: 12 }}>{children}</Text>;
+}
+
 export const T = {
   h1: { color: C.ink, fontSize: 28, fontWeight: '700' as const, letterSpacing: -0.4, lineHeight: 34 } as TextStyle,
   h2: { color: C.ink, fontSize: 18, fontWeight: '700' as const } as TextStyle,

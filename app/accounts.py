@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS families (
   son_voice_id TEXT, papa_voice_id TEXT, son_voice_expires REAL, papa_voice_expires REAL, voice_notes TEXT, created REAL
 );
 CREATE TABLE IF NOT EXISTS users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE NOT NULL, pw TEXT NOT NULL, family_id TEXT NOT NULL, created REAL
+  id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE NOT NULL, pw TEXT NOT NULL, family_id TEXT NOT NULL, created REAL, auth_id TEXT
 );
 CREATE TABLE IF NOT EXISTS tokens (
   hash TEXT PRIMARY KEY, family_id TEXT NOT NULL, role TEXT NOT NULL, user_id INTEGER, created REAL
@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS tokens (
 CREATE TABLE IF NOT EXISTS pair_codes (code TEXT PRIMARY KEY, family_id TEXT NOT NULL, expires REAL NOT NULL, used INTEGER NOT NULL DEFAULT 0);
 CREATE TABLE IF NOT EXISTS tg_links (hash TEXT PRIMARY KEY, family_id TEXT NOT NULL, expires REAL NOT NULL);
 CREATE TABLE IF NOT EXISTS tg_chats (chat_id TEXT PRIMARY KEY, family_id TEXT NOT NULL, linked REAL);
+CREATE INDEX IF NOT EXISTS tg_chats_family ON tg_chats(family_id);
 """
 EMAIL_RE = re.compile(r"[^@\s]{1,64}@[^@\s]{1,190}\.[^@\s]{2,24}")
 EDITABLE = ("name", "language", "timezone", "parent_address", "son_name", "report_hint")
@@ -102,8 +103,9 @@ class Throttle:
 class Accounts:
     def __init__(self, store, settings):
         self.store, self.settings = store, settings
-        with store._lock:
-            store._db.executescript(SCHEMA)
+        store.script(SCHEMA)
+        store.add_column("users", "auth_id", "TEXT")  # the Supabase Auth user this account belongs to
+        store.script("CREATE INDEX IF NOT EXISTS users_auth ON users(auth_id);")  # looked up on every sign-in
         self.throttle = Throttle()
         self.ensure_default()
 
@@ -178,15 +180,35 @@ class Accounts:
         fid = secrets.token_hex(6)
         self.store._exec("INSERT INTO families(id, created) VALUES (?,?)", (fid, time.time()))
         self.update_family(fid, language=language, timezone=timezone or "UTC", parent_address=parent_address or "Mom", son_name=son_name)
-        cur = self.store._exec("INSERT INTO users(email, pw, family_id, created) VALUES (?,?,?,?)", (email, _pw_hash(password), fid, time.time()))
-        return self.family(fid), self._issue(fid, "son", cur.lastrowid)
+        uid = self.store.insert("INSERT INTO users(email, pw, family_id, created) VALUES (?,?,?,?)", (email, _pw_hash(password), fid, time.time()))
+        return self.family(fid), self._issue(fid, "son", uid)
+
+    def supabase_session(self, auth_id: str, email: str, language: str = "en", timezone: str = "UTC",
+                         parent_address: str = "Mom", son_name: str = "") -> tuple[Family, str, bool]:
+        """A person Supabase Auth has just vouched for. First time: make their family. Returns (family, token, is_new)."""
+        email = email.strip().lower()
+        rows = self.store.query("SELECT * FROM users WHERE auth_id=?", (auth_id,))
+        if not rows:  # an account made before Supabase, with the same (now verified) email
+            rows = self.store.query("SELECT * FROM users WHERE email=?", (email,))
+            if rows:
+                self.store._exec("UPDATE users SET auth_id=? WHERE id=?", (auth_id, rows[0]["id"]))
+        if rows:
+            return self.family(rows[0]["family_id"]), self._issue(rows[0]["family_id"], "son", rows[0]["id"]), False
+        fid = secrets.token_hex(6)
+        self.store._exec("INSERT INTO families(id, created) VALUES (?,?)", (fid, time.time()))
+        try:
+            self.update_family(fid, language=language, timezone=timezone or "UTC", parent_address=parent_address or "Mom", son_name=son_name)
+        except AccountError:
+            pass  # a bad optional field must not block sign-in; the defaults stand and Settings can change them
+        uid = self.store.insert("INSERT INTO users(email, pw, family_id, created, auth_id) VALUES (?,?,?,?,?)", (email, "", fid, time.time(), auth_id))
+        return self.family(fid), self._issue(fid, "son", uid), True
 
     def login(self, email: str, password: str) -> tuple[Family, str]:
         email = email.strip().lower()
         if self.throttle.blocked(email):
             raise AccountError("Too many tries. Please wait a few minutes.")
         rows = self.store.query("SELECT * FROM users WHERE email=?", (email,))
-        if not rows or not _pw_ok(password, rows[0]["pw"]):
+        if not rows or not rows[0]["pw"] or not _pw_ok(password, rows[0]["pw"]):
             self.throttle.fail(email)
             raise AccountError("The email or password is wrong.")
         return self.family(rows[0]["family_id"]), self._issue(rows[0]["family_id"], "son", rows[0]["id"])
@@ -241,7 +263,7 @@ class Accounts:
         if not rows:
             return None
         self.store._exec("DELETE FROM tg_links WHERE hash=?", (_hash(token),))
-        self.store._exec("INSERT OR REPLACE INTO tg_chats(chat_id, family_id, linked) VALUES (?,?,?)", (str(chat_id), rows[0]["family_id"], time.time()))
+        self.store._exec("INSERT INTO tg_chats(chat_id, family_id, linked) VALUES (?,?,?) ON CONFLICT(chat_id) DO UPDATE SET family_id=excluded.family_id, linked=excluded.linked", (str(chat_id), rows[0]["family_id"], time.time()))
         return self.family(rows[0]["family_id"])
 
     def family_for_chat(self, chat_id) -> Family | None:

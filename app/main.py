@@ -40,7 +40,7 @@ for _noisy in ("httpx", "httpcore"):
     logging.getLogger(_noisy).setLevel(logging.WARNING)
 
 settings = get_settings()
-store = Store(settings.db_path)
+store = Store(settings.db_path, settings.database_url)
 accounts = Accounts(store, settings)
 
 
@@ -128,7 +128,7 @@ async def lifespan(_app):
 app = FastAPI(title="Kavach", version="0.1.0", lifespan=lifespan)
 
 
-PUBLIC_API = {"/api/account/signup", "/api/account/login", "/api/pair", "/api/languages"}
+PUBLIC_API = {"/api/account/signup", "/api/account/login", "/api/account/session", "/api/auth-config", "/api/pair", "/api/languages"}
 
 
 def ident_of(request: Request) -> Identity:
@@ -240,11 +240,64 @@ def family_json(fam) -> dict:
 def languages() -> dict:
     """The languages a family can choose now. Hindi is not offered yet: AssemblyAI speech-to-text covers it, text-to-speech
     does not, and a family warning has to be spoken."""
-    return {"languages": lang.available(), "coming": ["de", "fr", "it", "hi"]}
+    return {"languages": lang.available(), "coming": ["hi"]}
+
+
+def supabase_on() -> bool:
+    return bool(settings.supabase_url and settings.supabase_anon_key)
+
+
+@app.get("/api/auth-config")
+def auth_config() -> dict:
+    """Where the app signs people in. The anon key is public by design: it only lets someone sign up or log in."""
+    if not supabase_on():
+        return {"supabase": False}
+    return {"supabase": True, "url": settings.supabase_url.rstrip("/"), "anon_key": settings.supabase_anon_key}
+
+
+class SessionBody(BaseModel):
+    access_token: str
+    language: str = "en"
+    timezone: str = "UTC"
+    parent_address: str = "Mom"
+    son_name: str = ""
+
+
+async def supabase_user(access_token: str) -> dict | None:
+    """Asks Supabase whose token this is. Supabase checks the signature, the expiry and that the session still exists."""
+    import httpx
+    async with httpx.AsyncClient(timeout=10) as client:
+        r = await client.get(settings.supabase_url.rstrip("/") + "/auth/v1/user",
+                             headers={"apikey": settings.supabase_anon_key, "Authorization": f"Bearer {access_token}"})
+    return r.json() if r.status_code == 200 else None
+
+
+@app.post("/api/account/session")
+async def account_session(body: SessionBody) -> dict:
+    """The app signed in with Supabase and shows its token here once; it gets back the Kavach token that the app, the
+    call service on the phone and the WebSockets use from then on."""
+    if not supabase_on():
+        raise HTTPException(400, "This server does not use Supabase sign-in.")
+    try:
+        user = await supabase_user(body.access_token)
+    except Exception:
+        raise HTTPException(503, "Could not reach the sign-in service. Please try again.")
+    if not user or not user.get("id") or not user.get("email"):
+        raise HTTPException(401, "Your sign-in has expired. Please log in again.")
+    if not (user.get("email_confirmed_at") or user.get("confirmed_at")):
+        raise HTTPException(400, "Please confirm your email first: open the link we sent you.")
+    fam, token, new = accounts.supabase_session(user["id"], user["email"], body.language, body.timezone, body.parent_address, body.son_name)
+    return {"token": token, "role": "son", "family": family_json(fam), "new": new}
+
+
+def _legacy_only() -> None:
+    if supabase_on():
+        raise HTTPException(400, "Please update the Kavach app to sign in.")
 
 
 @app.post("/api/account/signup")
 def signup(body: SignupBody) -> dict:
+    _legacy_only()
     try:
         fam, token = accounts.signup(body.email, body.password, body.language, body.timezone, body.parent_address, body.son_name)
     except AccountError as e:
@@ -254,6 +307,7 @@ def signup(body: SignupBody) -> dict:
 
 @app.post("/api/account/login")
 def login(body: LoginBody) -> dict:
+    _legacy_only()
     try:
         fam, token = accounts.login(body.email, body.password)
     except AccountError as e:
@@ -446,22 +500,29 @@ def update_report(call_id: str, answers: ReportAnswers, request: Request):
     return {"md": f"/api/calls/{call_id}/report.md", "pdf": f"/api/calls/{call_id}/report.pdf", "missing": r.missing}
 
 
+def report_file(call_id: str, column: str) -> str:
+    """The report's path. The database is the record; the file is rebuilt from it if the host lost its disk."""
+    row = store.query(f"SELECT {column} AS path FROM calls WHERE id=?", (call_id,))
+    if not row or not row[0]["path"]:
+        raise HTTPException(404, "no report for this call")
+    if not Path(row[0]["path"]).exists():
+        fam = accounts.family(call_owner(call_id) or DEFAULT_FAMILY)
+        extra = {"tz": fam.timezone, "hint": fam.report_hint} if fam is not None and fam.id != DEFAULT_FAMILY else {}
+        report_mod.generate(store, call_id, settings.reports_dir, **extra)
+        row = store.query(f"SELECT {column} AS path FROM calls WHERE id=?", (call_id,))
+    return row[0]["path"]
+
+
 @app.get("/api/calls/{call_id}/report.md")
 def report_md(call_id: str, request: Request):
     own_call(request, call_id)
-    row = store.query("SELECT report_md_path FROM calls WHERE id=?", (call_id,))
-    if not row or not row[0]["report_md_path"]:
-        raise HTTPException(404, "no report for this call")
-    return PlainTextResponse(Path(row[0]["report_md_path"]).read_text(), media_type="text/markdown; charset=utf-8")
+    return PlainTextResponse(Path(report_file(call_id, "report_md_path")).read_text(), media_type="text/markdown; charset=utf-8")
 
 
 @app.get("/api/calls/{call_id}/report.pdf")
 def report_pdf(call_id: str, request: Request):
     own_call(request, call_id)
-    row = store.query("SELECT report_pdf_path FROM calls WHERE id=?", (call_id,))
-    if not row or not row[0]["report_pdf_path"]:
-        raise HTTPException(404, "no report for this call")
-    return FileResponse(row[0]["report_pdf_path"], media_type="application/pdf", filename=f"kavach-complaint-{call_id}.pdf")
+    return FileResponse(report_file(call_id, "report_pdf_path"), media_type="application/pdf", filename=f"kavach-complaint-{call_id}.pdf")
 
 
 @app.get("/api/calls/{call_id}/evidence")
@@ -503,7 +564,7 @@ def takeover_check(request: Request) -> dict:
     """What the latest background-listener call did: Kavach's lines and voice sent, and what the phone reported back."""
     if ident_of(request).role != "admin":
         raise HTTPException(403, "Operators only.")
-    latest = store.query("SELECT id FROM calls WHERE id LIKE 'apk-%' ORDER BY rowid DESC LIMIT 1")
+    latest = store.query("SELECT id FROM calls WHERE id LIKE 'apk-%' ORDER BY started_at DESC LIMIT 1")
     if not latest:
         return {"call_id": None}
     call_id = latest[0]["id"]

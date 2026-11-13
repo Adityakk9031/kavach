@@ -4,7 +4,7 @@ services:
   - type: web
     name: kavach
     runtime: docker
-    plan: starter  # the free plan has no disk, so every deploy would delete all accounts, families and voices
+    plan: starter  # the disk keeps the voice recordings; accounts and calls are in Supabase
     healthCheckPath: /health
     disk:
       name: kavach-data
@@ -23,7 +23,13 @@ services:
         sync: false
       - key: KAVACH_ACCESS_KEY  # the operator key: it sees every family. Families use their own tokens.
         sync: false
-      - key: DB_PATH
+      - key: DATABASE_URL       # Supabase > Connect > Session pooler. Accounts, families and calls live there.
+        sync: false
+      - key: SUPABASE_URL       # https://<project>.supabase.co
+        sync: false
+      - key: SUPABASE_ANON_KEY  # the public key, used to check sign-ins
+        sync: false
+      - key: DB_PATH            # only used when DATABASE_URL is empty
         value: /data/kavach.db
       - key: REPORTS_DIR
         value: /data/reports

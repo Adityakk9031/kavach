@@ -5,9 +5,10 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { PermissionsAndroid, Platform, Switch, Text, TextInput, View } from 'react-native';
 import { AudioBridge, BridgeHandle } from './AudioBridge';
 import { voiceRecorderUrl } from './bridge';
-import { Btn, C, Panel, Screen, T, Title, input } from './ui';
+import { BackLink, Btn, C, Panel, Screen, T, Title, input } from './ui';
 import { normalizeUrl, type Settings } from './config';
-import { call } from './account';
+import { call, loadAccount } from './account';
+import { useT } from './lang';
 
 export type Person = 'papa' | 'son';
 type Rec = { state: 'idle' | 'ready' | 'recording' | 'uploading' | 'uploaded' | 'error'; seconds: number; message: string };
@@ -15,15 +16,10 @@ type Job = { state: 'working' | 'ready' | 'failed'; error?: string | null };
 type Listing = { samples: Record<string, { seconds: number; recorded_at: string; speaker_name: string }>; consent_text: string; min_seconds: number; max_seconds: number;
   jobs?: Record<string, Job>; state?: Record<string, { cloned: boolean }> };
 
-// A different short text for each take, read the way you would really talk
-const READ_ALOUD = [
-  'Hello, this is me speaking calmly. Today the weather is pleasant, and I am sitting at home with a cup of tea. ' +
-    'Please do not worry about me. If anything seems strange, I will call you back and we will talk it through together.',
-  'Oh, one more thing. If someone calls and rushes you, or tells you to keep a secret, just stop and take a breath. Hang up and ring me. There is no hurry at all.',
-  'You know I am always here for you. Whatever happens, we will sort it out together, step by step, nice and slowly. Take your time.',
-];
-
 export function VoiceScreen({ settings, person, onBack }: { settings: Settings; person: Person; onBack: () => void }) {
+  const { t, te } = useT();
+  const [parent, setParent] = useState('');
+  useEffect(() => { loadAccount().then((a) => setParent(a?.parentAddress ?? '')); }, []);
   const [name, setName] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [rec, setRec] = useState<Rec>({ state: 'idle', seconds: 0, message: '' });
@@ -69,7 +65,7 @@ export function VoiceScreen({ settings, person, onBack }: { settings: Settings; 
       const j = l.ok ? l.data.jobs?.[person] : undefined;
       if (j && j.state !== 'working') { setJob(j); return; }
     }
-    setJob({ state: 'failed', error: 'This is taking longer than usual. Check back in a minute.' });
+    setJob({ state: 'failed', error: '@vs_slow' });
   }
 
   return (
@@ -77,60 +73,59 @@ export function VoiceScreen({ settings, person, onBack }: { settings: Settings; 
       {ready && (
         <AudioBridge key={`${person}-${name}-${take}`} ref={bridge} onMessage={onMessage} uri={voiceRecorderUrl(settings, person, name.trim(), take)} />
       )}
-      <Title title={person === 'papa' ? 'Your voice' : 'Your voice for the warning'}
-        subtitle={person === 'papa' ? 'If you hand a call over, Kavach talks to the caller in this voice.'
-          : 'Papa hears the scam warning in this voice, so he knows it is family.'} />
+      <BackLink label={t('back')} onPress={() => { bridge.current?.send({ type: 'rec_cancel' }); onBack(); }} />
+      <Title title={person === 'papa' ? t('vs_titleP') : t('vs_titleS')}
+        subtitle={person === 'papa' ? t('vs_subP') : t('vs_subS', { p: parent || '…' })} />
 
       <Panel>
-        <Text style={T.body}>Your name</Text>
-        <TextInput value={name} onChangeText={setName} placeholder="Name" placeholderTextColor={C.muted}
+        <Text style={T.body}>{t('vs_name')}</Text>
+        <TextInput value={name} onChangeText={setName} placeholder={t('vs_name')} placeholderTextColor={C.muted}
           style={input} />
       </Panel>
 
       <Panel>
-        <Text style={T.h2}>Your agreement</Text>
-        <Text style={[T.muted, { marginVertical: 6 }]}>{listing?.consent_text ?? 'Loading…'}</Text>
+        <Text style={T.h2}>{t('vs_agreeTitle')}</Text>
+        <Text style={[T.muted, { marginVertical: 6 }]}>{t('vs_consent')}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Switch value={agreed} onValueChange={setAgreed} disabled={busy} trackColor={{ true: C.accent, false: C.line }} thumbColor={C.onDark} />
-          <Text style={[T.body, { flex: 1, marginLeft: 10 }]}>I agree, and this is my own voice.</Text>
+          <Text style={[T.body, { flex: 1, marginLeft: 10 }]}>{t('vs_agree')}</Text>
         </View>
       </Panel>
 
       <Panel>
-        <Text style={T.h2}>Take {take} of 3: read this aloud, calmly ({minS}–{maxS} seconds)</Text>
-        <Text style={[T.body, { marginTop: 6 }]}>{READ_ALOUD[take - 1]}</Text>
-        <Text style={[T.muted, { marginTop: 6 }]}>Use a quiet room, hold the phone close, no music or other people talking.</Text>
+        <Text style={T.h2}>{t('vs_take', { n: take, min: minS, max: maxS })}</Text>
+        <Text style={[T.body, { marginTop: 6 }]}>{t((['read1', 'read2', 'read3'] as const)[take - 1])}</Text>
+        <Text style={[T.muted, { marginTop: 6 }]}>{t('vs_tip')}</Text>
       </Panel>
 
       {rec.state === 'recording' && (
         <Panel style={{ borderColor: C.danger }}>
-          <Text style={[T.h2, { color: C.danger }]}>Recording… {rec.seconds.toFixed(0)} s</Text>
-          <Text style={T.muted}>{rec.seconds < minS ? `Keep going until ${minS} s.` : 'You can stop now.'}</Text>
+          <Text style={[T.h2, { color: C.danger }]}>{t('vs_recording', { s: rec.seconds.toFixed(0) })}</Text>
+          <Text style={T.muted}>{rec.seconds < minS ? t('vs_keep', { min: minS }) : t('vs_canStop')}</Text>
         </Panel>
       )}
-      {rec.state === 'uploading' && <Panel><Text style={T.body}>Saving to the server…</Text></Panel>}
+      {rec.state === 'uploading' && <Panel><Text style={T.body}>{t('vs_saving')}</Text></Panel>}
       {rec.state === 'uploaded' && (
         <Panel style={{ borderColor: C.accent }}>
-          <Text style={[T.h2, { color: C.accent }]}>Take {take} saved ({rec.seconds} s)</Text>
-          <Text style={T.muted}>Another take or two makes the cloned voice clearer and more natural. When you are happy, make your voice.</Text>
+          <Text style={[T.h2, { color: C.accent }]}>{t('vs_saved', { n: take, s: rec.seconds })}</Text>
+          <Text style={T.muted}>{t('vs_more')}</Text>
         </Panel>
       )}
       {rec.state === 'error' && <Panel style={{ borderColor: C.danger }}><Text style={{ color: C.danger }}>{rec.message}</Text></Panel>}
       {have && rec.state !== 'uploaded' && (
-        <Panel><Text style={T.muted}>A sample from {have.speaker_name} ({have.seconds} s, {have.recorded_at}) is already saved. Recording again replaces it.</Text></Panel>
+        <Panel><Text style={T.muted}>{t('vs_have', { name: have.speaker_name, s: have.seconds })}</Text></Panel>
       )}
 
-      {job?.state === 'working' && <Panel><Text style={T.body}>Making your voice… this takes up to a minute.</Text></Panel>}
-      {job?.state === 'ready' && <Panel style={{ borderColor: C.accent }}><Text style={[T.h2, { color: C.accent }]}>Your voice is ready</Text><Text style={T.muted}>Kavach will use it from the next call.</Text></Panel>}
-      {job?.state === 'failed' && <Panel style={{ borderColor: C.danger }}><Text style={{ color: C.danger }}>{job.error || 'Could not make the voice.'}</Text></Panel>}
-      {taken && take < 3 && <Btn label={`Record take ${take + 1} (clearer voice)`} onPress={() => { setTake(take + 1); setRec({ state: 'idle', seconds: 0, message: '' }); }} />}
-      {taken && job?.state !== 'working' && <Btn label="Make my voice" kind="primary" onPress={makeVoice} />}
+      {job?.state === 'working' && <Panel><Text style={T.body}>{t('vs_making')}</Text></Panel>}
+      {job?.state === 'ready' && <Panel style={{ borderColor: C.accent }}><Text style={[T.h2, { color: C.accent }]}>{t('vs_readyT')}</Text><Text style={T.muted}>{t('vs_readyB')}</Text></Panel>}
+      {job?.state === 'failed' && <Panel style={{ borderColor: C.danger }}><Text style={{ color: C.danger }}>{job.error ? te(job.error) : t('vs_failed')}</Text></Panel>}
+      {taken && take < 3 && <Btn label={t('vs_nextTake', { n: take + 1 })} onPress={() => { setTake(take + 1); setRec({ state: 'idle', seconds: 0, message: '' }); }} />}
+      {taken && job?.state !== 'working' && <Btn label={t('vs_make')} kind="primary" onPress={makeVoice} />}
       {rec.state === 'recording'
-        ? <Btn label="Stop and save" kind="primary" disabled={rec.seconds < minS} onPress={() => bridge.current?.send({ type: 'rec_stop' })} />
-        : taken ? null : <Btn label={have ? 'Record again' : 'Start recording'} kind="primary" disabled={!canStart}
+        ? <Btn label={t('vs_stop')} kind="primary" disabled={rec.seconds < minS} onPress={() => bridge.current?.send({ type: 'rec_stop' })} />
+        : taken ? null : <Btn label={have ? t('v_again') : t('vs_start')} kind="primary" disabled={!canStart}
             onPress={() => { setRec({ state: 'ready', seconds: 0, message: '' }); bridge.current?.send({ type: 'rec_start' }); }} />}
-      {!canStart && !busy && <Text style={T.muted}>Enter your name and agree to start.</Text>}
-      <Btn label="Back" onPress={() => { bridge.current?.send({ type: 'rec_cancel' }); onBack(); }} />
+      {!canStart && !busy && <Text style={T.muted}>{t('vs_need')}</Text>}
     </Screen>
   );
 }

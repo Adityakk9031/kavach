@@ -1,0 +1,73 @@
+<!doctype html>
+<!-- Where Supabase's emails land: "confirm your email" and "reset your password". The address of this page goes in
+     Supabase > Authentication > URL Configuration > Redirect URLs. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kavach account</title>
+<style>
+  body { margin: 0; background: #f4f1eb; color: #1c1a17; font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 440px; margin: 0 auto; padding: 56px 20px; }
+  .card { background: #fff; border: 1px solid #ddd5c8; border-radius: 16px; padding: 22px; }
+  h1 { font-size: 26px; line-height: 1.2; margin: 0 0 10px; }
+  p { color: #68625a; margin: 0 0 16px; }
+  input { width: 100%; box-sizing: border-box; font-size: 17px; padding: 14px; border: 1px solid #ddd5c8; border-radius: 12px; margin-bottom: 12px; }
+  button { width: 100%; font-size: 17px; font-weight: 700; padding: 16px; border: 0; border-radius: 12px; background: #1c1a17; color: #fff; }
+  button:disabled { opacity: .4; }
+  .bad { color: #b3261e; } .good { color: #1f6b43; font-weight: 700; }
+  [hidden] { display: none; }
+</style>
+</head>
+<body>
+<main><div class="card">
+  <h1 id="title"></h1>
+  <p id="text"></p>
+  <form id="form" hidden>
+    <input id="pw" type="password" autocomplete="new-password" minlength="8" required>
+    <button id="go" type="submit"></button>
+  </form>
+  <p id="note"></p>
+</div></main>
+<script>
+const TEXT = {
+  en: { confirmed: 'Your email is confirmed', back: 'Go back to the Kavach app and tap Continue.', reset: 'Choose a new password', resetText: 'At least 8 characters.',
+        save: 'Save password', saved: 'Password changed. Go back to the Kavach app and log in.', bad: 'This link is no longer valid. Ask for a new one in the app.', fail: 'Could not change the password. Try again.' },
+  es: { confirmed: 'Tu correo está confirmado', back: 'Vuelve a la app Kavach y toca Continuar.', reset: 'Elige una contraseña nueva', resetText: 'Al menos 8 caracteres.',
+        save: 'Guardar contraseña', saved: 'Contraseña cambiada. Vuelve a la app Kavach e inicia sesión.', bad: 'Este enlace ya no es válido. Pide uno nuevo en la app.', fail: 'No se pudo cambiar la contraseña. Inténtalo de nuevo.' },
+  pt: { confirmed: 'Seu e-mail está confirmado', back: 'Volte ao app Kavach e toque em Continuar.', reset: 'Escolha uma nova senha', resetText: 'Pelo menos 8 caracteres.',
+        save: 'Salvar senha', saved: 'Senha alterada. Volte ao app Kavach e entre.', bad: 'Este link não é mais válido. Peça um novo no app.', fail: 'Não foi possível alterar a senha. Tente de novo.' },
+  de: { confirmed: 'Deine E-Mail ist bestätigt', back: 'Geh zurück zur Kavach-App und tippe auf Weiter.', reset: 'Neues Passwort wählen', resetText: 'Mindestens 8 Zeichen.',
+        save: 'Passwort speichern', saved: 'Passwort geändert. Geh zurück zur Kavach-App und melde dich an.', bad: 'Dieser Link ist nicht mehr gültig. Fordere in der App einen neuen an.', fail: 'Das Passwort konnte nicht geändert werden. Versuch es noch einmal.' },
+  fr: { confirmed: 'Votre e-mail est confirmé', back: 'Revenez dans l’application Kavach et touchez Continuer.', reset: 'Choisissez un nouveau mot de passe', resetText: 'Au moins 8 caractères.',
+        save: 'Enregistrer', saved: 'Mot de passe modifié. Revenez dans l’application Kavach et connectez-vous.', bad: 'Ce lien n’est plus valable. Demandez-en un nouveau dans l’application.', fail: 'Impossible de modifier le mot de passe. Réessayez.' },
+  it: { confirmed: 'La tua email è confermata', back: 'Torna all’app Kavach e tocca Continua.', reset: 'Scegli una nuova password', resetText: 'Almeno 8 caratteri.',
+        save: 'Salva password', saved: 'Password cambiata. Torna all’app Kavach e accedi.', bad: 'Questo link non è più valido. Chiedine uno nuovo nell’app.', fail: 'Impossibile cambiare la password. Riprova.' },
+};
+const t = TEXT[(navigator.language || 'en').slice(0, 2)] || TEXT.en;
+const $ = (id) => document.getElementById(id);
+const hash = new URLSearchParams(location.hash.slice(1));
+const token = hash.get('access_token'), kind = hash.get('type');
+history.replaceState(null, '', location.pathname); // the token does not stay in the address bar or the history
+
+if (hash.get('error') || !token) {
+  $('title').textContent = 'Kavach'; $('text').textContent = t.bad; $('text').className = 'bad';
+} else if (kind === 'recovery') {
+  $('title').textContent = t.reset; $('text').textContent = t.resetText; $('go').textContent = t.save; $('form').hidden = false;
+  $('form').addEventListener('submit', async (e) => {
+    e.preventDefault(); $('go').disabled = true; $('note').textContent = '';
+    try {
+      const cfg = await (await fetch('/api/auth-config')).json();
+      const r = await fetch(cfg.url.replace(/\/+$/, '') + '/auth/v1/user', { method: 'PUT',
+        headers: { apikey: cfg.anon_key, authorization: 'Bearer ' + token, 'content-type': 'application/json' },
+        body: JSON.stringify({ password: $('pw').value }) });
+      if (!r.ok) throw new Error();
+      $('form').hidden = true; $('text').textContent = t.saved; $('text').className = 'good';
+    } catch { $('note').textContent = t.fail; $('note').className = 'bad'; $('go').disabled = false; }
+  });
+} else {
+  $('title').textContent = t.confirmed; $('text').textContent = t.back;
+}
+</script>
+</body>
+</html>

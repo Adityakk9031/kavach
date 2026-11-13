@@ -34,7 +34,7 @@ Stages:
 {chr(10).join(f"{k}: {v}" for k, v in STAGES.items())}
 
 Rules:
-- The call may be in English, Spanish or Portuguese. Judge it the same way in any of them and copy quotes exactly as spoken.
+- The call may be in English, Spanish, Portuguese, German, French or Italian. Judge it the same way in any of them and copy quotes exactly as spoken.
 - Tag a stage only when the CALLER does it in this call. The listener's own words never count.
 - Ordinary callers identify themselves: a bank, courier, clinic, shop or company saying who they are and why they
   call is NOT S1. S1 means authority is used as LEVERAGE: claiming to be police, a tax agency, customs, a central bank, a government office or the bank's

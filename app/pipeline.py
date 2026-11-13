@@ -71,7 +71,7 @@ class CallPipeline:
             "since_turn_end_ms": round((now - turn_end_at) * 1000) if turn_end_at else None,
         }
         room.log_event("detect", payload, now)
-        room.store._exec(
+        room.store.write(
             "INSERT INTO detections(call_id, turn_id, stages, evidence_quotes, risk_llm, risk_cum, rationale, "
             "triggered, llm_ms, model) VALUES (?,?,?,?,?,?,?,?,?,?)",
             (room.call_id, turn["turn_id"], json.dumps(decision.stages_all), json.dumps(info["evidence_quotes"]),

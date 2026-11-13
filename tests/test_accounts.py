@@ -123,7 +123,7 @@ def test_signup_is_open_but_everything_else_needs_a_token_and_families_are_isola
         assert c.put("/api/family", json={"language": "es", "parent_address": "Abuela"}, headers=ha).json()["language"] == "es"
         assert c.put("/api/family", json={"language": "xx"}, headers=ha).status_code == 400
         langs = c.get("/api/languages").json()
-        assert [x["code"] for x in langs["languages"]] == ["en", "es", "pt"] and "hi" in langs["coming"]
+        assert [x["code"] for x in langs["languages"]] == ["en", "es", "pt", "de", "fr", "it"] and langs["coming"] == ["hi"]
 
 
 def test_a_parent_phone_link_is_kept_per_family(monkeypatch):

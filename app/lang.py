@@ -1,7 +1,7 @@
 """Everything a family hears or reads in its own language: the warning, the takeover voice's lines, Telegram messages.
 
-AssemblyAI streaming speech-to-text and text-to-speech both cover English, Spanish and Portuguese (and German, French and
-Italian), so those three are launched. Hindi is covered by speech-to-text but not yet by text-to-speech, so it waits.
+AssemblyAI streaming speech-to-text and text-to-speech both cover English, Spanish, Portuguese, German, French and Italian,
+so those six are offered. Hindi is covered by speech-to-text but not yet by text-to-speech, so it waits.
 Adding a language means adding one `Pack` here: nothing else in the server hard-codes English.
 """
 
@@ -188,7 +188,164 @@ PT = Pack(
     },
 )
 
-PACKS = {p.code: p for p in (EN, ES, PT)}
+NUM_DE = frozenset("null eins ein eine zwei zwo drei vier fünf sechs sieben acht neun".split())
+NUM_FR = frozenset("zéro zero un une deux trois quatre cinq six sept huit neuf".split())
+NUM_IT = frozenset("zero uno una due tre quattro cinque sei sette otto nove".split())
+
+DE = Pack(
+    code="de", tts="german", stt="de", label="German", native="Deutsch",
+    decoy_name="Helmut Krüger", decoy_city="Kassel", decoy_bank="Sparbank Mitte", decoy_phone="fünf fünf fünf, null eins null null",
+    opening="Hallo? Ach, Entschuldigung, ich habe Sie nicht richtig verstanden. Bitte, sprechen Sie weiter, ich höre zu.",
+    stalls=("Entschuldigung, äh, die Leitung ist ganz schlecht. Können Sie das noch einmal langsam sagen?",
+            "Einen Moment bitte, ich suche gerade meine Brille. Sagen Sie das bitte noch einmal.",
+            "Ah, ich schreibe das auf. Können Sie es noch einmal sagen, schön langsam?"),
+    examples=('Anrufer: "Ihr Konto ist gesperrt." Du: "Ach du liebe Zeit… gesperrt? Ich habe es doch heute Morgen noch benutzt. Von welcher Bank sind Sie, sagten Sie?"\n'
+              'Anrufer: "Überweisen Sie das Geld jetzt." Du: "Jetzt gleich? Oh, da muss ich erst mein Sparbuch suchen… das liegt irgendwo in der Schublade. Auf welchen Namen noch mal?"\n'
+              'Anrufer: "Lesen Sie mir den Code vor." Du: "Einen Code? Hm, da ist nichts gekommen, mein Telefon ist sehr alt. Falls wir unterbrochen werden, unter welcher Nummer erreiche ich Sie?"'),
+    number_words=NUM_DE,
+    warnings={
+        "S7": "{p}, stopp… Bitte installiere nichts und teile nicht deinen Bildschirm. Schließ diese App sofort. Leg auf und ruf mich an. Ich bin da.",
+        "S5": "{p}, stopp… Bitte lies diesen Code nicht vor. Keine Bank und kein Beamter fragt am Telefon nach einem Code oder einer PIN. Leg auf und ruf mich an. Ich bin da.",
+        "S6": "{p}, stopp… Bitte überweise kein Geld. Ein echter Beamter verlangt am Telefon niemals eine Zahlung. Leg auf und ruf mich zuerst an. Ich bin da.",
+        "S3": "{p}, stopp… Du musst nicht in diesem Gespräch bleiben. Ein echter Beamter verlangt nie, dass du es geheim hältst. Leg auf und ruf mich an. Ich bin da.",
+        "S2": "{p}, stopp… Die Polizei verhaftet niemanden am Telefon. Das ist Betrug. Leg jetzt auf. Ich bin da.",
+        "S1": "{p}, stopp… Ich glaube, das ist ein Betrugsanruf. Polizei und Banken drohen niemandem am Telefon. Leg auf und ruf mich an. Ich bin da.",
+        "default": "{p}, stopp… Ich glaube, dieser Anruf ist nicht sicher. Bitte leg auf und ruf mich an. Ich bin da.",
+    },
+    t={
+        "stages": {"S1": "Autorität", "S2": "Drohung", "S3": "Geheimhaltung", "S4": "Zeitdruck", "S5": "Frage nach Codes",
+                   "S6": "Zahlungsforderung", "S7": "Fernzugriff"}, "none_yet": "noch keine", "risk": "Risiko {risk}/100",
+        "caller": "Anrufer", "unknown": "unbekannte Nummer",
+        "warn_head": "🚨 Kavach: möglicher Betrugsanruf erkannt",
+        "warn_tail": "Tippe unten, um den Anruf zu beenden, oder sende eine Sprachnachricht. Sie wird auf dem Telefon von {p} abgespielt.",
+        "escalate_head": "⚠️ Kavach: der Anruf spitzt sich zu",
+        "takeover_head": "🛡️ Kavach hat den Anruf übernommen (die Lockvogel-Stimme spricht)",
+        "end_button": "☎️ Anruf beenden",
+        "report_ready": "📄 Kavach: Anruf beendet. Der Berichtsentwurf mit {n} erfassten Angabe(n) ist fertig. Tippe auf die Tasten unten, um zu sagen, ob Geld oder ein Code/eine PIN weitergegeben wurde. Prüfe dann den Entwurf und melde den Fall bei {hint}. (Nur ein Entwurf: es wurde nichts eingereicht.)",
+        "doc_caption": "Entwurf der Betrugsanzeige (vor dem Einreichen prüfen)",
+        "doc_caption2": "Aktualisierter Entwurf mit deinen Antworten (vor dem Einreichen prüfen)",
+        "money_yes": "Geld gesendet: Ja", "money_no": "Geld gesendet: Nein", "otp_yes": "Code/PIN genannt: Ja", "otp_no": "Code/PIN genannt: Nein",
+        "saved": "Gespeichert: {label} = {answer}", "money_label": "Geld gesendet", "otp_label": "Code/PIN genannt", "yes": "Ja", "no": "Nein",
+        "expired": "Diese Frage ist abgelaufen.",
+        "no_phone": "Das konnte ich nicht senden. Das Telefon von {p} ist gerade nicht mit Kavach verbunden.",
+        "too_long": "Diese Sprachnachricht ist zu lang. Bitte unter {n} Sekunden bleiben.",
+        "cannot_play": "Das konnte ich nicht abspielen: {why}.", "cannot_download": "Ich konnte diese Sprachnachricht nicht laden. Bitte versuche es noch einmal.",
+        "playing": "▶️ Wird jetzt auf dem Telefon von {p} abgespielt ({n} s).",
+        "no_confirm": "Das Telefon von {p} hat den Empfang nicht bestätigt. Vielleicht hat es gerade kein Internet.",
+        "app_offline": "Die App von {p} ist nicht verbunden, deshalb konnte nichts abgespielt werden.",
+        "already_ended": "Dieser Anruf ist schon beendet.", "ending": "Der Anruf wird beendet.",
+        "could_not_cut": "⚠️ Ich konnte den Anruf auf dem Telefon von {p} nicht beenden, er läuft also noch. Kavach schützt ihn weiter. Bitte versuche, {p} anzurufen oder zu schreiben.",
+        "call_ended": "☎️ Der Anruf wurde beendet. Sende jetzt eine Sprachnachricht, sie wird auf dem Telefon von {p} abgespielt.",
+        "linked": "✅ Verbunden. Hier bekommst du die Kavach-Warnungen für das Telefon von {p}. Wird ein Betrugsanruf erkannt, kannst du ihn von hier beenden und eine Sprachnachricht senden, die auf dem Telefon abgespielt wird.",
+        "link_bad": "Dieser Link ist abgelaufen oder wurde schon benutzt. Öffne die Kavach-App und tippe noch einmal auf „Telegram verbinden“.",
+        "welcome": "Hallo! Ich bin der Kavach-Bot. Um diesen Chat mit deiner Familie zu verbinden, öffne die Kavach-App und tippe auf „Telegram verbinden“.",
+        "voice_set": "Erledigt. Kavach spricht mit der Stimme {voice}, wenn es einen Anruf übernimmt.",
+    },
+)
+
+FR = Pack(
+    code="fr", tts="french", stt="fr", label="French", native="Français",
+    decoy_name="Bernard Lefèvre", decoy_city="Angers", decoy_bank="Banque du Centre", decoy_phone="cinq cinq cinq, zéro un zéro zéro",
+    opening="Allô ? Oh, pardon, je ne vous ai pas bien entendu. Continuez, je vous écoute.",
+    stalls=("Pardon, euh, la ligne est très mauvaise. Vous pouvez répéter lentement ?",
+            "Une petite minute, je cherche mes lunettes. Répétez, s'il vous plaît.",
+            "Ah, je note. Vous pouvez le redire encore une fois, doucement ?"),
+    examples=('Appelant : "Votre compte est bloqué." Toi : "Oh là là… bloqué ? Mais je m\'en suis servi ce matin. Vous êtes de quelle banque, vous m\'avez dit ?"\n'
+              'Appelant : "Envoyez l\'argent maintenant." Toi : "Maintenant ? Oh, il faut d\'abord que je retrouve mon chéquier… il est dans un tiroir, je crois. C\'est à quel nom, déjà ?"\n'
+              'Appelant : "Lisez-moi le code." Toi : "Un code ? Hmm, je n\'ai rien reçu, mon téléphone est très vieux. Si ça coupe, à quel numéro je peux vous rappeler ?"'),
+    number_words=NUM_FR,
+    warnings={
+        "S7": "{p}, arrête… N'installe rien et ne partage pas ton écran. Ferme cette application tout de suite. Raccroche et appelle-moi. Je suis là.",
+        "S5": "{p}, arrête… Ne donne pas ce code. Aucune banque ni aucun agent ne demande un code ou un PIN au téléphone. Raccroche et appelle-moi. Je suis là.",
+        "S6": "{p}, arrête… N'envoie pas d'argent. Un vrai agent ne demande jamais de paiement au téléphone. Raccroche et appelle-moi d'abord. Je suis là.",
+        "S3": "{p}, arrête… Tu n'es pas obligé de rester en ligne. Un vrai agent ne te demandera jamais de garder le secret. Raccroche et appelle-moi. Je suis là.",
+        "S2": "{p}, arrête… La police n'arrête personne par téléphone. C'est une arnaque. Raccroche maintenant. Je suis là.",
+        "S1": "{p}, arrête… Je crois que c'est une arnaque. La police et les banques ne menacent personne au téléphone. Raccroche et appelle-moi. Je suis là.",
+        "default": "{p}, arrête… Je crois que cet appel n'est pas sûr. S'il te plaît, raccroche et appelle-moi. Je suis là.",
+    },
+    t={
+        "stages": {"S1": "Autorité", "S2": "Menace", "S3": "Secret", "S4": "Urgence", "S5": "Demande de codes",
+                   "S6": "Demande de paiement", "S7": "Accès à distance"}, "none_yet": "aucune pour l'instant", "risk": "Risque {risk}/100",
+        "caller": "Appelant", "unknown": "numéro inconnu",
+        "warn_head": "🚨 Kavach : appel suspect, possible arnaque",
+        "warn_tail": "Touchez ci-dessous pour couper l'appel, ou envoyez un message vocal : il sera joué sur le téléphone de {p}.",
+        "escalate_head": "⚠️ Kavach : l'appel s'aggrave",
+        "takeover_head": "🛡️ Kavach a pris l'appel (la voix leurre parle)",
+        "end_button": "☎️ Couper l'appel",
+        "report_ready": "📄 Kavach : appel terminé. Le brouillon du signalement est prêt avec {n} élément(s) relevé(s). Touchez les boutons ci-dessous pour dire si de l'argent ou un code/PIN a été donné, relisez le brouillon et signalez-le à {hint}. (Brouillon seulement : rien n'a été envoyé.)",
+        "doc_caption": "Brouillon du signalement de fraude (à relire avant de le déposer)",
+        "doc_caption2": "Brouillon mis à jour avec vos réponses (à relire avant de le déposer)",
+        "money_yes": "Argent envoyé : Oui", "money_no": "Argent envoyé : Non", "otp_yes": "Code/PIN donné : Oui", "otp_no": "Code/PIN donné : Non",
+        "saved": "Enregistré : {label} = {answer}", "money_label": "Argent envoyé", "otp_label": "Code/PIN donné", "yes": "Oui", "no": "Non",
+        "expired": "Cette question a expiré.",
+        "no_phone": "Je n'ai pas pu l'envoyer. Le téléphone de {p} n'est pas connecté à Kavach en ce moment.",
+        "too_long": "Ce message vocal est trop long. Restez sous {n} secondes.",
+        "cannot_play": "Je n'ai pas pu le jouer : {why}.", "cannot_download": "Je n'ai pas pu télécharger ce message vocal. Réessayez.",
+        "playing": "▶️ En cours de lecture sur le téléphone de {p} ({n} s).",
+        "no_confirm": "Le téléphone de {p} n'a pas confirmé la réception. Il n'a peut-être pas d'internet en ce moment.",
+        "app_offline": "L'application de {p} n'est pas connectée, le message n'a donc pas pu être joué.",
+        "already_ended": "Cet appel est déjà terminé.", "ending": "Coupure de l'appel.",
+        "could_not_cut": "⚠️ Je n'ai pas pu couper l'appel sur le téléphone de {p}, il est donc toujours en cours. Kavach continue de le protéger. Essayez d'appeler ou d'écrire à {p}.",
+        "call_ended": "☎️ L'appel a été coupé. Envoyez un message vocal maintenant, il sera joué sur le téléphone de {p}.",
+        "linked": "✅ Connecté. Vous recevrez ici les alertes Kavach du téléphone de {p}. Si une arnaque est détectée, vous pourrez couper l'appel d'ici et envoyer un message vocal qui sera joué sur son téléphone.",
+        "link_bad": "Ce lien a expiré ou a déjà servi. Ouvrez l'application Kavach et touchez de nouveau « Connecter Telegram ».",
+        "welcome": "Bonjour ! Je suis le bot Kavach. Pour relier cette discussion à votre famille, ouvrez l'application Kavach et touchez « Connecter Telegram ».",
+        "voice_set": "C'est fait. Kavach parlera avec la voix {voice} quand il prendra un appel.",
+    },
+)
+
+IT = Pack(
+    code="it", tts="italian", stt="it", label="Italian", native="Italiano",
+    decoy_name="Giuseppe Ferrari", decoy_city="Modena", decoy_bank="Banca del Centro", decoy_phone="cinque cinque cinque, zero uno zero zero",
+    opening="Pronto? Ah, mi scusi, non ho sentito bene. Prego, continui, la ascolto.",
+    stalls=("Mi scusi, eh, la linea si sente male. Può ripetere piano?",
+            "Un momentino, sto cercando gli occhiali. Me lo ripeta, per favore.",
+            "Ah, me lo sto scrivendo. Può dirlo ancora una volta, piano piano?"),
+    examples=('Chiamante: "Il suo conto è bloccato." Tu: "Oh mamma mia… bloccato? Ma l\'ho usato stamattina. Di quale banca ha detto che è?"\n'
+              'Chiamante: "Mandi i soldi adesso." Tu: "Adesso? Eh, prima devo trovare il libretto… è in un cassetto, mi pare. A nome di chi, scusi?"\n'
+              'Chiamante: "Mi legga il codice." Tu: "Un codice? Mah, non è arrivato niente, il mio telefono è molto vecchio. Se cade la linea, a che numero la richiamo?"'),
+    number_words=NUM_IT,
+    warnings={
+        "S7": "{p}, fermati… Non installare niente e non condividere lo schermo. Chiudi subito quella app. Metti giù il telefono e chiamami. Sono qui.",
+        "S5": "{p}, fermati… Non dire quel codice. Nessuna banca e nessun agente chiede un codice o un PIN al telefono. Metti giù il telefono e chiamami. Sono qui.",
+        "S6": "{p}, fermati… Non mandare soldi. Un vero agente non chiede mai un pagamento al telefono. Metti giù il telefono e chiama prima me. Sono qui.",
+        "S3": "{p}, fermati… Non devi restare in questa chiamata. Un vero agente non ti chiede mai di tenere il segreto. Metti giù il telefono e chiamami. Sono qui.",
+        "S2": "{p}, fermati… La polizia non arresta nessuno per telefono. È una truffa. Metti giù il telefono adesso. Sono qui.",
+        "S1": "{p}, fermati… Credo che sia una truffa. La polizia e le banche non minacciano nessuno al telefono. Metti giù il telefono e chiamami. Sono qui.",
+        "default": "{p}, fermati… Credo che questa chiamata non sia sicura. Per favore, metti giù il telefono e chiamami. Sono qui.",
+    },
+    t={
+        "stages": {"S1": "Autorità", "S2": "Minaccia", "S3": "Segretezza", "S4": "Urgenza", "S5": "Richiesta di codici",
+                   "S6": "Richiesta di pagamento", "S7": "Accesso remoto"}, "none_yet": "nessuna per ora", "risk": "Rischio {risk}/100",
+        "caller": "Chiamante", "unknown": "numero sconosciuto",
+        "warn_head": "🚨 Kavach: possibile chiamata truffa rilevata",
+        "warn_tail": "Tocca qui sotto per chiudere la chiamata, oppure invia un messaggio vocale: verrà riprodotto sul telefono di {p}.",
+        "escalate_head": "⚠️ Kavach: la chiamata sta peggiorando",
+        "takeover_head": "🛡️ Kavach ha preso la chiamata (sta parlando la voce esca)",
+        "end_button": "☎️ Chiudi la chiamata",
+        "report_ready": "📄 Kavach: chiamata terminata. La bozza della segnalazione è pronta con {n} dato/i raccolto/i. Tocca i pulsanti qui sotto per dire se sono stati dati soldi o un codice/PIN, poi rileggi la bozza e segnala il caso a {hint}. (Solo una bozza: non è stato inviato niente.)",
+        "doc_caption": "Bozza della denuncia per truffa (da rileggere prima di presentarla)",
+        "doc_caption2": "Bozza aggiornata con le tue risposte (da rileggere prima di presentarla)",
+        "money_yes": "Soldi inviati: Sì", "money_no": "Soldi inviati: No", "otp_yes": "Codice/PIN comunicato: Sì", "otp_no": "Codice/PIN comunicato: No",
+        "saved": "Salvato: {label} = {answer}", "money_label": "Soldi inviati", "otp_label": "Codice/PIN comunicato", "yes": "Sì", "no": "No",
+        "expired": "Questa domanda è scaduta.",
+        "no_phone": "Non sono riuscito a inviarlo. Il telefono di {p} non è collegato a Kavach in questo momento.",
+        "too_long": "Questo messaggio vocale è troppo lungo. Resta sotto i {n} secondi.",
+        "cannot_play": "Non sono riuscito a riprodurlo: {why}.", "cannot_download": "Non sono riuscito a scaricare questo messaggio vocale. Riprova.",
+        "playing": "▶️ In riproduzione sul telefono di {p} ({n} s).",
+        "no_confirm": "Il telefono di {p} non ha confermato la ricezione. Forse adesso non ha internet.",
+        "app_offline": "L'app di {p} non è collegata, quindi non è stato possibile riprodurlo.",
+        "already_ended": "Quella chiamata è già terminata.", "ending": "Chiudo la chiamata.",
+        "could_not_cut": "⚠️ Non sono riuscito a chiudere la chiamata sul telefono di {p}, quindi è ancora in corso. Kavach continua a proteggerla. Prova a chiamare o a scrivere a {p}.",
+        "call_ended": "☎️ La chiamata è stata chiusa. Invia ora un messaggio vocale: verrà riprodotto sul telefono di {p}.",
+        "linked": "✅ Collegato. Qui riceverai gli avvisi di Kavach per il telefono di {p}. Se viene rilevata una truffa potrai chiudere la chiamata da qui e inviare un messaggio vocale che verrà riprodotto sul suo telefono.",
+        "link_bad": "Questo link è scaduto o è già stato usato. Apri l'app Kavach e tocca di nuovo «Collega Telegram».",
+        "welcome": "Ciao! Sono il bot di Kavach. Per collegare questa chat alla tua famiglia, apri l'app Kavach e tocca «Collega Telegram».",
+        "voice_set": "Fatto. Kavach parlerà con la voce {voice} quando prenderà una chiamata.",
+    },
+)
+
+PACKS = {p.code: p for p in (EN, ES, PT, DE, FR, IT)}
 DEFAULT = "en"
 
 

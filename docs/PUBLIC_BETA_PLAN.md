@@ -1,13 +1,29 @@
 # Kavach public beta: what changed and why
 
+## 0. Update, 2026-11-11: Supabase, six languages, translated app
+- **Sign-in is Supabase Auth** (email + password, confirmed by a link, password reset). The app talks to Supabase directly,
+  then shows Supabase's token to `POST /api/account/session` once and gets a Kavach token. `GET /api/auth-config` tells the app
+  whether Supabase is set up; without it the server's own sign-up and log-in still work.
+- **The database is Supabase Postgres** when `DATABASE_URL` is set (use the session pooler string); SQLite otherwise.
+  Tested against a real local Postgres 17.
+- **To switch it on** (Render environment): `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`. In Supabase, add
+  `<server>/web/account.html` to the redirect allow list (the page the confirmation and reset emails open).
+- **Languages: English, Spanish, Portuguese, German, French, Italian**, end to end (speech-to-text, warning, takeover voice,
+  Telegram). German, French and Italian speech-to-text have not been tried on a live call yet. Hindi still waits for TTS.
+- **The app's own screens are translated** into the same six (`mobile/src/i18n/`), including the card over the dialer
+  (the app writes the card's words into `kavach-config.json`). The PDF report is still English.
+- **Redesigned screens**: welcome with language choice, account, family home with three steps and progress, protected-phone
+  home with one row per permission (and a way out when one is blocked or "restricted settings" greys the switch out).
+- **No Shizuku**: see section 3. A built-in copy of Shizuku would still need Developer options and wireless debugging on the
+  parent's phone and would stop on every restart, so Standard mode is the path for everyone and Shizuku stays optional.
+
 ## 1. Languages (verified live on 2026-11-10)
 AssemblyAI TTS speaks English, Spanish, German, French, Italian and Portuguese. Streaming speech-to-text (Universal-3.6 Pro)
 accepted `es`, `pt` and `en`. **Hindi has speech-to-text but no text-to-speech yet**, and the warning must be spoken, so Hindi waits.
 
-Launched: **English, Spanish, Portuguese** (large scam-call populations, both fully supported end to end).
-Next, one `Pack` each in `app/lang.py`: German, French, Italian. Then Hindi when TTS supports it.
+Launched: **English, Spanish, Portuguese, German, French, Italian**. Then Hindi when TTS supports it.
 Per family: STT language, TTS language, warning text, takeover persona (made-up older person, per language), Telegram texts,
-number-word guard. Not yet translated: the PDF report (English) and the app's own screens (English).
+number-word guard. Not yet translated: the PDF report (English).
 
 ## 2. Voices (the "unfamiliar voice" problem)
 - The takeover now speaks in the **parent's own cloned voice**, and the warning in the **son's**.

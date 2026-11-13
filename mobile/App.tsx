@@ -7,14 +7,16 @@ import { HomeScreen } from './src/HomeScreen';
 import { ProtectScreen } from './src/ProtectScreen';
 import { CallerScreen } from './src/CallerScreen';
 import { VoiceScreen } from './src/VoiceScreen';
+import { ProScreen } from './src/ProScreen';
 import { Onboarding } from './src/Onboarding';
 import { AuthScreen } from './src/AuthScreen';
 import { FamilyHome } from './src/FamilyHome';
 import { Account, loadAccount, signOut, writeNativeConfig } from './src/account';
 import { EMPTY, Prefs, loadPrefs, savePrefs } from './src/prefs';
 import { C } from './src/ui';
+import { LangProvider } from './src/lang';
 
-type Screen = { name: 'home' } | { name: 'setup' } | { name: 'voice' } | { name: 'protect' | 'caller'; code: string; rehearsal: boolean; listen?: boolean; watchCall?: string };
+type Screen = { name: 'home' } | { name: 'setup' } | { name: 'voice' } | { name: 'pro' } | { name: 'protect' | 'caller'; code: string; rehearsal: boolean; listen?: boolean; watchCall?: string };
 
 export default function App() {
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -71,13 +73,15 @@ export default function App() {
       onPickLanguage={(code) => setAccount({ ...account, language: code })} />;
   } else if (settings && account && screen.name === 'home') {
     body = <HomeScreen role="papa" settings={settings} onSwitch={signedOut} signedIn onReset={() => {}} onProtect={(code, rehearsal, listen) => setScreen({ name: 'protect', code, rehearsal, listen })}
-      onCaller={(code, rehearsal) => setScreen({ name: 'caller', code, rehearsal })} onSettings={() => setScreen({ name: 'setup' })} onVoice={() => setScreen({ name: 'voice' })} />;
+      onCaller={(code, rehearsal) => setScreen({ name: 'caller', code, rehearsal })} onSettings={() => setScreen({ name: 'setup' })} onVoice={() => setScreen({ name: 'voice' })} onPro={() => setScreen({ name: 'pro' })} />;
   } else if (settings && screen.name === 'home' && switching) {
     body = <Onboarding startAtRoles onDone={choose} onCancel={() => setSwitching(false)} />;
   } else if (settings && !prefs.onboarded && screen.name === 'home') {
     body = <Onboarding onDone={choose} />;
   } else if (screen.name === 'setup' || !settings) {
     body = <SetupScreen initial={settings} onSaved={(s) => { setSettings(s); home(); }} onBack={settings ? home : undefined} />;
+  } else if (screen.name === 'pro') {
+    body = <ProScreen onBack={home} />;
   } else if (screen.name === 'voice') {
     body = <VoiceScreen settings={settings} person={(account ? account.role === 'son' : prefs.role === 'family') ? 'son' : 'papa'} onBack={home} />;
   } else if (screen.name === 'protect') {
@@ -89,5 +93,5 @@ export default function App() {
       onCaller={(code, rehearsal) => setScreen({ name: 'caller', code, rehearsal })} onSettings={() => setScreen({ name: 'setup' })}
       onVoice={() => setScreen({ name: 'voice' })} />;
   }
-  return <View style={{ flex: 1, backgroundColor: C.bg }}><StatusBar style="dark" />{body}</View>;
+  return <LangProvider><View style={{ flex: 1, backgroundColor: C.bg }}><StatusBar style="dark" />{body}</View></LangProvider>;
 }

@@ -14,3 +14,6 @@ os.environ["TELEGRAM_BOT_TOKEN"] = ""
 os.environ["TELEGRAM_CHAT_ID"] = ""
 os.environ["KAVACH_ACCESS_KEY"] = ""  # a key in the local .env must not lock the tests out
 os.environ["VOICES_DIR"] = os.path.join(tempfile.mkdtemp(prefix="kavach-voices-"))
+os.environ["DATABASE_URL"] = os.environ.get("KAVACH_TEST_PG_APP", "")  # tests use SQLite; tests/test_supabase.py opts in with KAVACH_TEST_PG
+os.environ["SUPABASE_URL"] = ""
+os.environ["SUPABASE_ANON_KEY"] = ""

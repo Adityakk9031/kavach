@@ -70,6 +70,11 @@ class Settings(BaseSettings):
     # --- alerts ---
     max_alerts_per_call: int = 3
 
+    # --- Supabase: the database and the sign-in. Both empty = SQLite and the built-in email/password (local use) ---
+    database_url: str = ""       # Supabase > Connect > "Session pooler" connection string
+    supabase_url: str = ""       # https://<project>.supabase.co
+    supabase_anon_key: str = ""  # the public (anon / publishable) key; it is safe inside the app
+
     # --- storage ---
     db_path: str = "data/kavach.db"
     reports_dir: str = "data/reports"
