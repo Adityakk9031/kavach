@@ -18,12 +18,12 @@ CREATE TABLE IF NOT EXISTS turns (
   is_decoy INTEGER NOT NULL DEFAULT 0
 );
 CREATE TABLE IF NOT EXISTS detections (
-  id BIGSERIAL PRIMARY KEY, call_id TEXT NOT NULL, turn_id INTEGER, stages TEXT,
+  id BIGSERIAL PRIMARY KEY, call_id TEXT NOT NULL, turn_id BIGINT, stages TEXT,
   evidence_quotes TEXT, risk_llm INTEGER, risk_cum DOUBLE PRECISION, rationale TEXT, triggered INTEGER,
   llm_ms INTEGER, model TEXT
 );
 CREATE TABLE IF NOT EXISTS evidence (
-  id BIGSERIAL PRIMARY KEY, call_id TEXT NOT NULL, turn_id INTEGER, type TEXT,
+  id BIGSERIAL PRIMARY KEY, call_id TEXT NOT NULL, turn_id BIGINT, type TEXT,
   value TEXT, normalized TEXT, quote TEXT, ts_ms INTEGER, valid INTEGER
 );
 CREATE TABLE IF NOT EXISTS events (
@@ -52,6 +52,13 @@ ALTER TABLE calls ADD COLUMN IF NOT EXISTS family_id TEXT;
 CREATE INDEX IF NOT EXISTS calls_family ON calls(family_id);
 ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_id TEXT;
 CREATE INDEX IF NOT EXISTS users_auth ON users(auth_id);
+ALTER TABLE families ADD COLUMN IF NOT EXISTS person_gender TEXT;
+ALTER TABLE families ADD COLUMN IF NOT EXISTS person_age TEXT;
+ALTER TABLE families ADD COLUMN IF NOT EXISTS style_note TEXT;
+ALTER TABLE families ADD COLUMN IF NOT EXISTS learn_style INTEGER;
+ALTER TABLE families ADD COLUMN IF NOT EXISTS speech_style TEXT;
+ALTER TABLE detections ALTER COLUMN turn_id TYPE BIGINT;
+ALTER TABLE evidence ALTER COLUMN turn_id TYPE BIGINT;
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS events_call ON events(call_id, ts_mono);

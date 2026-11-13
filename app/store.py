@@ -29,12 +29,12 @@ CREATE TABLE IF NOT EXISTS turns (
   is_decoy INTEGER NOT NULL DEFAULT 0
 );
 CREATE TABLE IF NOT EXISTS detections (
-  id INTEGER PRIMARY KEY AUTOINCREMENT, call_id TEXT NOT NULL, turn_id INTEGER, stages TEXT,
+  id INTEGER PRIMARY KEY AUTOINCREMENT, call_id TEXT NOT NULL, turn_id BIGINT, stages TEXT,
   evidence_quotes TEXT, risk_llm INTEGER, risk_cum REAL, rationale TEXT, triggered INTEGER,
   llm_ms INTEGER, model TEXT
 );
 CREATE TABLE IF NOT EXISTS evidence (
-  id INTEGER PRIMARY KEY AUTOINCREMENT, call_id TEXT NOT NULL, turn_id INTEGER, type TEXT,
+  id INTEGER PRIMARY KEY AUTOINCREMENT, call_id TEXT NOT NULL, turn_id BIGINT, type TEXT,
   value TEXT, normalized TEXT, quote TEXT, ts_ms INTEGER, valid INTEGER
 );
 CREATE TABLE IF NOT EXISTS events (
@@ -73,6 +73,9 @@ class Store:
         self.script(SCHEMA)
         self.add_column("calls", "family_id", "TEXT")  # databases made before families existed
         self.script("CREATE INDEX IF NOT EXISTS calls_family ON calls(family_id);")
+        if self.pg:  # turn ids are made by the server now (microseconds), too big for a 4-byte column
+            for table in ("detections", "evidence"):
+                self._db.execute(f"ALTER TABLE {table} ALTER COLUMN turn_id TYPE BIGINT")
 
     # ---- the two databases ---------------------------------------------------------------------------------
 
@@ -155,7 +158,7 @@ class Store:
 
     def start_call(self, call_id: str, mode: str = "live", caller_number: str | None = None,
                    script_id: str | None = None) -> None:
-        self._exec(
+        self.write(  # not waited for: the phone is already ringing
             "INSERT INTO calls(id, mode, caller_number, script_id, started_at) VALUES (?,?,?,?,?) "
             "ON CONFLICT(id) DO UPDATE SET caller_number=COALESCE(excluded.caller_number, calls.caller_number)",
             (call_id, mode, caller_number, script_id, time.time()),
@@ -173,15 +176,24 @@ class Store:
             (call_id, ts_mono, time.time(), type_, json.dumps(payload or {})),
         )
 
+    def _turn_id(self) -> int:
+        """A turn id made here, not by the database: a call must never wait for the database to answer. Microseconds
+        since 1970, always rising, so ids stay in order and two servers cannot collide in practice."""
+        with self._lock:
+            self._last_turn_id = max(getattr(self, "_last_turn_id", 0) + 1, time.time_ns() // 1000)
+            return self._last_turn_id
+
     def add_turn(self, call_id: str, channel: str, idx: int, text: str, audio_start_ms: int | None,
                  audio_end_ms: int | None, final_at_mono: float, stt_latency_ms: float | None,
                  is_decoy: bool = False) -> int:
-        return self.insert(
-            "INSERT INTO turns(call_id, channel, idx, text, audio_start_ms, audio_end_ms, final_at_mono, "
-            "stt_latency_ms, is_decoy) VALUES (?,?,?,?,?,?,?,?,?)",
-            (call_id, channel, idx, text, audio_start_ms, audio_end_ms, final_at_mono, stt_latency_ms,
+        tid = self._turn_id()
+        self.write(
+            "INSERT INTO turns(id, call_id, channel, idx, text, audio_start_ms, audio_end_ms, final_at_mono, "
+            "stt_latency_ms, is_decoy) VALUES (?,?,?,?,?,?,?,?,?,?)",
+            (tid, call_id, channel, idx, text, audio_start_ms, audio_end_ms, final_at_mono, stt_latency_ms,
              int(is_decoy)),
         )
+        return tid
 
     def make_answer_token(self, call_id: str) -> str:
         """A short random token for Telegram buttons: it stands for one call and cannot be guessed from the call id."""

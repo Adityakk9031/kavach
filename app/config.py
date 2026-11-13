@@ -50,6 +50,7 @@ class Settings(BaseSettings):
     # --- voices ---
     kavach_warning_voice_id: str = ""  # cloned family voice (US data zone)
     persona_voice_id: str = "aai-gunnar"
+    persona_voice_female_id: str = "aai-mary"  # takeover voice for a woman who has not cloned her own voice yet
     fallback_warning_voice_id: str = "aai-peter"
 
     # --- audio ---

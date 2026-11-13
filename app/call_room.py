@@ -197,6 +197,8 @@ class CallRoom:
                 self.stt_offset_ms[role] = before_ms
                 self._offset_pending.discard(role)
             await stt.send_audio(pcm)
+        if role == "receiver" and self.phone_call:
+            return  # the phone sends the person's own voice for the transcript only: the real call carries it to the caller
         other = "receiver" if role == "caller" else "caller"
         if role == "receiver" and (self.takeover or (self.warning is not None and self.warning.active)
                                    or time.monotonic() < self.family_until):

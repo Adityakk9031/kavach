@@ -10,6 +10,7 @@ Passwords are stored as salted scrypt hashes and tokens as SHA-256 hashes, so a 
 """
 
 import hashlib
+import json
 import hmac
 import re
 import secrets
@@ -38,8 +39,12 @@ CREATE TABLE IF NOT EXISTS tg_chats (chat_id TEXT PRIMARY KEY, family_id TEXT NO
 CREATE INDEX IF NOT EXISTS tg_chats_family ON tg_chats(family_id);
 """
 EMAIL_RE = re.compile(r"[^@\s]{1,64}@[^@\s]{1,190}\.[^@\s]{2,24}")
-EDITABLE = ("name", "language", "timezone", "parent_address", "son_name", "report_hint")
+EDITABLE = ("name", "language", "timezone", "parent_address", "son_name", "report_hint", "person_gender", "person_age", "style_note",
+            "learn_style")
+GENDERS, AGE_GROUPS = ("", "man", "woman"), ("young", "middle", "senior")
 PAIR_TTL_S, LINK_TTL_S = 600, 900
+PERSON_COLUMNS = (("person_gender", "TEXT"), ("person_age", "TEXT"), ("style_note", "TEXT"), ("learn_style", "INTEGER"),
+                  ("speech_style", "TEXT"))
 
 
 class AccountError(ValueError):
@@ -58,6 +63,12 @@ class Family:
     son_voice_id: str | None = None
     papa_voice_id: str | None = None
     chat_ids: list = field(default_factory=list)
+    # Who the protected person is, so the takeover voice can pass for them (app/persona.py, app/style.py)
+    person_gender: str = ""       # "man" | "woman" | "" (not said)
+    person_age: str = "senior"    # "young" | "middle" | "senior"
+    style_note: str = ""          # the family's own words on how they talk
+    learn_style: bool = True      # may Kavach learn their manner of speaking from their calls
+    speech_style: dict | None = None  # what it has learned
 
     @property
     def pack(self) -> lang.Pack:
@@ -69,6 +80,14 @@ class Identity:
     family_id: str
     role: str  # son | parent | admin
     user_id: int | None = None
+
+
+def _json(text):
+    try:
+        value = json.loads(text) if text else None
+    except ValueError:
+        return None
+    return value if isinstance(value, dict) else None
 
 
 def _hash(value: str) -> str:
@@ -106,7 +125,10 @@ class Accounts:
         store.script(SCHEMA)
         store.add_column("users", "auth_id", "TEXT")  # the Supabase Auth user this account belongs to
         store.script("CREATE INDEX IF NOT EXISTS users_auth ON users(auth_id);")  # looked up on every sign-in
+        for column, kind in PERSON_COLUMNS:  # who the protected person is and how they talk
+            store.add_column("families", column, kind)
         self.throttle = Throttle()
+        self._seen: dict[str, tuple[Identity, float]] = {}  # token hash -> (who, remembered until)
         self.ensure_default()
 
     # ---- the original single household, kept working -------------------------------------------------------
@@ -130,14 +152,28 @@ class Accounts:
         chats = [c["chat_id"] for c in self.store.query("SELECT chat_id FROM tg_chats WHERE family_id=?", (family_id,))]
         return Family(id=r["id"], name=r["name"] or "", language=r["language"], timezone=r["timezone"], parent_address=r["parent_address"],
                       son_name=r["son_name"] or "", report_hint=r["report_hint"], son_voice_id=r["son_voice_id"],
-                      papa_voice_id=r["papa_voice_id"], chat_ids=chats)
+                      papa_voice_id=r["papa_voice_id"], chat_ids=chats,
+                      person_gender=r.get("person_gender") or "", person_age=r.get("person_age") or "senior",
+                      style_note=r.get("style_note") or "", learn_style=r.get("learn_style") is None or bool(r.get("learn_style")),
+                      speech_style=_json(r.get("speech_style")))
 
     def update_family(self, family_id: str, **fields) -> Family:
         clean = {}
         for k, v in fields.items():
             if k not in EDITABLE or v is None:
                 continue
+            if k == "learn_style":
+                clean[k] = int(bool(v))
+                if not v:
+                    clean["speech_style"] = None  # switching it off also forgets what was learned
+                continue
             v = str(v).strip()
+            if k == "person_gender" and v not in GENDERS:
+                raise AccountError("Choose a man, a woman, or leave it open.")
+            if k == "person_age" and v not in AGE_GROUPS:
+                raise AccountError("Choose an age group.")
+            if k == "style_note":
+                v = re.sub(r"\s+", " ", re.sub(r"[\d@<>{}]", "", v)).strip()[:200]
             if k == "language" and v.lower()[:2] not in lang.PACKS:
                 raise AccountError("That language is not available yet.")
             if k == "language":
@@ -159,6 +195,17 @@ class Accounts:
             cols = ", ".join(f"{k}=?" for k in clean)
             self.store._exec(f"UPDATE families SET {cols} WHERE id=?", (*clean.values(), family_id))
         return self.family(family_id)
+
+    def set_style(self, family_id: str, style: dict | None) -> None:
+        """What Kavach has learned about how the protected person talks (None forgets it)."""
+        self.store._exec("UPDATE families SET speech_style=? WHERE id=?", (json.dumps(style) if style else None, family_id))
+
+    def own_lines(self, family_id: str, limit: int = 150) -> list[str]:
+        """The protected person's own words in this family's recent real calls, oldest first."""
+        rows = self.store.query(
+            "SELECT t.text FROM turns t JOIN calls c ON c.id = t.call_id WHERE c.family_id=? AND c.mode='live' "
+            "AND t.channel='receiver' ORDER BY t.id DESC LIMIT ?", (family_id, limit))
+        return [r["text"] for r in reversed(rows)]
 
     # ---- sign-up, log-in, tokens -------------------------------------------------------------------------------
 
@@ -226,8 +273,18 @@ class Accounts:
     def _token_identity(self, key: str | None) -> Identity | None:
         if not key:
             return None
-        rows = self.store.query("SELECT family_id, role, user_id FROM tokens WHERE hash=?", (_hash(key),))
-        return Identity(rows[0]["family_id"], rows[0]["role"], rows[0]["user_id"]) if rows else None
+        h = _hash(key)
+        hit = self._seen.get(h)
+        if hit and hit[1] > time.time():
+            return hit[0]  # remembered: every request and every call would otherwise wait on the database
+        rows = self.store.query("SELECT family_id, role, user_id FROM tokens WHERE hash=?", (h,))
+        if not rows:
+            return None
+        ident = Identity(rows[0]["family_id"], rows[0]["role"], rows[0]["user_id"])
+        if len(self._seen) > 5000:
+            self._seen.clear()
+        self._seen[h] = (ident, time.time() + 600)
+        return ident
 
     # ---- pairing the parent's phone ----------------------------------------------------------------------------
 

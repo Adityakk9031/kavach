@@ -205,7 +205,8 @@ class CallWarning:
         asyncio.create_task(again())
 
     async def on_speech_started(self, room: CallRoom, channel: str, ev: dict) -> None:
-        if channel == "receiver" and room.parties.get("receiver"):
+        # On a real phone call the person's "hello?" must not cut the warning short: they hear it in the same ear
+        if channel == "receiver" and room.parties.get("receiver") and not room.phone_call:
             await self.barge_in("stt_speech_started")
 
     async def on_browser_barge_in(self, room: CallRoom, role: str, msg: dict) -> None:

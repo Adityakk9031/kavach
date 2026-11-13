@@ -16,7 +16,7 @@ import { EMPTY, Prefs, loadPrefs, savePrefs } from './src/prefs';
 import { C } from './src/ui';
 import { LangProvider } from './src/lang';
 
-type Screen = { name: 'home' } | { name: 'setup' } | { name: 'voice' } | { name: 'pro' } | { name: 'protect' | 'caller'; code: string; rehearsal: boolean; listen?: boolean; watchCall?: string };
+type Screen = { name: 'home' } | { name: 'setup' } | { name: 'voice'; person?: 'papa' | 'son' } | { name: 'pro' } | { name: 'protect' | 'caller'; code: string; rehearsal: boolean; listen?: boolean; watchCall?: string };
 
 export default function App() {
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -69,7 +69,7 @@ export default function App() {
     body = <AuthScreen onDone={(s, a) => { setSettings(s); setAccount(a); const p = { onboarded: true, role: a.role === 'son' ? 'family' as const : 'papa' as const }; setPrefs(p); savePrefs(p); home(); }}
       onAdvanced={() => setScreen({ name: 'setup' })} />;
   } else if (settings && account && screen.name === 'home' && account.role === 'son') {
-    body = <FamilyHome settings={settings} account={account} onVoice={() => setScreen({ name: 'voice' })} onSignOut={signedOut}
+    body = <FamilyHome settings={settings} account={account} onVoice={() => setScreen({ name: 'voice' })} onPersonVoice={() => setScreen({ name: 'voice', person: 'papa' })} onSignOut={signedOut}
       onPickLanguage={(code) => setAccount({ ...account, language: code })} />;
   } else if (settings && account && screen.name === 'home') {
     body = <HomeScreen role="papa" settings={settings} onSwitch={signedOut} signedIn onReset={() => {}} onProtect={(code, rehearsal, listen) => setScreen({ name: 'protect', code, rehearsal, listen })}
@@ -83,7 +83,7 @@ export default function App() {
   } else if (screen.name === 'pro') {
     body = <ProScreen onBack={home} />;
   } else if (screen.name === 'voice') {
-    body = <VoiceScreen settings={settings} person={(account ? account.role === 'son' : prefs.role === 'family') ? 'son' : 'papa'} onBack={home} />;
+    body = <VoiceScreen settings={settings} person={screen.person ?? ((account ? account.role === 'son' : prefs.role === 'family') ? 'son' : 'papa')} onBack={home} />;
   } else if (screen.name === 'protect') {
     body = <ProtectScreen key={screen.code} settings={settings} code={screen.code} rehearsal={screen.rehearsal} listen={screen.listen} watchCall={screen.watchCall} onBack={home} />;
   } else if (screen.name === 'caller') {

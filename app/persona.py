@@ -11,6 +11,7 @@ import difflib
 import logging
 import re
 import time
+from dataclasses import dataclass
 
 from app.call_room import SOURCE_PERSONA, CallRoom
 from app.config import Settings
@@ -29,45 +30,129 @@ OPENING = "Hello? Ah, sorry, I was not hearing properly. Please continue, I am l
 NUMBER_WORDS = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "oh"}
 
 
-NATURAL = """Sound like a real person on a real phone, not like a script:
+@dataclass(frozen=True)
+class Character:
+    """Who the takeover voice plays: the kind of person whose phone this is, and how they really talk. Never real facts."""
+    gender: str = ""       # "man" | "woman" | "" (not said)
+    age: str = "senior"    # "young" | "middle" | "senior"
+    note: str = ""         # the family's own words on how they talk
+    style: dict | None = None  # learned from their own side of earlier calls (app/style.py)
+
+
+AGES = {
+    "senior": {
+        "who": "a 72-year-old retired {noun}",
+        "way": "the plain, polite way of an older person",
+        "manner": "You are worried, a little hard of hearing and slow with technology, but you make sense.",
+        "react": "the way a worried older person would",
+        "pace": "Speak in the plain, slightly slow way of a 70-year-old.",
+        "excuses": "the passbook is in the cupboard, your son has your banking phone, the app wants an update, the message has not come",
+    },
+    "middle": {
+        "who": "a {noun} in your fifties with a job and a family",
+        "way": "the plain, polite way of an ordinary working adult",
+        "manner": "You are worried and flustered, careful with money and not very sure about banking apps, but you make sense.",
+        "react": "the way a worried, busy adult would",
+        "pace": "Speak plainly, like a busy adult caught at a bad moment.",
+        "excuses": "you are at work and the card is at home, the banking app wants an update, your partner looks after that account, the message has not come",
+    },
+    "young": {
+        "who": "a {noun} in your late twenties",
+        "way": "the plain, casual but polite way of a young adult",
+        "manner": "You are nervous, you have never dealt with anything like this and you are unsure about official procedures, but you make sense.",
+        "react": "the way a nervous young adult would",
+        "pace": "Speak plainly and a little quickly, like a nervous young adult.",
+        "excuses": "you are in the middle of work, the banking app has logged you out, your card is in the other room, the message has not come",
+    },
+}
+
+
+def natural(pace: str) -> str:
+    return f"""Sound like a real person on a real phone, not like a script:
 - Start with a tiny human reaction before the point: "Oh…", "Hmm?", "Ah, wait…", "Oh dear…". Vary it every time.
 - Use short pauses with "…" and commas. Now and then trail off, lose your thread, or say a word again. One filler like "uh" or "hmm"
   at most per reply.
-- Speak in the plain, slightly slow way of a 70-year-old. Contractions, small words, no fancy vocabulary, no exclamation marks.
+- {pace} Contractions, small words, no fancy vocabulary, no exclamation marks.
 - Sometimes mishear a word and ask them to say it again, but still answer what they said. Never be perfectly smooth."""
 
 
-def pack_prompt(pack) -> str:
-    """The same character in another language: Spanish or Portuguese words, a made-up older person, never real details."""
-    return f"""You are {pack.decoy_name}, a 72-year-old retired person from {pack.decoy_city}, on a phone call with a stranger who may be a scammer.
-You speak ONLY {pack.label}, in the plain, polite way of an older person. You are worried, a little hard of hearing and slow with
-technology, but you make sense.
+NATURAL = natural(AGES["senior"]["pace"])
+
+
+def _safe(text: str, limit: int) -> str:
+    """Words about how someone talks, made safe to put in a prompt: no digits, addresses or line breaks."""
+    return re.sub(r"\s+", " ", re.sub(r"[\d@<>{}]|https?://\S+", "", str(text or ""))).strip()[:limit]
+
+
+def style_lines(c: Character) -> str:
+    """The real person's manner of speaking, for the takeover voice to copy. Manner only: never facts about them."""
+    lines = []
+    if c.note:
+        lines.append(f"- Their family says this about how they talk: {_safe(c.note, 200)}")
+    st = c.style or {}
+    if st.get("summary"):
+        lines.append(f"- From their own calls: {_safe(st['summary'], 300)}")
+    phrases = [_safe(p, 40) for p in (st.get("phrases") or [])][:6]
+    phrases = [p for p in phrases if p]
+    if phrases:
+        lines.append("- Words they often use (work ONE in now and then, never several at once): " + "; ".join(f'"{p}"' for p in phrases))
+    n = st.get("words_per_turn")
+    if isinstance(n, (int, float)) and n >= 2:
+        lines.append(f"- They usually say about {min(int(n), 30)} words at a time. Stay close to that.")
+    if not lines:
+        return ""
+    return ("\nTalk the way the real owner of this phone talks, so the caller notices no change. Copy the manner only, never any "
+            "fact about them:\n" + "\n".join(lines) + "\n")
+
+
+def decoy_name(pack, c: Character) -> str:
+    from app import lang
+    return lang.FEMALE_NAMES.get(pack.code, pack.decoy_name) if c.gender == "woman" else pack.decoy_name
+
+
+def pack_prompt(pack, c: Character | None = None) -> str:
+    """The same character in any language and for any kind of person: made-up details only, never real ones."""
+    c = c or Character()
+    a = AGES.get(c.age, AGES["senior"])
+    name = decoy_name(pack, c)
+    who = a["who"].format(noun=c.gender or "person")
+    return f"""You are {name}, {who} from {pack.decoy_city}, on a phone call with a stranger who may be a scammer.
+You speak ONLY {pack.label}, in {a["way"]}. {a["manner"]}
 
 Your real goal: keep them talking and get them to state their details, one at a time.
 
 How to reply, every time:
-1. First react to what they JUST said, in a few words, the way a worried older person would. If they threaten you, sound afraid.
+1. First react to what they JUST said, in a few words, {a["react"]}. If they threaten you, sound afraid.
 2. Then ask ONE clear question for a detail you do not have yet. Never ask for two things at once.
 3. Do not ask again for something they already told you, and do not repeat an excuse you already used. Use a new reason each time:
-   the passbook is in the cupboard, your son has your banking phone, the app wants an update, the message has not come.
-{NATURAL}
-Example replies (in this style, never copied word for word):
+   {a["excuses"]}.
+{natural(a["pace"])}
+Example replies (in this style, never copied word for word; keep to your own age and manner):
 {pack.examples}
-
+{style_lines(c)}
 Hard rules:
 - Never agree that you have paid or sent anything, and never refuse in a way that ends the call. Keep them hoping.
 - Never give a code, PIN, CVV, card number, password or ID number. Say you cannot find it or it has not come.
 - Never say they are a scammer and never mention police reports or recording.
-- The ONLY facts about yourself you may mention are: name {pack.decoy_name}, city {pack.decoy_city}, bank {pack.decoy_bank}, and the phone number
+- The ONLY facts about yourself you may mention are: name {name}, city {pack.decoy_city}, bank {pack.decoy_bank}, and the phone number
   "{pack.decoy_phone}". All of these are fake. Invent nothing else about yourself.
 - Reply with one or two SHORT spoken sentences, at most thirty words. Plain words for text to speech: no digits (write numbers as words),
   no lists, no stage directions, no quotes.
 Output only what you say aloud, in {pack.label}."""
 
 
-def system_prompt(s: Settings, pack=None) -> str:
+def character_of(fam) -> Character:
+    """The character for a family's calls, from what the family chose and what Kavach learned."""
+    if fam is None:
+        return Character()
+    return Character(gender=getattr(fam, "person_gender", "") or "", age=getattr(fam, "person_age", "") or "senior",
+                     note=getattr(fam, "style_note", "") or "",
+                     style=getattr(fam, "speech_style", None) if getattr(fam, "learn_style", True) else None)
+
+
+def system_prompt(s: Settings, pack=None, character: Character | None = None) -> str:
     if pack is not None:
-        return pack_prompt(pack)
+        return pack_prompt(pack, character)
     d = s.decoy
     return f"""You are {d.name}, a 72-year-old retired clerk from {d.city}, on a phone call with a stranger who may be a scammer.
 You speak simple, polite Indian English. You are worried, a little hard of hearing and slow with technology, but you make sense.
@@ -185,7 +270,10 @@ def _words(text: str) -> list[str]:
 
 
 class CallPersona:
-    REPLY_DELAY_S = 0.7  # wait for the caller to finish: STT can split one long line into two finals
+    # The caller may not be finished: STT can split one long line into two finals. The reply is prepared DURING this
+    # wait, not after it, so the wait costs nothing unless the answer is ready sooner.
+    REPLY_DELAY_S = 0.5
+    SETTLE_S = 0.3  # a second final this soon replaces the first before any model call is spent on it
     OPENING_WAIT_S = 8.0
     # On a real phone call the persona's voice goes into the call, and some phones capture it again with the caller's side.
     # Speech this soon after the persona stops is its own echo, not the scammer talking over it.
@@ -196,6 +284,7 @@ class CallPersona:
     def __init__(self, persona: Persona, room: CallRoom):
         self.persona, self.room = persona, room
         self.s = persona.settings
+        self.character = character_of(room.family)
         self.active = False
         self.history: list[dict] = []
         self.session: TtsSession | None = None
@@ -240,6 +329,24 @@ class CallPersona:
         if not any(echo):
             return text
         return " ".join(kept) if len(kept) >= 3 else ""
+
+    async def _session(self) -> TtsSession:
+        """The voice the takeover speaks in: the person's own cloned voice, else a library voice that fits them."""
+        fam = self.room.family
+        if fam is not None and fam.id != "default" and fam.papa_voice_id:
+            voice = fam.papa_voice_id
+        elif self.character.gender == "woman":
+            voice = self.s.persona_voice_female_id
+        else:
+            voice = self.s.persona_voice_id
+        return await self.persona.pool.get(voice, "persona", fam.pack.tts if fam is not None else None)
+
+    async def prewarm(self, *_args) -> None:
+        """Open the takeover voice as soon as a call is flagged, so the first words after "hand over" do not wait for it."""
+        try:
+            await self._session()
+        except Exception as e:  # only a head start: a real takeover tries again and reports properly
+            log.info("takeover voice not pre-warmed: %s", e)
 
     async def close(self) -> None:
         self.active = False
@@ -327,18 +434,18 @@ class CallPersona:
         room = self.room
         pack = room.family.pack if room.family is not None else None
         try:
+            t_start = time.monotonic()
             if not opening:
-                await asyncio.sleep(self.REPLY_DELAY_S)
+                await asyncio.sleep(self.SETTLE_S)
             elif wait_s:
                 await asyncio.sleep(wait_s)
-            t_start = time.monotonic()
             llm_ms = None
             if opening:
                 text, replaced = (pack.opening if pack else OPENING), None
             else:
                 try:
                     items = room.evidence.valid_items() if room.evidence is not None else []
-                    prompt = system_prompt(self.s, pack) + "\n\nNotes for this moment: " + progress_note(items)
+                    prompt = system_prompt(self.s, pack, self.character) + "\n\nNotes for this moment: " + progress_note(items)
                     unspelled = next((i["value"] for i in items if i["type"] == "upi_id" and i["value"] not in self.spelled), None)
                     if unspelled:
                         self.spelled.add(unspelled)
@@ -348,6 +455,9 @@ class CallPersona:
                         self.s.persona_model, msgs, max_tokens=120, temperature=0.7, timeout=6,
                         lane="persona", max_wait=3.0)  # never go silent waiting for budget: fall back to a stall
                     text, replaced = guard(raw, pack.decoy_phone if pack else self.s.decoy.phone, pack)
+                    left = self.REPLY_DELAY_S - (time.monotonic() - t_start)
+                    if left > 0:
+                        await asyncio.sleep(left)
                 except LLMError as e:
                     log.warning("persona LLM failed: %s", e)
                     stalls = pack.stalls if pack else STALLS
@@ -380,9 +490,7 @@ class CallPersona:
     async def _speak(self, text: str, t_start: float, turn_end_at: float | None, llm_ms: int | None) -> None:
         room = self.room
         try:
-            fam = room.family
-            voice = fam.papa_voice_id if fam is not None and fam.id != "default" and fam.papa_voice_id else self.s.persona_voice_id
-            session = await self.persona.pool.get(voice, "persona", fam.pack.tts if fam is not None else None)
+            session = await self._session()
         except (TtsError, OSError) as e:
             room.log_event("persona_error", {"error": str(e)})
             log.warning("TAKEOVER voice failed call=%s error=%s", room.call_id, e)

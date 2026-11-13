@@ -101,7 +101,7 @@ class RateLimiter:
 # 20k tokens/min on qwen, 30 req/min and 200k tokens/min on gemma). Each model's budget is split into lanes so the
 # detector (the call path) cannot be starved by persona/evidence calls during a takeover.
 MODEL_LIMITS = {"qwen3.5-4b-32k-fast": {"detector": (12, 8000), "persona": (10, 7000), "other": (6, 3000)},
-                "gemma-4-31b": {"detector": (8, 50000), "persona": (8, 50000), "other": (12, 80000)}}
+                "gemma-4-31b": {"detector": (8, 50000), "persona": (12, 70000), "other": (8, 60000)}}
 DEFAULT_LIMITS = {"detector": (8, 5000), "persona": (8, 5000), "other": (8, 5000)}
 
 

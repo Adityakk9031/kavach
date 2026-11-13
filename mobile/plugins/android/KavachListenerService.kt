@@ -587,6 +587,41 @@ class KavachListenerService : AccessibilityService() {
         return if (heard) "HEARD" else "${loudest * 100 / 32767}%"
     }
 
+    @Volatile private var ownVoiceOn = false
+
+    /** The person's own side of the call, sent only when the family lets Kavach learn how they speak (the server asks
+     *  for it). Only while Kavach listens to the call directly: on speaker the microphone would hear the caller too.
+     *  Silence is sent whenever the microphone could hear anything but the person: Kavach speaking, or the loudspeaker. */
+    private fun sendOwnVoice() {
+        if (ownVoiceOn) return
+        ownVoiceOn = true
+        thread {
+            try {
+                while (recording && shellOut == null) Thread.sleep(500)  // direct listening has not started (yet)
+                if (!recording) return@thread
+                val min = AudioRecord.getMinBufferSize(16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
+                val rec = try {
+                    AudioRecord(MediaRecorder.AudioSource.VOICE_RECOGNITION, 16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, maxOf(min, 6400))
+                } catch (_: Exception) { return@thread }
+                if (rec.state != AudioRecord.STATE_INITIALIZED) { rec.release(); return@thread }
+                try { rec.startRecording() } catch (_: Exception) { rec.release(); return@thread }
+                report("own_voice", "state", "on")
+                val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                val buf = ByteArray(3200)
+                while (recording && shellOut != null) {
+                    val n = try { rec.read(buf, 0, buf.size) } catch (_: Exception) { -1 }
+                    if (n < 0) break
+                    if (n == 0) continue
+                    val quiet = takenOver || notePlaying || audio.isSpeakerphoneOn || System.currentTimeMillis() < playingUntil + 400
+                    receiver?.send((if (quiet) ByteArray(n) else buf.copyOf(n)).toByteString())
+                }
+                try { rec.stop() } catch (_: Exception) {}
+                rec.release()
+            } catch (_: Exception) {
+            } finally { ownVoiceOn = false }
+        }
+    }
+
     private fun stopCall() {
         inCall = false
         recording = false
@@ -631,6 +666,7 @@ class KavachListenerService : AccessibilityService() {
             if (!events) return
             val ev = JSONObject(text)
             when (ev.optString("type")) {
+                "own_voice" -> if (ev.optBoolean("on")) sendOwnVoice()
                 "detection" -> risk = ev.optDouble("risk_cum", ev.optDouble("risk", risk.toDouble())).toInt()
                 "transcript" -> if (ev.optBoolean("final")) showWords(ev.optString("text"))
                 "flush_playback" -> {

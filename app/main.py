@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Red
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
 
-from app import lang
+from app import lang, style
 from app.accounts import DEFAULT_FAMILY, AccountError, Accounts, Identity
 from app.call_room import ROLES, Peer, RoomRegistry
 from app.config import get_settings
@@ -64,12 +64,40 @@ def attach_pipeline(room) -> None:
     if settings.assemblyai_api_key:
         room.pipeline = CallPipeline(room, detector)
         warner.attach(room, room.pipeline)  # with no cloned voice yet it warns in a library voice, and says so
-        persona.attach(room)
-        decoys = tuple({settings.decoy.name} | {p.decoy_name for p in lang.PACKS.values()})
+        cp = persona.attach(room)
+        room.pipeline.on_trigger.append(cp.prewarm)  # a flagged call is the one that gets handed over
+        decoys = tuple({settings.decoy.name} | {p.decoy_name for p in lang.PACKS.values()} | set(lang.FEMALE_NAMES.values()))
         room.evidence = EvidenceCollector(room, llm, settings.persona_model, room.pipeline, decoys)
         room.alerts = CallAlerts(alerter, room, room.pipeline, room.persona, settings.max_alerts_per_call)
 
         room.finalize_hooks.append(make_finalize(room, store, settings))
+        room.on_end_hooks.append(lambda r=room: learn_style_after(r))
+
+
+_style_tasks: set = set()
+
+
+async def learn_style_after(room) -> None:
+    """After a real call in which the protected person spoke: update what Kavach knows about how they talk. Runs on its
+    own, after the call, so it never slows one down."""
+    fam = room.family
+    spoke = room.pipeline is not None and any(h["channel"] == "receiver" for h in room.pipeline.history)
+    if fam is None or fam.id == DEFAULT_FAMILY or not fam.learn_style or room.mode != "live" or not spoke:
+        return
+
+    async def run():
+        try:
+            lines = await asyncio.to_thread(accounts.own_lines, fam.id)
+            card = await style.learn(llm, settings.script_gen_model, lines, fam.pack.label)
+            if card:
+                await asyncio.to_thread(accounts.set_style, fam.id, card)
+                logging.getLogger("kavach.style").info("speaking style updated family=%s turns=%s", fam.id, card["turns"])
+        except Exception:
+            logging.getLogger("kavach.style").exception("could not update the speaking style")
+
+    task = asyncio.create_task(run())
+    _style_tasks.add(task)
+    task.add_done_callback(_style_tasks.discard)
 
 
 rooms = RoomRegistry(stt_factory, store, settings.sample_rate, on_new_room=attach_pipeline)
@@ -229,11 +257,27 @@ class FamilyBody(BaseModel):
     parent_address: str | None = None
     son_name: str | None = None
     report_hint: str | None = None
+    person_gender: str | None = None
+    person_age: str | None = None
+    style_note: str | None = None
+    learn_style: bool | None = None
 
 
 def family_json(fam) -> dict:
+    st = fam.speech_style or {}
     return {"id": fam.id, "language": fam.language, "timezone": fam.timezone, "parent_address": fam.parent_address,
-            "son_name": fam.son_name, "report_hint": fam.report_hint, "telegram_linked": bool(fam.chat_ids)}
+            "son_name": fam.son_name, "report_hint": fam.report_hint, "telegram_linked": bool(fam.chat_ids),
+            "person_gender": fam.person_gender, "person_age": fam.person_age, "style_note": fam.style_note,
+            "learn_style": fam.learn_style,
+            "learned": {"turns": st.get("turns", 0), "summary": st.get("summary", ""), "phrases": st.get("phrases", [])}}
+
+
+@app.delete("/api/family/style")
+def forget_style(request: Request) -> dict:
+    """Forget what Kavach has learned about how the protected person talks."""
+    ident = need_son(request)
+    accounts.set_style(ident.family_id, None)
+    return family_json(accounts.family(ident.family_id))
 
 
 @app.get("/api/languages")
@@ -621,6 +665,10 @@ async def call_socket(ws: WebSocket, call_id: str, role: str, caller_number: str
         return
     room = rooms.get(call_id, family_of(ident))
     await room.join(role, ws, caller_number=caller_number, mode=mode)
+    fam = room.family
+    if role == "receiver" and room.phone_call and fam is not None and fam.id != DEFAULT_FAMILY and fam.learn_style:
+        # The family lets Kavach learn how this person speaks: ask the phone for their own side of the call too
+        await room.send_event("receiver", {"type": "own_voice", "on": True})
     try:
         while True:
             msg = await ws.receive()

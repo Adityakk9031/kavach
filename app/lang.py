@@ -30,6 +30,10 @@ class Pack:
     t: dict = field(default_factory=dict)
 
 
+# The made-up name the takeover voice uses when the protected person is a woman (the packs hold the man's name)
+FEMALE_NAMES = {"en": "Helen Peterson", "es": "Carmen Ortega", "pt": "Maria Silva", "de": "Helga Krüger",
+                "fr": "Bernadette Lefèvre", "it": "Giuseppina Ferrari"}
+
 NUM_EN = frozenset("zero one two three four five six seven eight nine oh".split())
 NUM_ES = frozenset("cero uno una dos tres cuatro cinco seis siete ocho nueve".split())
 NUM_PT = frozenset("zero um uma dois duas três tres quatro cinco seis sete oito nove".split())

@@ -9,7 +9,7 @@ import { NONE, ProStatus, readPro } from './pro';
 import { useT } from './lang';
 import type { Role } from './prefs';
 
-const P = PermissionsAndroid.PERMISSIONS;
+const P = PermissionsAndroid?.PERMISSIONS ?? ({} as typeof PermissionsAndroid.PERMISSIONS); // undefined in a web browser
 const ANDROID = Platform.OS === 'android';
 const rand = () => Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('');
 

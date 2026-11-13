@@ -21,6 +21,11 @@ LATER = [
     "CREATE INDEX IF NOT EXISTS calls_family ON calls(family_id)",
     "ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_id TEXT",
     "CREATE INDEX IF NOT EXISTS users_auth ON users(auth_id)",
+    # who the protected person is and how they talk, for the takeover voice
+    *[f"ALTER TABLE families ADD COLUMN IF NOT EXISTS {c} {store._pg(k)}" for c, k in accounts.PERSON_COLUMNS],
+    # turn ids are made by the server (microseconds), too big for a 4-byte column
+    "ALTER TABLE detections ALTER COLUMN turn_id TYPE BIGINT",
+    "ALTER TABLE evidence ALTER COLUMN turn_id TYPE BIGINT",
 ]
 
 
